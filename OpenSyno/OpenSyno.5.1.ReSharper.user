@@ -35,7 +35,7 @@
       <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="2428" fromTop="10" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="12746" fromTop="17" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PlaybackService.cs" caret="6108" fromTop="18" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:AlbumViewModel.cs" caret="188" fromTop="8" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:AlbumViewModel.cs" caret="210" fromTop="10" />
     </RecentFiles>
     <RecentEdits>
       <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:IAudioStationSession.cs" caret="1420" fromTop="11" />
@@ -67,7 +67,7 @@
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="8079" fromTop="18" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="7746" fromTop="8" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PlaybackService.cs" caret="6108" fromTop="18" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:AlbumViewModel.cs" caret="188" fromTop="8" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:AlbumViewModel.cs" caret="210" fromTop="10" />
     </RecentEdits>
   </RecentFiles>
   <NAntValidationSettings>

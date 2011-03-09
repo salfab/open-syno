@@ -8,7 +8,7 @@ namespace OpenSyno
         {
             this.Album = album; 
         }
-         
+          
         public SynoItem Album { get; set; }
     }
 }
