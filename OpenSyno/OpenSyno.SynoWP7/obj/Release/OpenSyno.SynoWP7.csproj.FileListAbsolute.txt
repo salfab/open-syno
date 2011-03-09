@@ -1,0 +1,5 @@
+C:\Users\Salfab\Documents\Visual Studio 2010\Projects\WP7\OpenSyno\OpenSyno.SynoWP7\Bin\Release\OpenSyno.SynoWP7.dll
+C:\Users\Salfab\Documents\Visual Studio 2010\Projects\WP7\OpenSyno\OpenSyno.SynoWP7\Bin\Release\OpenSyno.SynoWP7.pdb
+C:\Users\Salfab\Documents\Visual Studio 2010\Projects\WP7\OpenSyno\OpenSyno.SynoWP7\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Salfab\Documents\Visual Studio 2010\Projects\WP7\OpenSyno\OpenSyno.SynoWP7\obj\Release\OpenSyno.SynoWP7.dll
+C:\Users\Salfab\Documents\Visual Studio 2010\Projects\WP7\OpenSyno\OpenSyno.SynoWP7\obj\Release\OpenSyno.SynoWP7.pdb

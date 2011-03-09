@@ -1,0 +1,32 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="OpenSyno.ArtistPanoramaView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:OpenSyno="clr-namespace:OpenSyno" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="False">
+
+    <!--LayoutRoot contains the root grid where all other page content is placed-->
+    <phone:PhoneApplicationPage.Resources>
+        
+    </phone:PhoneApplicationPage.Resources>
+    <Grid x:Name="LayoutRoot">
+
+        
+        <controls:Panorama  Title="{Binding ArtistName, Mode=TwoWay}" ItemsSource="{Binding PanoramaItems, Mode=TwoWay}" ItemTemplate="{StaticResource PanoramaItemTemplate}" HeaderTemplate="{StaticResource PanoramaHeaderTemplate}" >            
+            <controls:Panorama.Background>
+                <ImageBrush ImageSource="Untitled.png" Opacity=".5" />
+            </controls:Panorama.Background>
+        </controls:Panorama>
+    </Grid>
+
+    <!--Panorama-based applications should not show an ApplicationBar-->
+
+</phone:PhoneApplicationPage>

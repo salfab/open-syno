@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5002B837-907D-4DEF-93BF-8D8A54BE4CE3}</ProjectGuid>
+    <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenSyno</RootNamespace>
+    <AssemblyName>OpenSyno</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <TargetFrameworkProfile>WindowsPhone</TargetFrameworkProfile>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightApplication>true</SilverlightApplication>
+    <SupportedCultures>
+    </SupportedCultures>
+    <XapOutputs>true</XapOutputs>
+    <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
+    <XapFilename>OpenSyno.xap</XapFilename>
+    <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
+    <SilverlightAppEntry>OpenSyno.App</SilverlightAppEntry>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.20901.0</ExpressionBlendVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MediaParsers.Phone">
+      <HintPath>..\3rd party\ManagedMediaHelpers\MediaParsers.Phone.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Phone" />
+    <Reference Include="Microsoft.Phone.Controls" />
+    <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL">
+      <HintPath>..\3rd party\SLToolkit\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Phone.Interop" />
+    <Reference Include="Microsoft.Practices.Prism">
+      <HintPath>..\3rd party\prism4\Microsoft.Practices.Prism.dll</HintPath>
+    </Reference>
+    <Reference Include="Mp3MediaStreamSource.Phone">
+      <HintPath>..\3rd party\ManagedMediaHelpers\Mp3MediaStreamSource.Phone.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AlbumViewModel.cs" />
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ArtistPanoramaAlbumDetailItem.xaml.cs" />
+    <Compile Include="ArtistPanoramaAlbumsListItem.xaml.cs" />
+    <Compile Include="ArtistPanoramaItem.xaml.cs" />
+    <Compile Include="ArtistPanoramaKind.cs" />
+    <Compile Include="ArtistPanoramaView.xaml.cs">
+      <DependentUpon>ArtistPanoramaView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ArtistPanoramaViewModelFactory.xaml.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\ItemsCountToBrushValueConverter.cs" />
+    <Compile Include="Converters\TimeSpanToTimeCodeConverter.cs" />
+    <Compile Include="Converters\UrlToBitmapImageConverter.cs" />
+    <Compile Include="Helpers\AppBarBindingsHelper.cs" />
+    <Compile Include="IOpenSynoSettings.cs" />
+    <Compile Include="LoginView.xaml.cs">
+      <DependentUpon>LoginView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OpenSynoSettings.xaml.cs" />
+    <Compile Include="Services\MediaEndedEventArgs.cs" />
+    <Compile Include="ViewModels\SearchResultsViewModelFactory.xaml.cs" />
+    <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
+    <Compile Include="ViewModels\SearchResultsViewModel.cs" />
+    <Compile Include="ViewModels\SearchViewModel.xaml.cs" />
+    <Compile Include="ViewModels\SearchResultItemViewModel.cs" />
+    <Compile Include="SelectedArtistChangedAggregatedEvent.cs" />
+    <Compile Include="Services\AudioRenderingService.cs" />
+    <Compile Include="Services\IAudioRenderingService.cs" />
+    <Compile Include="Services\IPlaybackService.cs" />
+    <Compile Include="Services\LocalAudioRenderingService.cs" />
+    <Compile Include="Services\PlaybackContinuity.cs" />
+    <Compile Include="Services\PlaybackService.cs" />
+    <Compile Include="Services\TrackCurrentPositionChangedDelegate.cs" />
+    <Compile Include="Services\TrackCurrentPositionChangedEventArgs.cs" />
+    <Compile Include="TiltEffect.cs" />
+    <Compile Include="ViewModels\TrackViewModel.cs" />
+    <Compile Include="ViewModels\ArtistPanoramaViewModel.cs" />
+    <Compile Include="Behaviors\ArtistPanoramaItemKindToStyleConverter.cs" />
+    <Compile Include="Behaviors\ButtonClickToCommandBehavior.cs" />
+    <Compile Include="Behaviors\EnterKeyUpToCommandBehavior.cs" />
+    <Compile Include="Converters\BindingDebuggerConverter.cs" />
+    <Compile Include="Group.cs" />
+    <Compile Include="IoC.xaml.cs" />
+    <Compile Include="PlayListOperation.cs" />
+    <Compile Include="PlayListOperationAggregatedEvent.cs" />
+    <Compile Include="PlayQueueView.xaml.cs">
+      <DependentUpon>PlayQueueView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\PlayQueueViewModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchResultsView.xaml.cs">
+      <DependentUpon>SearchResultsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SearchView.xaml.cs">
+      <DependentUpon>SearchView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Services\IPageSwitchingService.cs" />
+    <Compile Include="Services\PageSwitchingService.cs" />
+    <Compile Include="Services\SearchResultsRetrievedAggregatedEvent.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="LoginViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\AppManifest.xml" />
+    <None Include="Properties\WMAppManifest.xml">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ApplicationIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Untitled.png" />
+    <Resource Include="11-18-04.jpg" />
+    <Resource Include="appbar.basecircle.rest.png" />
+    <Resource Include="appbar.folder.rest.png" />
+    <Resource Include="PanoramaBackground.png" />
+    <Resource Include="SampleData\11-18-36.jpg" />
+    <Content Include="SplashScreenImage.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenSyno.SynoWP7\OpenSyno.SynoWP7.csproj">
+      <Project>{16DA973A-2885-4E6E-89CD-5CA3825B3CA6}</Project>
+      <Name>OpenSyno.SynoWP7</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="ArtistPanoramaStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ArtistPanoramaView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoginView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="LongListSelectors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="OpenSynoStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PlayQueueStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PlayQueueView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchResultsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions />
+</Project>

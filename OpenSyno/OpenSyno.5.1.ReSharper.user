@@ -1,0 +1,766 @@
+<Configuration>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="livetemplates.csharp.usevar">True</setting>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Converters/f:TimeSpanToTimeCodeConverter.cs" caret="435" fromTop="13" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Converters/f:BooleanToVisibilityConverter.cs" caret="406" fromTop="9" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:App.xaml" caret="1007" fromTop="1" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PageSwitchingService.cs" caret="1184" fromTop="7" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:ISearchService.cs" caret="1030" fromTop="7" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:LocalAudioRenderingService.cs" caret="106" fromTop="3" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:IAudioRenderingService.cs" caret="53" fromTop="1" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:ViewModelBase.cs" caret="359" fromTop="10" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:TrackViewModel.cs" caret="259" fromTop="0" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:PlayQueueView.xaml" caret="4874" fromTop="7" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:MockSearchService.cs" caret="3500" fromTop="7" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Converters/f:UrlToBitmapImageConverter.cs" caret="1076" fromTop="7" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:TiltEffect.cs" caret="11507" fromTop="6" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="2054" fromTop="6" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:IPlaybackService.cs" caret="1613" fromTop="8" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:SearchView.xaml" caret="423" fromTop="1" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:App.xaml.cs" caret="6752" fromTop="23" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SynologyJsonDeserializationHelper.cs" caret="958" fromTop="8" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:SearchViewModel.xaml.cs" caret="2163" fromTop="17" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SearchService.cs" caret="806" fromTop="12" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:IAudioStationSession.cs" caret="727" fromTop="14" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:FileDownloadResponseReceivedUserState.cs" caret="10" fromTop="0" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="3035" fromTop="16" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="2428" fromTop="10" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="12746" fromTop="17" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PlaybackService.cs" caret="6108" fromTop="18" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SearchService.cs" caret="1086" fromTop="18" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:IAudioStationSession.cs" caret="1420" fromTop="11" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="1670" fromTop="15" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="5482" fromTop="6" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="5388" fromTop="2" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="13274" fromTop="16" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="13277" fromTop="20" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="12732" fromTop="11" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="11684" fromTop="13" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:IAudioStationSession.cs" caret="471" fromTop="12" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="877" fromTop="8" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="771" fromTop="8" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="2704" fromTop="23" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:FileDownloadResponseReceivedUserState.cs" caret="468" fromTop="13" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:FileDownloadResponseReceivedUserState.cs" caret="10" fromTop="0" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="2343" fromTop="20" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="3034" fromTop="16" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="2674" fromTop="16" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="11518" fromTop="16" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="11960" fromTop="15" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="3930" fromTop="15" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="4514" fromTop="28" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="6991" fromTop="16" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="5103" fromTop="6" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="9578" fromTop="27" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="6004" fromTop="26" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="14290" fromTop="30" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="8079" fromTop="18" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="7746" fromTop="8" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PlaybackService.cs" caret="6108" fromTop="18" />
+    </RecentEdits>
+  </RecentFiles>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerNUnit>
+    <NUnitInstallDir IsNull="False">
+    </NUnitInstallDir>
+    <UseAddins>Never</UseAddins>
+  </UnitTestRunnerNUnit>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Default">
+      <Item value="string" priority="12" />
+      <Item value="select" priority="2" />
+      <Item value="new" priority="52" />
+      <Item value="PageSwitchingService`0" priority="0" />
+      <Item value="a" priority="2" />
+      <Item value="Artists" priority="0" />
+      <Item value="artists" priority="2" />
+      <Item value="tempArtists" priority="2" />
+      <Item value="o" priority="8" />
+      <Item value="StartsWith" priority="0" />
+      <Item value="SynoTrack`0" priority="12" />
+      <Item value="Group" priority="1" />
+      <Item value="List&lt;Group&lt;SynoTrack&gt;&gt;" priority="0" />
+      <Item value="foreach" priority="3" />
+      <Item value="c" priority="1" />
+      <Item value="char" priority="3" />
+      <Item value="for" priority="0" />
+      <Item value="if" priority="20" />
+      <Item value="items" priority="2" />
+      <Item value="OrdinalIgnoreCase" priority="0" />
+      <Item value="titleChar" priority="1" />
+      <Item value="Group&lt;T&gt;" priority="0" />
+      <Item value="List" priority="7" />
+      <Item value="Title" priority="2" />
+      <Item value="ItemPid" priority="3" />
+      <Item value="SynoItem`0" priority="10" />
+      <Item value="IsContainer" priority="0" />
+      <Item value="true" priority="2" />
+      <Item value="false" priority="2" />
+      <Item value="ItemID" priority="0" />
+      <Item value="Sequence" priority="0" />
+      <Item value="Support" priority="0" />
+      <Item value="T`0" priority="1" />
+      <Item value="null" priority="9" />
+      <Item value="Button`0" priority="0" />
+      <Item value="GetCommand`0" priority="0" />
+      <Item value="SearchResultsRetrievedAggregatedEvent`0" priority="1" />
+      <Item value="set" priority="1" />
+      <Item value="SearchResultItem`0" priority="0" />
+      <Item value="SearchResultItemViewModel`0" priority="4" />
+      <Item value="SearchResultItemViewModel" priority="0" />
+      <Item value="ItemInfo" priority="3" />
+      <Item value="result" priority="0" />
+      <Item value="IoC`0" priority="5" />
+      <Item value="prop" priority="16" />
+      <Item value="ctor" priority="4" />
+      <Item value="PanoramaItems" priority="1" />
+      <Item value="List&lt;ArtistPanoramaItem&gt;" priority="0" />
+      <Item value="var" priority="18" />
+      <Item value="ArtistPanoramaItem`0" priority="1" />
+      <Item value="albumsList" priority="1" />
+      <Item value="_searchService" priority="4" />
+      <Item value="artist" priority="5" />
+      <Item value="int" priority="9" />
+      <Item value="ArtistPanoramaKind" priority="0" />
+      <Item value="this" priority="19" />
+      <Item value="panoramaKind" priority="0" />
+      <Item value="ArtistPanoramaItemKind`0" priority="4" />
+      <Item value="_eventAggregator" priority="2" />
+      <Item value="CompositePresentationEvent" priority="2" />
+      <Item value="obj" priority="0" />
+      <Item value="IEventAggregator`0" priority="0" />
+      <Item value="payload" priority="0" />
+      <Item value="SelectedArtistChangedAggregatedEvent" priority="0" />
+      <Item value="Artist" priority="0" />
+      <Item value="IPageSwitchingService`0" priority="0" />
+      <Item value="_navigationService" priority="2" />
+      <Item value="Uri" priority="6" />
+      <Item value="UriKind`0" priority="0" />
+      <Item value="ArtistPanoramaViewModel`0" priority="1" />
+      <Item value="SearchViewModel`0" priority="0" />
+      <Item value="SearchService" priority="0" />
+      <Item value="ISearchService`0" priority="1" />
+      <Item value="searchService" priority="0" />
+      <Item value="eventAggregator" priority="3" />
+      <Item value="pageSwitchingService" priority="3" />
+      <Item value="PageSwitchingService" priority="0" />
+      <Item value="NavigationService" priority="0" />
+      <Item value="SearchResultsPropertyName" priority="0" />
+      <Item value="SearchResults" priority="0" />
+      <Item value="SearchResultsViewModelFactory`0" priority="0" />
+      <Item value="return" priority="9" />
+      <Item value="lastSearchResults" priority="0" />
+      <Item value="PropertyChangedCallback`0" priority="0" />
+      <Item value="album" priority="5" />
+      <Item value="public" priority="8" />
+      <Item value="Tracks" priority="0" />
+      <Item value="List&lt;SynoTrack&gt;" priority="0" />
+      <Item value="DataTemplate`0" priority="1" />
+      <Item value="ArtistPanoramaItemKindToStyleConverter`0" priority="1" />
+      <Item value="ContentControl`0" priority="1" />
+      <Item value="d" priority="4" />
+      <Item value="as" priority="1" />
+      <Item value="_attachedObject" priority="2" />
+      <Item value="ContentPresenter`0" priority="0" />
+      <Item value="style" priority="3" />
+      <Item value="XamlReader`0" priority="0" />
+      <Item value="template" priority="0" />
+      <Item value="ResourceDictionary`0" priority="1" />
+      <Item value="e" priority="20" />
+      <Item value="switch" priority="0" />
+      <Item value="Style`0" priority="1" />
+      <Item value="FrameworkElement`0" priority="0" />
+      <Item value="GetTracksStyle`0" priority="0" />
+      <Item value="styleTarget" priority="0" />
+      <Item value="PanoramaItem`0" priority="0" />
+      <Item value="albumsListPanel" priority="0" />
+      <Item value="AlbumDetail" priority="0" />
+      <Item value="albumDetail" priority="0" />
+      <Item value="AlbumsList" priority="0" />
+      <Item value="Albums" priority="1" />
+      <Item value="AlbumViewModel`0" priority="0" />
+      <Item value="ViewModelBase`0" priority="0" />
+      <Item value="albumViewModel" priority="0" />
+      <Item value="track" priority="4" />
+      <Item value="value" priority="1" />
+      <Item value="Header" priority="2" />
+      <Item value="albums" priority="2" />
+      <Item value="firstAlbum" priority="0" />
+      <Item value="NavigationService`0" priority="0" />
+      <Item value="ArtistPanoramaViewModel" priority="0" />
+      <Item value="navigationService" priority="0" />
+      <Item value="DataContext" priority="1" />
+      <Item value="factory" priority="0" />
+      <Item value="_pageSwitchingService" priority="1" />
+      <Item value="viewModel" priority="3" />
+      <Item value="else" priority="2" />
+      <Item value="LoadArtistInfo`0" priority="0" />
+      <Item value="SelectedArtistChangedAggregatedEvent`0" priority="0" />
+      <Item value="_defaultArtist" priority="0" />
+      <Item value="override" priority="0" />
+      <Item value="PlayQueueItems" priority="2" />
+      <Item value="trackViewModel" priority="0" />
+      <Item value="ObservableCollection&lt;TrackViewModel&gt;" priority="0" />
+      <Item value="enum" priority="0" />
+      <Item value="bool" priority="2" />
+      <Item value="void" priority="1" />
+      <Item value="object" priority="4" />
+      <Item value="changedEventArgs" priority="0" />
+      <Item value="eventArgs" priority="0" />
+      <Item value="double" priority="5" />
+      <Item value="event" priority="4" />
+      <Item value="DownloadFileState`0" priority="0" />
+      <Item value="IPlaybackService`0" priority="0" />
+      <Item value="_playbackService" priority="4" />
+      <Item value="IEnumerable" priority="0" />
+      <Item value="PlayqueueItems" priority="4" />
+      <Item value="OnPropertyChanged`0" priority="2" />
+      <Item value="ActiveTrack" priority="0" />
+      <Item value="TrackViewModel`0" priority="3" />
+      <Item value="PlaybackService" priority="0" />
+      <Item value="AudioRenderingService" priority="0" />
+      <Item value="insertPosition" priority="1" />
+      <Item value="synoTrack" priority="10" />
+      <Item value="_audioRenderingService" priority="5" />
+      <Item value="Stream`0" priority="3" />
+      <Item value="Buffer`0" priority="1" />
+      <Item value="trackStream" priority="4" />
+      <Item value="DownloadToTemporaryFile`0" priority="1" />
+      <Item value="WebClient" priority="0" />
+      <Item value="client" priority="8" />
+      <Item value="Absolute" priority="2" />
+      <Item value="WebClient`0" priority="2" />
+      <Item value="uri" priority="1" />
+      <Item value="callback" priority="7" />
+      <Item value="IAudioRenderingService`0" priority="0" />
+      <Item value="IAudioStationSession`0" priority="0" />
+      <Item value="trackToPlay" priority="3" />
+      <Item value="RemoteFileMockAudioStationSession`0" priority="0" />
+      <Item value="HttpRequestHeader`0" priority="0" />
+      <Item value="contentLength" priority="0" />
+      <Item value="targetStream" priority="10" />
+      <Item value="File`0" priority="1" />
+      <Item value="Action`0" priority="4" />
+      <Item value="virtual" priority="0" />
+      <Item value="BufferPlayableHeuristicPredicate" priority="2" />
+      <Item value="long" priority="4" />
+      <Item value="loadedBytes" priority="0" />
+      <Item value="bufferReachedPlayableState" priority="1" />
+      <Item value="webClient" priority="0" />
+      <Item value="EndOfStreamException`0" priority="0" />
+      <Item value="HttpWebRequest`0" priority="3" />
+      <Item value="HttpWebRequest" priority="0" />
+      <Item value="request" priority="7" />
+      <Item value="ar" priority="5" />
+      <Item value="StartSearchCommand" priority="0" />
+      <Item value="SearchResultsRetrievedAggregatedEvent" priority="0" />
+      <Item value="try" priority="0" />
+      <Item value="Thread`0" priority="1" />
+      <Item value="ThreadStart" priority="0" />
+      <Item value="t" priority="0" />
+      <Item value="SendOrPostCallback`0" priority="0" />
+      <Item value="WaitCallback`0" priority="0" />
+      <Item value="_mre" priority="1" />
+      <Item value="ManualResetEvent" priority="0" />
+      <Item value="me" priority="2" />
+      <Item value="IsolatedStorageFile`0" priority="1" />
+      <Item value="Open" priority="1" />
+      <Item value="Read" priority="1" />
+      <Item value="RelativeOrAbsolute" priority="0" />
+      <Item value="App`0" priority="1" />
+      <Item value="sourceStream" priority="3" />
+      <Item value="tempFileStream" priority="1" />
+      <Item value="filePath" priority="3" />
+      <Item value="args" priority="2" />
+      <Item value="tempFilePath" priority="0" />
+      <Item value="private" priority="2" />
+      <Item value="_mediaElement" priority="10" />
+      <Item value="IsolatedStorageFileStream`0" priority="0" />
+      <Item value="using" priority="0" />
+      <Item value="MediaElement`0" priority="5" />
+      <Item value="mediaElement_DownloadProgressChanged`0" priority="0" />
+      <Item value="Play`0" priority="0" />
+      <Item value="EventHandler" priority="3" />
+      <Item value="MediaEnded" priority="0" />
+      <Item value="MediaEndedEventArgs" priority="0" />
+      <Item value="Track" priority="0" />
+      <Item value="_currentTrack" priority="1" />
+      <Item value="audioRenderingService" priority="0" />
+      <Item value="PlayTrackInQueue`0" priority="0" />
+      <Item value="Guid`0" priority="0" />
+      <Item value="IDisposable`0" priority="0" />
+      <Item value="IFormatProvider`0" priority="1" />
+      <Item value="openSynoSettings" priority="4" />
+      <Item value="IsolatedStorageSettings`0" priority="1" />
+      <Item value="OpenSynoSettings" priority="0" />
+      <Item value="IOpenSynoSettings`0" priority="0" />
+      <Item value="UserName" priority="0" />
+      <Item value="synoSettings" priority="0" />
+      <Item value="Password" priority="0" />
+      <Item value="audioStation" priority="0" />
+      <Item value="_synoSettings" priority="5" />
+      <Item value="Host" priority="1" />
+      <Item value="Port" priority="1" />
+      <Item value="_token" priority="3" />
+      <Item value="stream" priority="2" />
+      <Item value="responseAr" priority="1" />
+      <Item value="httpWebRequest" priority="2" />
+      <Item value="webResponse" priority="0" />
+      <Item value="StreamReader`0" priority="0" />
+      <Item value="reader" priority="1" />
+      <Item value="responseStream" priority="0" />
+      <Item value="callbackError" priority="0" />
+      <Item value="CookieContainer`0" priority="0" />
+      <Item value="Deployment`0" priority="1" />
+      <Item value="_host" priority="0" />
+      <Item value="_port" priority="0" />
+      <Item value="count" priority="2" />
+      <Item value="limit" priority="0" />
+      <Item value="MessageBox`0" priority="1" />
+      <Item value="String`0" priority="1" />
+      <Item value="_audioStationSession" priority="2" />
+      <Item value="HttpUtility`0" priority="1" />
+      <Item value="ParseSynologyArtists`0" priority="0" />
+      <Item value="content" priority="0" />
+      <Item value="out" priority="0" />
+      <Item value="OnOperationReturnedWithError`0" priority="1" />
+      <Item value="tracks" priority="0" />
+      <Item value="urlBase" priority="1" />
+      <Item value="CookieContainer" priority="0" />
+      <Item value="url" priority="0" />
+      <Item value="currentTrackItem" priority="1" />
+      <Item value="TrackCurrentPositionChanged" priority="1" />
+      <Item value="TrackCurrentPositionChangedEventArgs" priority="0" />
+      <Item value="LoadPercentComplete" priority="0" />
+      <Item value="TimeSpan`0" priority="2" />
+      <Item value="Binding" priority="1" />
+      <Item value="Binding`0" priority="0" />
+      <Item value="Mode" priority="0" />
+      <Item value="BindingMode`0" priority="0" />
+      <Item value="Path" priority="0" />
+      <Item value="PropertyPath" priority="0" />
+      <Item value="Position" priority="0" />
+      <Item value="MediaPositionChanged" priority="1" />
+      <Item value="MediaPositionChangedEventArgs" priority="0" />
+      <Item value="mediaPositionChangedEventArgs" priority="1" />
+      <Item value="parameter" priority="0" />
+      <Item value="while" priority="0" />
+      <Item value="ex" priority="2" />
+      <Item value="OK" priority="0" />
+      <Item value="BooleanToVisibilityConverter`0" priority="0" />
+      <Item value="Visibility`0" priority="0" />
+      <Item value="BufferedBytesCount" priority="0" />
+      <Item value="OnCurrentStateChanged`0" priority="0" />
+      <Item value="EventArgs`0" priority="1" />
+      <Item value="bytesLeft" priority="0" />
+      <Item value="fileSize" priority="0" />
+      <Item value="BufferingProgressUpdatedEventArgs`0" priority="0" />
+      <Item value="BufferingProgressUpdated" priority="3" />
+      <Item value="bufferingProgressUpdatedEventArgs" priority="6" />
+      <Item value="Console`0" priority="0" />
+      <Item value="bytesLoaded" priority="1" />
+      <Item value="isPlayable" priority="0" />
+      <Item value="OnBufferReachedPlayableState`0" priority="0" />
+      <Item value="_isPlayable" priority="0" />
+      <Item value="ReadWrite" priority="0" />
+      <Item value="FileName" priority="1" />
+      <Item value="ea" priority="5" />
+      <Item value="OnBufferingProgressUpdated`0" priority="0" />
+      <Item value="BufferingProgressUpdatedEventArgs" priority="0" />
+      <Item value="BytesLeft" priority="0" />
+      <Item value="Mp3MediaStreamSource`0" priority="0" />
+      <Item value="Mp3MediaStreamSource" priority="0" />
+      <Item value="isoStream" priority="0" />
+      <Item value="BufferingStream" priority="1" />
+      <Item value="MemoryStream`0" priority="0" />
+      <Item value="lock" priority="0" />
+      <Item value="oldPosition" priority="0" />
+      <Item value="userState" priority="1" />
+      <Item value="_position" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.ISearchService">
+      <Item value="SearchArtists`0" priority="0" />
+      <Item value="GetAlbumsForArtist`0" priority="0" />
+      <Item value="GetAllArtists`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.IEnumerable`1">
+      <Item value="GroupBy`4" priority="2" />
+      <Item value="OrderBy`2" priority="0" />
+      <Item value="Select`2" priority="2" />
+      <Item value="ToList`1" priority="0" />
+      <Item value="First`1" priority="0" />
+      <Item value="Count`1" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Synology.AudioStationApi.SynoTrack">
+      <Item value="Artist" priority="4" />
+      <Item value="Album" priority="0" />
+      <Item value="Class" priority="0" />
+      <Item value="ItemID" priority="0" />
+      <Item value="ItemPid" priority="0" />
+      <Item value="Res" priority="1" />
+      <Item value="Size" priority="1" />
+      <Item value="Bitrate" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.String">
+      <Item value="FirstOrDefault`1" priority="3" />
+      <Item value="Equals`0" priority="0" />
+      <Item value="ToLowerInvariant`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Linq.IGrouping`2">
+      <Item value="Key" priority="3" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Char">
+      <Item value="ToString`0" priority="5" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Char">
+      <Item value="IsLetter`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.List`1">
+      <Item value="Contains`0" priority="0" />
+      <Item value="Any`1" priority="0" />
+      <Item value="Add`0" priority="1" />
+      <Item value="OrderBy`2" priority="0" />
+      <Item value="Count" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Group`1">
+      <Item value="Title" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Synology.AudioStationApi.SynoItem">
+      <Item value="ItemPid" priority="0" />
+      <Item value="AlbumArtUrl" priority="0" />
+      <Item value="Title" priority="1" />
+      <Item value="ItemID" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Controls.Button">
+      <Item value="Click" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Input.ICommand">
+      <Item value="Execute`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.ViewModels.SearchResultItemViewModel">
+      <Item value="ItemInfo" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@OpenSyno.IoC">
+      <Item value="Current" priority="6" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.IoC">
+      <Item value="Resolve`1" priority="2" />
+      <Item value="RegisterInstance`1" priority="3" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.ArtistPanoramaKind">
+      <Item value="AlbumsList" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@OpenSyno.ArtistPanoramaItemKind">
+      <Item value="AlbumDetail" priority="1" />
+      <Item value="AlbumsList" priority="0" />
+      <Item value="Biography" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Practices.Prism.Events.IEventAggregator">
+      <Item value="GetEvent`1" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Practices.Prism.Events.CompositePresentationEvent`1">
+      <Item value="Subscribe`0" priority="1" />
+      <Item value="Publish`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Services.IPageSwitchingService">
+      <Item value="NavigateToSearchResults`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Navigation.NavigationService">
+      <Item value="Navigate`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.UriKind">
+      <Item value="RelativeOrAbsolute" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Controls.ContentControl">
+      <Item value="ContentTemplate" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Markup.XamlReader">
+      <Item value="Load`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.DependencyPropertyChangedEventArgs">
+      <Item value="NewValue" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.FrameworkElement">
+      <Item value="Style" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.ArtistPanoramaAlbumDetailItem">
+      <Item value="PanoramaItemKind" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.ObjectModel.ObservableCollection`1">
+      <Item value="Add`0" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.ArtistPanoramaViewModelFactory">
+      <Item value="Create`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.ArtistPanoramaView">
+      <Item value="NavigationService" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.SelectedArtistChangedAggregatedEvent">
+      <Item value="Artist" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.PlayListOperationAggregatedEvent">
+      <Item value="Items" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Services.AudioRenderingService+DownloadFileState">
+      <Item value="SourceStream" priority="0" />
+      <Item value="BytesLeft" priority="0" />
+      <Item value="TargetStream" priority="0" />
+      <Item value="Buffer" priority="0" />
+      <Item value="FilePath" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.TrackViewModel">
+      <Item value="TrackInfo" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Services.IPlaybackService">
+      <Item value="InsertTracksToQueue`0" priority="0" />
+      <Item value="PlayqueueItems" priority="0" />
+      <Item value="PlayTrackInQueue`0" priority="1" />
+      <Item value="BufferingProgressUpdated" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.IList`1">
+      <Item value="Insert`0" priority="0" />
+      <Item value="Clear`0" priority="0" />
+      <Item value="IndexOf`0" priority="0" />
+      <Item value="Count" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Net.WebClient">
+      <Item value="OpenWriteAsync`0" priority="0" />
+      <Item value="OpenReadCompleted" priority="4" />
+      <Item value="OpenReadAsync`0" priority="1" />
+      <Item value="Headers" priority="1" />
+      <Item value="DownloadProgressChanged" priority="2" />
+      <Item value="DownloadStringCompleted" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Net.OpenReadCompletedEventArgs">
+      <Item value="Result" priority="1" />
+      <Item value="UserState" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Net.HttpRequestHeader">
+      <Item value="ContentLength" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Int32">
+      <Item value="Parse`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.IO.File">
+      <Item value="Open`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Net.DownloadProgressChangedEventArgs">
+      <Item value="UserState" priority="0" />
+      <Item value="TotalBytesToReceive" priority="1" />
+      <Item value="BytesReceived" priority="0" />
+      <Item value="ProgressPercentage" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Net.HttpWebRequest">
+      <Item value="Method" priority="0" />
+      <Item value="BeginGetResponse`0" priority="0" />
+      <Item value="CookieContainer" priority="5" />
+      <Item value="Headers" priority="1" />
+      <Item value="BeginGetRequestStream`0" priority="0" />
+      <Item value="EndGetRequestStream`0" priority="0" />
+      <Item value="EndGetResponse`0" priority="0" />
+      <Item value="Accept" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.IAsyncResult">
+      <Item value="AsyncState" priority="3" />
+      <Item value="AsyncWaitHandle" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Exception">
+      <Item value="Message" priority="2" />
+      <Item value="InnerException" priority="0" />
+      <Item value="GetType`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Threading.ThreadPool">
+      <Item value="QueueUserWorkItem`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Threading.Thread">
+      <Item value="Start`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Threading.ManualResetEvent">
+      <Item value="WaitOne`0" priority="0" />
+      <Item value="Reset`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Controls.MediaElement">
+      <Item value="Source" priority="1" />
+      <Item value="Play`0" priority="0" />
+      <Item value="MediaOpened" priority="0" />
+      <Item value="MediaFailed" priority="0" />
+      <Item value="MediaEnded" priority="0" />
+      <Item value="DownloadProgressChanged" priority="0" />
+      <Item value="Position" priority="1" />
+      <Item value="CurrentStateChanged" priority="0" />
+      <Item value="GetBindingExpression`0" priority="0" />
+      <Item value="SetBinding`0" priority="0" />
+      <Item value="NaturalDuration" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.IO.IsolatedStorage.IsolatedStorageFile">
+      <Item value="GetUserStoreForApplication`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.IO.IsolatedStorage.IsolatedStorageFile">
+      <Item value="OpenFile`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.IO.FileAccess">
+      <Item value="ReadWrite" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Services.AudioRenderingService">
+      <Item value="BufferPlayableHeuristicPredicate" priority="1" />
+      <Item value="MediaEnded" priority="2" />
+      <Item value="OnMediaPositionChanged`0" priority="0" />
+      <Item value="BufferingProgressUpdated" priority="0" />
+      <Item value="BufferPlayableHeuristic`0" priority="0" />
+      <Item value="_currentTrack" priority="0" />
+      <Item value="Play`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@OpenSyno.App">
+      <Item value="Current" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Application">
+      <Item value="RootVisual" priority="0" />
+      <Item value="Resources" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.UIElement">
+      <Item value="Dispatcher" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Threading.Dispatcher">
+      <Item value="BeginInvoke`0" priority="1" />
+      <Item value="CheckAccess`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.IO.Stream">
+      <Item value="Close`0" priority="1" />
+      <Item value="Dispose`0" priority="2" />
+      <Item value="Position" priority="3" />
+      <Item value="Length" priority="3" />
+      <Item value="CanRead" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.IO.IsolatedStorage.IsolatedStorageFileStream">
+      <Item value="Name" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Diagnostics.Debugger">
+      <Item value="Break`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Services.MediaEndedEventArgs">
+      <Item value="Track" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Guid">
+      <Item value="NewGuid`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Guid">
+      <Item value="ToString`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.IO.IsolatedStorage.IsolatedStorageSettings">
+      <Item value="ApplicationSettings" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.IO.IsolatedStorage.IsolatedStorageSettings">
+      <Item value="Contains`0" priority="0" />
+      <Item value="Save`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Net.DownloadStringCompletedEventArgs">
+      <Item value="Result" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.IOpenSynoSettings">
+      <Item value="Host" priority="2" />
+      <Item value="Port" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Net.CookieContainer">
+      <Item value="Add`0" priority="1" />
+      <Item value="SetCookies`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Int32">
+      <Item value="ToString`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Net.WebResponse">
+      <Item value="GetResponseStream`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.IO.StreamReader">
+      <Item value="ReadToEnd`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Deployment">
+      <Item value="Current" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Deployment">
+      <Item value="Dispatcher" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.String">
+      <Item value="Format`0" priority="5" />
+      <Item value="Empty" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.MessageBox">
+      <Item value="Show`0" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Int64">
+      <Item value="Parse`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Newtonsoft.Json.Linq.JToken">
+      <Item value="ToString`0" priority="0" />
+      <Item value="Value`1" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Net.HttpUtility">
+      <Item value="UrlEncode`0" priority="1" />
+      <Item value="HtmlEncode`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Services.PlaybackService">
+      <Item value="TrackCurrentPositionChanged" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Controls.MediaElement">
+      <Item value="PositionProperty" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Data.Binding">
+      <Item value="Source" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Data.BindingMode">
+      <Item value="TwoWay" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.PropertyPath">
+      <Item value="Path" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Services.MediaPositionChangedEventArgs">
+      <Item value="Duration" priority="0" />
+      <Item value="Position" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Duration">
+      <Item value="TimeSpan" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.TimeSpan">
+      <Item value="TotalSeconds" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.ApplicationUnhandledExceptionEventArgs">
+      <Item value="ExceptionObject" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Type">
+      <Item value="Name" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Visibility">
+      <Item value="Visible" priority="0" />
+      <Item value="Collapsed" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.Services.BufferingProgressUpdatedEventArgs">
+      <Item value="FileSize" priority="4" />
+      <Item value="BytesLeft" priority="3" />
+      <Item value="BufferingStream" priority="0" />
+      <Item value="SynoTrack" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenSyno.ViewModels.PlayQueueViewModel">
+      <Item value="BufferedBytesCount" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Console">
+      <Item value="WriteLine`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Synology.AudioStationApi.FileDownloadResponseReceivedUserState">
+      <Item value="SynoTrack" priority="1" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
+</Configuration>

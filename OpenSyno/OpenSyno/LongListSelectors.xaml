@@ -1,0 +1,20 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors">
+    <DataTemplate x:Key="ArtistLongListSelectorItemTemplate">
+        <!--
+        1) Create a behavior to handle the click event within a command
+        2) Create a ViewModel, wrap the SynoItem in it, and add a DelegateCommand property at the same level.
+        3) Use {Binding ItemId} as a CommandParameter
+        4) in the command : launch the navigation process to the panorama view of the artist's page : albums, background pictures, and so on.-->
+        <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding ItemSelectedCommand}" Style="{StaticResource StillButton}" BorderThickness="0" HorizontalContentAlignment="Left">
+            <TextBlock Margin="6" Text="{Binding ItemInfo.Title}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        </Button>
+    </DataTemplate>    
+    <DataTemplate x:Key="SquareGroupTitleTemplate">
+        <Border HorizontalAlignment="Left" Background="{Binding Items.Count, Converter={StaticResource GroupToBrushValueConverter}}" Width="99" Height="99" Margin="6">
+            <TextBlock Text="{Binding Title}" FontSize="40" Foreground="{StaticResource PhoneForegroundBrush}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
+        </Border>
+    </DataTemplate>
+    <!-- Resource dictionary entries should be defined here. -->
+</ResourceDictionary>

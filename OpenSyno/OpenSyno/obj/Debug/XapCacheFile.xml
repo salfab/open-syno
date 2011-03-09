@@ -1,0 +1,15 @@
+﻿<xapCache source="C:\temp\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.xap" wasSigned="False" certificateThumbprint="" TimeStampUrl="" lastWriteTime="08.03.2011 21:23:03">
+  <file source="C:\temp\OpenSyno\OpenSyno\Properties\WMAppManifest.xml" archivePath="WMAppManifest.xml" lastWriteTime="22.01.2011 11:03:01" />
+  <file source="C:\temp\OpenSyno\OpenSyno\obj\Debug\OpenSyno.dll" archivePath="OpenSyno.dll" lastWriteTime="08.03.2011 21:23:02" />
+  <file source="C:\temp\OpenSyno\3rd party\ManagedMediaHelpers\MediaParsers.Phone.dll" archivePath="MediaParsers.Phone.dll" lastWriteTime="01.03.2011 08:56:14" />
+  <file source="C:\Program Files (x86)\Microsoft SDKs\Windows Phone\v7.0\Libraries\Silverlight\Microsoft.Phone.Controls.dll" archivePath="Microsoft.Phone.Controls.dll" lastWriteTime="25.01.2011 00:39:08" />
+  <file source="C:\temp\OpenSyno\3rd party\SLToolkit\Microsoft.Phone.Controls.Toolkit.dll" archivePath="Microsoft.Phone.Controls.Toolkit.dll" lastWriteTime="02.01.2011 21:48:22" />
+  <file source="C:\temp\OpenSyno\3rd party\prism4\Microsoft.Practices.Prism.dll" archivePath="Microsoft.Practices.Prism.dll" lastWriteTime="10.11.2010 09:13:12" />
+  <file source="C:\temp\OpenSyno\3rd party\ManagedMediaHelpers\Mp3MediaStreamSource.Phone.dll" archivePath="Mp3MediaStreamSource.Phone.dll" lastWriteTime="01.03.2011 08:59:24" />
+  <file source="C:\temp\OpenSyno\OpenSyno.SynoWP7\Bin\Debug\OpenSyno.SynoWP7.dll" archivePath="OpenSyno.SynoWP7.dll" lastWriteTime="08.03.2011 08:32:21" />
+  <file source="C:\temp\OpenSyno\OpenSyno.SynoWP7\Bin\Debug\Newtonsoft.Json.WindowsPhone.dll" archivePath="Newtonsoft.Json.WindowsPhone.dll" lastWriteTime="04.01.2011 13:48:14" />
+  <file source="C:\temp\OpenSyno\OpenSyno\ApplicationIcon.png" archivePath="ApplicationIcon.png" lastWriteTime="22.01.2011 00:14:43" />
+  <file source="C:\temp\OpenSyno\OpenSyno\Background.png" archivePath="Background.png" lastWriteTime="22.01.2011 00:14:43" />
+  <file source="C:\temp\OpenSyno\OpenSyno\SplashScreenImage.jpg" archivePath="SplashScreenImage.jpg" lastWriteTime="18.02.2011 19:09:50" />
+  <file source="C:\temp\OpenSyno\OpenSyno\Bin\Debug\AppManifest.xaml" archivePath="AppManifest.xaml" lastWriteTime="08.03.2011 08:32:23" />
+</xapCache>

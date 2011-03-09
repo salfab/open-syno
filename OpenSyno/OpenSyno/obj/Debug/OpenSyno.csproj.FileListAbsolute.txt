@@ -1,0 +1,55 @@
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\ApplicationIcon.png
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\Background.png
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.dll
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.pdb
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\AppManifest.xaml
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.xap
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Phone.Controls.dll
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Phone.Controls.Toolkit.dll
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Practices.Prism.dll
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.SynoWP7.dll
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.SynoWP7.pdb
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Phone.Controls.xml
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Phone.Controls.Toolkit.xml
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Practices.Prism.xml
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\ResolveAssemblyReference.cache
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\App.g.i.cs
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\ArtistPanoramaView.g.i.cs
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\PlayQueueView.g.i.cs
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\SearchResultsView.g.i.cs
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\SearchView.g.i.cs
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\OpenSyno.g.resources
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\OpenSyno.dll
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\OpenSyno.pdb
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\XapCacheFile.xml
+C:\temp\delete the other OpenSyno\OpenSyno\OpenSyno\obj\Debug\LoginView.g.i.cs
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\ApplicationIcon.png
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Background.png
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.dll
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.pdb
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\AppManifest.xaml
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.xap
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Phone.Controls.dll
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Phone.Controls.Toolkit.dll
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Practices.Prism.dll
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.SynoWP7.dll
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Newtonsoft.Json.WindowsPhone.dll
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\OpenSyno.SynoWP7.pdb
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Phone.Controls.xml
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Phone.Controls.Toolkit.xml
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Microsoft.Practices.Prism.xml
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Newtonsoft.Json.WindowsPhone.pdb
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Newtonsoft.Json.WindowsPhone.xml
+C:\temp\OpenSyno\OpenSyno\obj\Debug\ResolveAssemblyReference.cache
+C:\temp\OpenSyno\OpenSyno\obj\Debug\App.g.i.cs
+C:\temp\OpenSyno\OpenSyno\obj\Debug\ArtistPanoramaView.g.i.cs
+C:\temp\OpenSyno\OpenSyno\obj\Debug\LoginView.g.i.cs
+C:\temp\OpenSyno\OpenSyno\obj\Debug\PlayQueueView.g.i.cs
+C:\temp\OpenSyno\OpenSyno\obj\Debug\SearchResultsView.g.i.cs
+C:\temp\OpenSyno\OpenSyno\obj\Debug\SearchView.g.i.cs
+C:\temp\OpenSyno\OpenSyno\obj\Debug\OpenSyno.g.resources
+C:\temp\OpenSyno\OpenSyno\obj\Debug\OpenSyno.dll
+C:\temp\OpenSyno\OpenSyno\obj\Debug\OpenSyno.pdb
+C:\temp\OpenSyno\OpenSyno\obj\Debug\XapCacheFile.xml
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\MediaParsers.Phone.dll
+C:\temp\OpenSyno\OpenSyno\Bin\Debug\Mp3MediaStreamSource.Phone.dll
