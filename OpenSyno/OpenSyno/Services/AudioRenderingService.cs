@@ -67,6 +67,7 @@ namespace OpenSyno.Services
         {
             if (MediaPositionChanged != null)
             {
+                // FIXME : NaturalDuration has nothing to do with the total duration of the track : Same for the position : it doesn't reflect the position of the current track, ( is it the position in the total duration of the played items ? ) at least in the emulator !
                 MediaPositionChanged(this, new MediaPositionChangedEventArgs {Position = position, Duration = _mediaElement.NaturalDuration.TimeSpan});
             }
         }
@@ -168,6 +169,8 @@ namespace OpenSyno.Services
 
         public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
         bool _isPlayable;
+        
+        public event EventHandler<PlayBackStartedEventArgs> PlaybackStarted;
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
         {
@@ -185,7 +188,7 @@ namespace OpenSyno.Services
             _isPlayable = this.BufferPlayableHeuristic(bufferingProgressUpdatedEventArgs.SynoTrack, bufferingProgressUpdatedEventArgs.FileSize - bufferingProgressUpdatedEventArgs.BytesLeft);
             if (_isPlayable)
             {
-                OnBufferReachedPlayableState(bufferingProgressUpdatedEventArgs.BufferingStream);
+                OnBufferReachedPlayableState(bufferingProgressUpdatedEventArgs.BufferingStream, bufferingProgressUpdatedEventArgs.SynoTrack);
             }
 
 
@@ -301,7 +304,7 @@ namespace OpenSyno.Services
            
         }
 
-        private void OnBufferReachedPlayableState(Stream stream)
+        private void OnBufferReachedPlayableState(Stream stream, SynoTrack synoTrack)
         {
             // Hack : for now we just avoid it to crash : it seems that not continuing the download is not enough since an pother thread might still be running
             // and continuing once too much and make everything crash : 
@@ -312,15 +315,26 @@ namespace OpenSyno.Services
                 Delegate mediaRenderingStarter = new Action<Stream>(streamToPlay =>
                                                                           {
                                                                              
-                                                                             _mediaElement.Stop();
-                                                                             Mp3MediaStreamSource mss = new Mp3MediaStreamSource(streamToPlay);
-                                                                             _mediaElement.SetSource(mss);
+                                                                                _mediaElement.Stop();
+                                                                                Mp3MediaStreamSource mss = new Mp3MediaStreamSource(streamToPlay);
+                                                                                _mediaElement.SetSource(mss);
 
-                                                                             _mediaElement.Position = TimeSpan.FromSeconds(0);
-                                                                             _mediaElement.Volume = 20;
-                                                                             _mediaElement.Play();           
-                                                                         });
+                                                                                _mediaElement.Position = TimeSpan.FromSeconds(0);
+                                                                                _mediaElement.Volume = 20;
+                                                                                _mediaElement.Play();
+                                                                                PlayBackStartedEventArgs eventArgs = new PlayBackStartedEventArgs();
+                                                                                eventArgs.Track = synoTrack;
+                                                                                OnPlaybackStarted(eventArgs);
+                                                                          });
                 Deployment.Current.Dispatcher.BeginInvoke(mediaRenderingStarter, new object[] {stream});
+            }
+        }
+
+        protected void OnPlaybackStarted(PlayBackStartedEventArgs eventArgs)
+        {
+            if (PlaybackStarted != null)
+            {
+                PlaybackStarted(this, eventArgs);
             }
         }
 
@@ -342,6 +356,11 @@ namespace OpenSyno.Services
             _mediaElement.MediaOpened -= MediaOpened;
             _mediaElement.MediaEnded -= PlayingMediaEnded;
         }
+    }
+
+    public class PlayBackStartedEventArgs : EventArgs
+    {
+        public SynoTrack Track { get; set; }
     }
 
     public class BufferingProgressUpdatedEventArgs : EventArgs

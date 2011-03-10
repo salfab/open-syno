@@ -57,12 +57,11 @@ namespace OpenSyno.Services
         event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
     }
 
-    public delegate void TrackStartedDelegate(object sender, TrackStartedDelegateArgs args);
+    public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);
 
-    public class TrackStartedDelegateArgs
+    public class TrackStartedEventArgs
     {
         public SynoTrack Track { get; set; }
-        public BitmapImage Artwork { get; set; }
     }
 
     public delegate void TrackEndedDelegate(object sender, TrackEndedDelegateArgs args);

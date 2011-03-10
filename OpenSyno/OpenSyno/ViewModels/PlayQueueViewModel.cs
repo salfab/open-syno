@@ -211,10 +211,13 @@
             }
 
             _playbackService.PlayTrackInQueue(trackViewModel.TrackInfo);
+            _playbackService.TrackStarted += (sender, ea) =>
+                                                 {
+                                                     CurrentArtwork = new Uri(ea.Track.AlbumArtUrl, UriKind.Absolute);
 
-            // TODO : Load image AFTER the mp3 is downloaded, or after it's started at least, to optimize the track download.
-            CurrentArtwork = new Uri(trackViewModel.TrackInfo.AlbumArtUrl, UriKind.Absolute);
-            ActiveTrack = trackViewModel;
+                                                     // FIXME : Use a factory so we can mock the active track !
+                                                     ActiveTrack = new TrackViewModel(ea.Track);
+                                                 };
         }      
 
         /// <summary>
