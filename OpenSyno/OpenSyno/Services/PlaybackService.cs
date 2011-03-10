@@ -169,7 +169,8 @@ namespace OpenSyno.Services
                 }
                 catch (InvalidOperationException)
                 {
-                    // we know that witn version 7.0 : this operation is not supported, so instead of testing the version to see if it is supported, we try it anyway, and if the OS supports it, then good for us. otherwise, it will be just as if we hadn't even tried it.                    
+                    // we know that with version 7.0 : this operation is not supported, so instead of testing the version to see if it is supported,
+                    // we try it anyway, and if the OS supports it, then good for us. otherwise, it will be just as if we hadn't even tried it.                    
                 }
                 
             }

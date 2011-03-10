@@ -6,7 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Converters="clr-namespace:OpenSyno.Converters" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -14,7 +14,10 @@
     shell:SystemTray.IsVisible="True">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+	<phone:PhoneApplicationPage.Resources>
+        <Converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
+	</phone:PhoneApplicationPage.Resources>
+	<Grid x:Name="LayoutRoot" Background="Transparent">
         <!--Pivot Control-->
         <controls:Pivot Title="{StaticResource AppName}">
             <!--Pivot item one-->
@@ -42,7 +45,7 @@
             				<ColumnDefinition />
             			</Grid.ColumnDefinitions>
             			<TextBlock Margin="0,12,0,0" Text="{Binding CurrentTrackPosition, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
-            			<Slider Value="{Binding CurrentTrackPosition.TotalSeconds}" Maximum="{Binding ActiveTrack.TrackInfo.Duration.TotalSeconds, Mode=TwoWay}" Grid.Column="1" />
+                        <Slider Value="{Binding CurrentTrackPosition, Converter={StaticResource TimeSpanToSecondsConverter}}" Maximum="{Binding ActiveTrack.TrackInfo.Duration.TotalSeconds, Mode=TwoWay}" Grid.Column="1" />
             			<ProgressBar Grid.Column="1" Opacity="0.5" IsHitTestVisible="False" Value="{Binding BufferedBytesCount, Mode=TwoWay}" Maximum="{Binding CurrentFileSize}" Margin="0,-12,0,0" />
             			<TextBlock HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Column="2" Text="{Binding ActiveTrack.TrackInfo.Duration, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
             		</Grid>
