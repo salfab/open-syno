@@ -31,9 +31,8 @@ namespace OpenSyno.Behaviors
 
         private static void CommandPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // Note : It should be a OneTime binding, since we never unregister the event !
-            ((Button) d).Click += (o, ea) =>
-                GetCommand(d).Execute(GetCommandParameter(d));
+            // Note : It should be a OneTime binding, since we never unregister the event !                        
+            ((Button) d).Click += (o, ea) => GetCommand(d).Execute(GetCommandParameter(d));
         }
 
 

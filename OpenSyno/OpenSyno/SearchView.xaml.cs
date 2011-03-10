@@ -28,7 +28,12 @@ namespace OpenSyno
         {
             // FIXME : Use IoC or a ViewModelLocator
             var eventAggregator = IoC.Current.Resolve<IEventAggregator>();
-            DataContext = new SearchViewModel(IoC.Current.Resolve<ISearchService>(), new PageSwitchingService(NavigationService), eventAggregator);
+
+            // don't rebuild a viewmodel if we're navigating back from the navigation journal : it still exists in memory !
+            if (DataContext == null)
+            {
+                DataContext = new SearchViewModel(IoC.Current.Resolve<ISearchService>(), new PageSwitchingService(NavigationService), eventAggregator);                
+            }
         }
 
         /// <summary>
