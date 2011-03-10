@@ -25,13 +25,7 @@ namespace OpenSyno.SynoWP7
             artists = from album in jObject["items"]
                       select new SynoItem
                       {
-                          // in DSM 3.0
-                          // http://host/audio/[albumArtURL]
-
-                          // in DSM 3.1
-                          // http://host/webman/[albumArtURL]
-
-                          AlbumArtUrl = urlBase + "/webman/" + album["albumArtURL"].Value<string>(),
+                          AlbumArtUrl = BuildAbsoluteAlbumArtUrl(urlBase, album["albumArtURL"].Value<string>()),
                           Icon = album["icon"].Value<string>(),
                           IsContainer = album["is_container"].Value<bool>(),
                           IsTrack = album["is_track"].Value<bool>(),
@@ -42,6 +36,18 @@ namespace OpenSyno.SynoWP7
                           Title = album["title"].Value<string>()
                       };
             total = jObject["total"].Value<long>();
+        }
+
+        private static string BuildAbsoluteAlbumArtUrl(string urlBase, string relativeAlbumArtUrl)
+        {
+            // in DSM 3.0
+            // http://host/audio/[albumArtURL]
+
+            // in DSM 3.1
+            // http://host/webman/[albumArtURL]
+
+            string rootPath = "/webman/";
+            return urlBase + rootPath + relativeAlbumArtUrl;
         }
 
         public static void ParseSynologyAlbums(string content, out IEnumerable<SynoItem> albums, out long total, string urlBase)
@@ -79,7 +85,7 @@ namespace OpenSyno.SynoWP7
                     select new SynoTrack
                     {
                         Album = p["album"].Value<string>(),
-                        AlbumArtUrl = urlBase + "/audio/" + p["albumArtURL"].Value<string>(),
+                        AlbumArtUrl = BuildAbsoluteAlbumArtUrl(urlBase, p["albumArtURL"].Value<string>()),
                         Artist = p["artist"].Value<string>(),
                         Bitrate = p["bitrate"].Value<long>(),
                         Channels = p["channels"].Value<int>(),

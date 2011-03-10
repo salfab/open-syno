@@ -29,7 +29,7 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <StackPanel>
-                <TextBlock Margin="12,0" Text="What are you looking for ?" />
+                <!--<TextBlock Margin="12,0" Text="What are you looking for ?" />
                 <TextBox VerticalAlignment="Top" Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding StartSearchCommand}">
                     <TextBox.InputScope>
                         <InputScope>
@@ -37,7 +37,8 @@
                         </InputScope>
                     </TextBox.InputScope>
 
-                </TextBox>
+                </TextBox>-->
+                <Button Content="Artists" Behaviors:ButtonClickToCommandBehavior.Command="{Binding StartSearchCommand}" />
             </StackPanel>
         </Grid>
     </Grid>

@@ -6,9 +6,9 @@ namespace OpenSyno
     {
         public AlbumViewModel(SynoItem album)
         {
-            this.Album = album; 
+            this.Album = album;
         }
-          
+
         public SynoItem Album { get; set; }
     }
 }

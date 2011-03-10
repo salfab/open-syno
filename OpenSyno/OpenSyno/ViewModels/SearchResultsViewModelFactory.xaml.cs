@@ -30,7 +30,7 @@
             _lastSearchResults = payload.Results;
         }
 
-        public object Create(PageSwitchingService pageSwitchingService)
+        public ISearchResultsViewModel Create(PageSwitchingService pageSwitchingService)
         {
             return new SearchResultsViewModel(pageSwitchingService, _lastSearchResults);
         }

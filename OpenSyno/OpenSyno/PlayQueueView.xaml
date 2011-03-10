@@ -18,44 +18,51 @@
         <!--Pivot Control-->
         <controls:Pivot Title="{StaticResource AppName}">
             <!--Pivot item one-->
-            <controls:PivotItem Header="play queue">
-                <ListBox SelectedItem="{Binding ActiveTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay}" DisplayMemberPath="TrackInfo.Title" ItemContainerStyle="{StaticResource PlayQueueItemStyle}" />                    
-            </controls:PivotItem>
             <controls:PivotItem Header="now playing" >
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Image Source="{Binding CurrentArtwork}" Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" />
-                    <TextBlock Grid.Row="1" Text="{Binding ActiveTrack.TrackInfo.Artist}" />
-                    <TextBlock Grid.Row="2" Text="{Binding ActiveTrack.TrackInfo.Title}" />
-                    <Grid Grid.Row="3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="6.5*"/>
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Margin="0,12,0,0" Text="{Binding CurrentTrackPosition, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
-                        <Slider Value="{Binding CurrentTrackPosition.TotalSeconds}" Maximum="{Binding ActiveTrack.TrackInfo.Duration.TotalSeconds}" Grid.Column="1" />
-                        <ProgressBar Grid.Column="1" Opacity="0.5" IsHitTestVisible="False" Value="{Binding BufferedBytesCount, Mode=TwoWay}" Maximum="{Binding CurrentFileSize}" Margin="0,-12,0,0" />
-                        <TextBlock HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Column="2" Text="{Binding ActiveTrack.TrackInfo.Duration, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
-                    </Grid>
-                    <Grid Grid.Row="4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Button Content="&lt;" />
+            	<Grid>
+            		<Grid.RowDefinitions>
+            			<RowDefinition />
+            			<RowDefinition Height="Auto" />
+            			<RowDefinition Height="Auto"/>
+            			<RowDefinition Height="Auto"/>
+            			<RowDefinition Height="Auto"/>
+            		</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
+            		<Image Grid.Column="0" Source="{Binding CurrentArtwork}" Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" />
+					<ListBox Grid.Column="1" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay}" DisplayMemberPath="TrackInfo.Title" ItemContainerStyle="{StaticResource PlayQueueItemStyle}" />
+            		<TextBlock Grid.Row="1" Text="{Binding ActiveTrack.TrackInfo.Artist}" />
+            		<TextBlock Grid.Row="2" Text="{Binding ActiveTrack.TrackInfo.Title}" />
+            		<Grid Grid.Row="3" Grid.ColumnSpan="2">
+            			<Grid.ColumnDefinitions>
+            				<ColumnDefinition />
+            				<ColumnDefinition Width="6.5*"/>
+            				<ColumnDefinition />
+            			</Grid.ColumnDefinitions>
+            			<TextBlock Margin="0,12,0,0" Text="{Binding CurrentTrackPosition, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
+            			<Slider Value="{Binding CurrentTrackPosition.TotalSeconds}" Maximum="{Binding ActiveTrack.TrackInfo.Duration.TotalSeconds}" Grid.Column="1" />
+            			<ProgressBar Grid.Column="1" Opacity="0.5" IsHitTestVisible="False" Value="{Binding BufferedBytesCount, Mode=TwoWay}" Maximum="{Binding CurrentFileSize}" Margin="0,-12,0,0" />
+            			<TextBlock HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Column="2" Text="{Binding ActiveTrack.TrackInfo.Duration, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
+            		</Grid>
+                    <Grid Grid.Row="4" Grid.ColumnSpan="2">
+            			<Grid.ColumnDefinitions>
+            				<ColumnDefinition />
+            				<ColumnDefinition />
+            				<ColumnDefinition />
+            			</Grid.ColumnDefinitions>
+            			<Button Content="&lt;" />
                         <!--<Button Content="&quot;" Grid.Column="1"/>-->
-                        <Button Content="P" Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayCommand}"  Grid.Column="1"/>
-                        <Button Content="&gt;" Grid.Column="2"/>                        
-                    </Grid>
-                </Grid>
+            			<Button Content="P" Behaviors:ButtonClickToCommandBehavior.CommandParameter="{Binding SelectedTrack}" Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayCommand}"  Grid.Column="1"/>
+            			<Button Content="&gt;" Grid.Column="2"/>                        
+            		</Grid>
+            	</Grid>
+            </controls:PivotItem>
+
+            <!--Pivot item one-->
+            <controls:PivotItem Header="play queue">
+                <ListBox SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay}" DisplayMemberPath="TrackInfo.Title" ItemContainerStyle="{StaticResource PlayQueueItemStyle}" />                    
             </controls:PivotItem>
 
             <!--Pivot item two-->

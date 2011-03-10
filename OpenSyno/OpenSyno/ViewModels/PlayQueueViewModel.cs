@@ -67,7 +67,7 @@
                 };
             _playbackService.TrackCurrentPositionChanged += (o, e) => CurrentTrackPosition = e.Position;
 
-            PlayCommand = new DelegateCommand(OnPlay, () => ActiveTrack != null);
+            PlayCommand = new DelegateCommand<TrackViewModel>(OnPlay, track => track != null);
         }
 
         public long CurrentFileSize
@@ -97,6 +97,22 @@
             }
         }
 
+        public TrackViewModel SelectedTrack
+        {
+            get
+            {
+                return _selectedTrack;
+            }
+
+            set
+            {
+                _selectedTrack  = value;
+                OnPropertyChanged(SelectedTrackPropertyName);
+            }
+        }
+
+
+
         private long _bufferedBytesCount;
 
         public long BufferedBytesCount
@@ -115,6 +131,10 @@
         private TimeSpan _currentTrackPosition;
 
         private long _currentFileSize;
+
+        private TrackViewModel _selectedTrack;
+
+        private string SelectedTrackPropertyName = "SelectedTrack";
 
         private const string BufferBytesCountPropertyName = "BufferedBytesCount";
 
@@ -148,7 +168,6 @@
                 OnPropertyChanged(CurrentArtworkPropertyName);
             }
         }
-
     
         public ICommand PlayCommand { get; set; }
 
@@ -184,22 +203,19 @@
             }
         }
 
-        private void OnPlay()
+        private void OnPlay(TrackViewModel trackViewModel)
         {
-            DefineNextActiveTrack();
-            _playbackService.PlayTrackInQueue(this.ActiveTrack.TrackInfo);
+            if (trackViewModel == null)
+            {
+                throw new ArgumentNullException("trackViewModel", "The play command has been triggered without specifying a track to play.");
+            }
+
+            _playbackService.PlayTrackInQueue(trackViewModel.TrackInfo);
 
             // TODO : Load image AFTER the mp3 is downloaded, or after it's started at least, to optimize the track download.
-            CurrentArtwork = new Uri(ActiveTrack.TrackInfo.AlbumArtUrl, UriKind.Absolute);
-        }
-
-        private void DefineNextActiveTrack()
-        {
-            if (ActiveTrack == null)
-            {
-                ActiveTrack = PlayQueueItems.First();
-            }
-        }
+            CurrentArtwork = new Uri(trackViewModel.TrackInfo.AlbumArtUrl, UriKind.Absolute);
+            ActiveTrack = trackViewModel;
+        }      
 
         /// <summary>
         /// Called when a play list operation is requested.
@@ -217,7 +233,8 @@
                     AppendItems(e.Items);
                     if (_playbackService.Status == PlaybackStatus.Stopped)
                     {
-                        OnPlay();
+                        var trackToPlay = SelectedTrack != null ? SelectedTrack : PlayQueueItems.First();
+                        OnPlay(trackToPlay);
                     }
                     break;
                 default:

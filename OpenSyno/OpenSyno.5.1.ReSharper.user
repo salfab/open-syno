@@ -9,65 +9,68 @@
   </SettingsComponent>
   <RecentFiles>
     <RecentFiles>
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Converters/f:TimeSpanToTimeCodeConverter.cs" caret="435" fromTop="13" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Converters/f:BooleanToVisibilityConverter.cs" caret="406" fromTop="9" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:App.xaml" caret="1007" fromTop="1" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PageSwitchingService.cs" caret="1184" fromTop="7" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:ISearchService.cs" caret="1030" fromTop="7" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:LocalAudioRenderingService.cs" caret="106" fromTop="3" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:IAudioRenderingService.cs" caret="53" fromTop="1" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:ViewModelBase.cs" caret="359" fromTop="10" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:TrackViewModel.cs" caret="259" fromTop="0" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:PlayQueueView.xaml" caret="4874" fromTop="7" />
       <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:MockSearchService.cs" caret="3500" fromTop="7" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Converters/f:UrlToBitmapImageConverter.cs" caret="1076" fromTop="7" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:TiltEffect.cs" caret="11507" fromTop="6" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="2054" fromTop="6" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:IPlaybackService.cs" caret="1613" fromTop="8" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:SearchView.xaml" caret="423" fromTop="1" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:App.xaml.cs" caret="6752" fromTop="23" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SynologyJsonDeserializationHelper.cs" caret="958" fromTop="8" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:SearchViewModel.xaml.cs" caret="2163" fromTop="17" />
+      <File id="d:Miscellaneous Files/f:System.IO.IsolatedStorage.IsolatedStorageFile.cs/l:C!?temp?OpenSyno?_ReSharper.OpenSyno?DecompilerCache?metadata?mscorlib-5a1e?System.IO.IsolatedStorage.IsolatedStorageFile.cs" caret="409" fromTop="10" />
+      <File id="d:Miscellaneous Files/f:MpegFrame.cs/l:C!?temp?loarabia-ManagedMediaHelpers-22e1116?MediaParsers.Desktop?MpegFrame.cs" caret="4971" fromTop="8" />
       <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SearchService.cs" caret="806" fromTop="12" />
       <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:IAudioStationSession.cs" caret="727" fromTop="14" />
       <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:FileDownloadResponseReceivedUserState.cs" caret="10" fromTop="0" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="3035" fromTop="16" />
       <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="2428" fromTop="10" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="12746" fromTop="17" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PlaybackService.cs" caret="6108" fromTop="18" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:AlbumViewModel.cs" caret="210" fromTop="10" />
+      <File id="d:Miscellaneous Files/f:Mp3MediaStreamSource.cs/l:C!?temp?loarabia-ManagedMediaHelpers-22e1116?Mp3MediaStreamSource.SL4?Mp3MediaStreamSource.cs" caret="14368" fromTop="10" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PlaybackService.cs" caret="6533" fromTop="28" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="6185" fromTop="23" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:SearchView.xaml" caret="2499" fromTop="12" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:ISearchService.cs" caret="266" fromTop="10" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:IPageSwitchingService.cs" caret="194" fromTop="8" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:SearchResultsView.xaml" caret="2189" fromTop="28" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:SearchResultsView.xaml.cs" caret="824" fromTop="18" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:ISearchResultsViewModel.cs" caret="137" fromTop="6" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:SearchResultsViewModelFactory.xaml.cs" caret="1176" fromTop="20" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:SearchResultsViewModel.cs" caret="3059" fromTop="13" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:SearchViewModel.xaml.cs" caret="2177" fromTop="17" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="8899" fromTop="17" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PageSwitchingService.cs" caret="796" fromTop="19" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:App.xaml.cs" caret="6427" fromTop="17" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SynologyJsonDeserializationHelper.cs" caret="3840" fromTop="14" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="6329" fromTop="17" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:PlayQueueView.xaml" caret="3320" fromTop="19" />
     </RecentFiles>
     <RecentEdits>
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:IAudioStationSession.cs" caret="1420" fromTop="11" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="1670" fromTop="15" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="5482" fromTop="6" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="5388" fromTop="2" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="13274" fromTop="16" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="13277" fromTop="20" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="12732" fromTop="11" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="11684" fromTop="13" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:IAudioStationSession.cs" caret="471" fromTop="12" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="877" fromTop="8" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="771" fromTop="8" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="2704" fromTop="23" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:FileDownloadResponseReceivedUserState.cs" caret="468" fromTop="13" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:FileDownloadResponseReceivedUserState.cs" caret="10" fromTop="0" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="2343" fromTop="20" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:AudioStationSession.cs" caret="3034" fromTop="16" />
-      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:RemoteFileMockAudioStationSession.cs" caret="2674" fromTop="16" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="11518" fromTop="16" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="11960" fromTop="15" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="3930" fromTop="15" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="4514" fromTop="28" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="6991" fromTop="16" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="5103" fromTop="6" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="9578" fromTop="27" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="6004" fromTop="26" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="14290" fromTop="30" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="8079" fromTop="18" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="7746" fromTop="8" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="9712" fromTop="27" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="14424" fromTop="30" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="8213" fromTop="18" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="7880" fromTop="8" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PlaybackService.cs" caret="6108" fromTop="18" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:AlbumViewModel.cs" caret="210" fromTop="10" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="1670" fromTop="18" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="6185" fromTop="23" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:SearchView.xaml" caret="1925" fromTop="20" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:SearchView.xaml" caret="2424" fromTop="29" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:SearchResultsView.xaml.cs" caret="741" fromTop="17" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:SearchResultsViewModelFactory.xaml.cs" caret="1155" fromTop="23" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:ISearchResultsViewModel.cs" caret="137" fromTop="6" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="3466" fromTop="28" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="3415" fromTop="3" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="4053" fromTop="30" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="3299" fromTop="13" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="5692" fromTop="19" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="2504" fromTop="15" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="7225" fromTop="16" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="5873" fromTop="15" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="6078" fromTop="19" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SynologyJsonDeserializationHelper.cs" caret="1710" fromTop="15" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SynologyJsonDeserializationHelper.cs" caret="1972" fromTop="24" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SynologyJsonDeserializationHelper.cs" caret="967" fromTop="9" />
+      <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SynologyJsonDeserializationHelper.cs" caret="3976" fromTop="16" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="4945" fromTop="21" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="6453" fromTop="18" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="6708" fromTop="17" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:PlayQueueView.xaml" caret="2337" fromTop="19" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:PlayQueueView.xaml" caret="3320" fromTop="19" />
     </RecentEdits>
   </RecentFiles>
   <NAntValidationSettings>
@@ -116,7 +119,7 @@
       <Item value="Sequence" priority="0" />
       <Item value="Support" priority="0" />
       <Item value="T`0" priority="1" />
-      <Item value="null" priority="9" />
+      <Item value="null" priority="10" />
       <Item value="Button`0" priority="0" />
       <Item value="GetCommand`0" priority="0" />
       <Item value="SearchResultsRetrievedAggregatedEvent`0" priority="1" />
@@ -131,14 +134,14 @@
       <Item value="ctor" priority="4" />
       <Item value="PanoramaItems" priority="1" />
       <Item value="List&lt;ArtistPanoramaItem&gt;" priority="0" />
-      <Item value="var" priority="18" />
+      <Item value="var" priority="19" />
       <Item value="ArtistPanoramaItem`0" priority="1" />
       <Item value="albumsList" priority="1" />
       <Item value="_searchService" priority="4" />
       <Item value="artist" priority="5" />
-      <Item value="int" priority="9" />
+      <Item value="int" priority="10" />
       <Item value="ArtistPanoramaKind" priority="0" />
-      <Item value="this" priority="19" />
+      <Item value="this" priority="21" />
       <Item value="panoramaKind" priority="0" />
       <Item value="ArtistPanoramaItemKind`0" priority="4" />
       <Item value="_eventAggregator" priority="2" />
@@ -215,7 +218,7 @@
       <Item value="_defaultArtist" priority="0" />
       <Item value="override" priority="0" />
       <Item value="PlayQueueItems" priority="2" />
-      <Item value="trackViewModel" priority="0" />
+      <Item value="trackViewModel" priority="1" />
       <Item value="ObservableCollection&lt;TrackViewModel&gt;" priority="0" />
       <Item value="enum" priority="0" />
       <Item value="bool" priority="2" />
@@ -231,8 +234,8 @@
       <Item value="IEnumerable" priority="0" />
       <Item value="PlayqueueItems" priority="4" />
       <Item value="OnPropertyChanged`0" priority="2" />
-      <Item value="ActiveTrack" priority="0" />
-      <Item value="TrackViewModel`0" priority="3" />
+      <Item value="ActiveTrack" priority="1" />
+      <Item value="TrackViewModel`0" priority="4" />
       <Item value="PlaybackService" priority="0" />
       <Item value="AudioRenderingService" priority="0" />
       <Item value="insertPosition" priority="1" />
@@ -250,7 +253,7 @@
       <Item value="callback" priority="7" />
       <Item value="IAudioRenderingService`0" priority="0" />
       <Item value="IAudioStationSession`0" priority="0" />
-      <Item value="trackToPlay" priority="3" />
+      <Item value="trackToPlay" priority="4" />
       <Item value="RemoteFileMockAudioStationSession`0" priority="0" />
       <Item value="HttpRequestHeader`0" priority="0" />
       <Item value="contentLength" priority="0" />
@@ -393,6 +396,8 @@
       <Item value="oldPosition" priority="0" />
       <Item value="userState" priority="1" />
       <Item value="_position" priority="0" />
+      <Item value="SelectedTrack" priority="1" />
+      <Item value="relativeAlbumArtUrl" priority="0" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:OpenSyno.ISearchService">
       <Item value="SearchArtists`0" priority="0" />
@@ -504,6 +509,7 @@
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.Collections.ObjectModel.ObservableCollection`1">
       <Item value="Add`0" priority="2" />
+      <Item value="First`1" priority="0" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:OpenSyno.ArtistPanoramaViewModelFactory">
       <Item value="Create`0" priority="0" />
@@ -756,6 +762,7 @@
     </ItemStatistics>
     <ItemStatistics item="Qualified:OpenSyno.ViewModels.PlayQueueViewModel">
       <Item value="BufferedBytesCount" priority="0" />
+      <Item value="PlayQueueItems" priority="0" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.Console">
       <Item value="WriteLine`0" priority="0" />

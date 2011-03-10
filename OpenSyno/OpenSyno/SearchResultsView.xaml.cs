@@ -24,7 +24,7 @@ namespace OpenSyno
 
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
-            // FIXME : Use IoC or a ViewModelLocator
+            // we u se a factory so wecan inject a PageSwitchingService in the view model.
             var searchResultsViewModelFactory = IoC.Current.Resolve<SearchResultsViewModelFactory>();
             DataContext = searchResultsViewModelFactory.Create(new PageSwitchingService(NavigationService));
         }
