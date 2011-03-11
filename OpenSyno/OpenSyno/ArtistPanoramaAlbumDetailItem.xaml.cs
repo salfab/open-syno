@@ -10,6 +10,8 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno
 {
+    using System.Windows;
+
     public class ArtistPanoramaAlbumDetailItem : ArtistPanoramaItem
     {
         private readonly ISearchService _searchService;
@@ -55,7 +57,15 @@ namespace OpenSyno
         {
             var operation = PlayListOperation.Append;
             IEnumerable<TrackViewModel> selectedItems = Tracks.Where(o=> o.IsSelected);
-            _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(operation, selectedItems));
+            if (selectedItems.Count() < 1)
+            {
+                // FIXME : Use a service to de-couple the viewmodel and the way a message is visually shown to the user. (i.e. use a service)
+                MessageBox.Show("Please, select at least one track to play.");
+            }
+            else
+            {
+                _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(operation, selectedItems));                
+            }
         }
 
         private void OnSelectAllOrNone()
