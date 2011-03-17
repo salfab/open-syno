@@ -63,11 +63,31 @@
                     this.BufferedBytesCount = e.FileSize - e.BytesLeft;
                     this.CurrentFileSize = e.FileSize;
                     Debug.WriteLine("Download progress : " + (double)(e.FileSize - e.BytesLeft) / (double)e.FileSize * (double)100.0);
-
                 };
-            _playbackService.TrackCurrentPositionChanged += (o, e) => CurrentTrackPosition = e.Position;
+
+            _playbackService.TrackCurrentPositionChanged += (o, e) =>
+                {
+                    CurrentPlaybackPercentComplete = e.PlaybackPercentComplete;
+                    CurrentTrackPosition = e.Position;
+                };
 
             PlayCommand = new DelegateCommand<TrackViewModel>(OnPlay, track => track != null);
+        }
+
+        private double _currentPlaybackPercentComplete;
+
+        public double CurrentPlaybackPercentComplete
+        {
+            get
+            {
+                return _currentPlaybackPercentComplete;
+            }
+
+            set
+            {
+                _currentPlaybackPercentComplete = value;
+                OnPropertyChanged(CurrentPlaybackPercentCompletePropertyName);
+            }
         }
 
         public long CurrentFileSize
@@ -135,6 +155,8 @@
         private TrackViewModel _selectedTrack;
 
         private string SelectedTrackPropertyName = "SelectedTrack";
+
+        private const string CurrentPlaybackPercentCompletePropertyName = "CurrentPlaybackPercentComplete";
 
         private const string BufferBytesCountPropertyName = "BufferedBytesCount";
 

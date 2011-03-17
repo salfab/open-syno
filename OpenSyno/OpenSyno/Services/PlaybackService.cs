@@ -146,7 +146,7 @@ namespace OpenSyno.Services
         {
             if (TrackCurrentPositionChanged != null)
             {
-                TrackCurrentPositionChanged(this, new TrackCurrentPositionChangedEventArgs { LoadPercentComplete = 1, PlaybackPercentComplete = mediaPositionChangedEventArgs.Duration.TotalSeconds / mediaPositionChangedEventArgs.Position.TotalSeconds, Position = mediaPositionChangedEventArgs.Position });
+                TrackCurrentPositionChanged(this, new TrackCurrentPositionChangedEventArgs { LoadPercentComplete = 1, PlaybackPercentComplete = mediaPositionChangedEventArgs.Position.TotalSeconds / mediaPositionChangedEventArgs.Duration.TotalSeconds, Position = mediaPositionChangedEventArgs.Position });
             }
         }
 
