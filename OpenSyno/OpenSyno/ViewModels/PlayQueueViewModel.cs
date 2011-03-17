@@ -67,7 +67,7 @@
 
             _playbackService.TrackCurrentPositionChanged += (o, e) =>
                 {
-                    CurrentPlaybackPercentComplete = e.PlaybackPercentComplete;
+                    CurrentPlaybackPercentComplete = e.PlaybackPercentComplete;;
                     CurrentTrackPosition = e.Position;
                 };
 

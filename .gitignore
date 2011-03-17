@@ -1,3 +1,6 @@
 
 *.dat
-OpenSyno/_ReSharper.OpenSyno/*.*
+OpenSyno/_ReSharper.OpenSyno/
+OpenSyno/OpenSyno.SynoWP7/Bin/*.*
+bin/
+obj/

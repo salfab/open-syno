@@ -18,6 +18,13 @@ namespace OpenSyno.Services
 
         private PlaybackStatus _status;
 
+        // HACK : remove this and use the duration of the media stream source
+        /// <summary>
+        /// the last started track
+        /// </summary>
+        /// <remarks>The MP3 Media Stream Source is buggy with Variable bitrates, so the duration is not computed correctly. Instead, we want to use the duration exposed by Synology. In order to do this, we need to keep a reference on the last played SynoTrack.</remarks>
+        private SynoTrack _lastStartedTrack;
+
         /// <summary>
         /// Gets or sets what strategy should be used to define the next track to play.
         /// </summary>
@@ -88,6 +95,7 @@ namespace OpenSyno.Services
 
         protected void OnTrackStarted(TrackStartedEventArgs trackStartedEventArgs)
         {
+            _lastStartedTrack = trackStartedEventArgs.Track;
             if (TrackStarted != null)
             {
                 TrackStarted(this, trackStartedEventArgs);
@@ -146,7 +154,9 @@ namespace OpenSyno.Services
         {
             if (TrackCurrentPositionChanged != null)
             {
-                TrackCurrentPositionChanged(this, new TrackCurrentPositionChangedEventArgs { LoadPercentComplete = 1, PlaybackPercentComplete = mediaPositionChangedEventArgs.Position.TotalSeconds / mediaPositionChangedEventArgs.Duration.TotalSeconds, Position = mediaPositionChangedEventArgs.Position });
+                // Hack : we shouldn't have to resort to use a SynoTrack, but since the MediaStreamSource is buggy, we don't have much of a choice...
+                TrackCurrentPositionChanged(this, new TrackCurrentPositionChangedEventArgs { LoadPercentComplete = 1, PlaybackPercentComplete = mediaPositionChangedEventArgs.Position.TotalSeconds / _lastStartedTrack.Duration.TotalSeconds, Position = mediaPositionChangedEventArgs.Position });
+                //TrackCurrentPositionChanged(this, new TrackCurrentPositionChangedEventArgs { LoadPercentComplete = 1, PlaybackPercentComplete = mediaPositionChangedEventArgs.Position.TotalSeconds / mediaPositionChangedEventArgs.Duration.TotalSeconds, Position = mediaPositionChangedEventArgs.Position });
             }
         }
 
