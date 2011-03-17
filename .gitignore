@@ -1,2 +1,3 @@
 
-OpenSyno/_ReSharper.OpenSyno/BuildScriptCache/.crc
+*.dat
+OpenSyno/_ReSharper.OpenSyno/*.*
