@@ -72,6 +72,20 @@
                 };
 
             PlayCommand = new DelegateCommand<TrackViewModel>(OnPlay, track => track != null);
+            PlayNextCommand = new DelegateCommand(OnPlayNext);
+            PlayPreviousCommand = new DelegateCommand(OnPlayPrevious, () => false);
+        }
+
+        private void OnPlayPrevious()
+        {
+            //TrackViewModel previousTrack = _playbackService.GetPreviousTrack();
+            //OnPlay(previousTrack);
+        }
+
+        private void OnPlayNext()
+        {
+            TrackViewModel nextTrack = new TrackViewModel(_playbackService.GetNextTrack(ActiveTrack.TrackInfo));
+            OnPlay(nextTrack);
         }
 
         private double _currentPlaybackPercentComplete;
@@ -190,7 +204,11 @@
                 OnPropertyChanged(CurrentArtworkPropertyName);
             }
         }
-    
+
+        public ICommand PlayPreviousCommand { get; set; }
+
+        public ICommand PlayNextCommand { get; set; }
+
         public ICommand PlayCommand { get; set; }
 
         public ObservableCollection<TrackViewModel> PlayQueueItems

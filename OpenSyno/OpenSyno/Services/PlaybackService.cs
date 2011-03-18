@@ -137,6 +137,20 @@ namespace OpenSyno.Services
 
         public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
 
+
+        public SynoTrack GetNextTrack(SynoTrack currentTrack)
+        {
+            int currentTrackIndex = PlayqueueItems.IndexOf(currentTrack);
+
+            if (PlayqueueItems.Count > currentTrackIndex + 1)
+            {
+                return PlayqueueItems[currentTrackIndex + 1];
+            } 
+
+            // if there is no track next, then we return null.
+            return null;
+        }
+
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
         {
             if (BufferingProgressUpdated != null)
@@ -168,7 +182,7 @@ namespace OpenSyno.Services
             
             if (PlayqueueItems.Count > currentTrackItem + 1)
             {
-                var nextTrack = PlayqueueItems[currentTrackItem + 1];
+                var nextTrack = GetNextTrack(e.Track);
                 PlayTrackInQueue(nextTrack);
             }
             else

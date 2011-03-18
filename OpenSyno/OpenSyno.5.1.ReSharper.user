@@ -37,8 +37,8 @@
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:PageSwitchingService.cs" caret="796" fromTop="19" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:App.xaml.cs" caret="6427" fromTop="17" />
       <File id="16DA973A-2885-4E6E-89CD-5CA3825B3CA6/f:SynologyJsonDeserializationHelper.cs" caret="3840" fromTop="14" />
-      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="6329" fromTop="17" />
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/f:PlayQueueView.xaml" caret="3320" fromTop="19" />
+      <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:ViewModels/f:PlayQueueViewModel.cs" caret="2546" fromTop="14" />
     </RecentFiles>
     <RecentEdits>
       <File id="5002B837-907D-4DEF-93BF-8D8A54BE4CE3/d:Services/f:AudioRenderingService.cs" caret="9712" fromTop="27" />

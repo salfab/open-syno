@@ -55,6 +55,8 @@ namespace OpenSyno.Services
         event TrackCurrentPositionChangedDelegate TrackCurrentPositionChanged;
 
         event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
+
+        SynoTrack GetNextTrack(SynoTrack currentTrack);
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);
