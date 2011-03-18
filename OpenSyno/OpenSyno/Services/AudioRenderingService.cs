@@ -44,7 +44,7 @@ namespace OpenSyno.Services
             _mediaElement = (MediaElement)App.Current.Resources["MediaElement"];
 
             // for now, a predicate that allows a partially loaded track will only work on the emulator, and I have no clue why.
-            BufferPlayableHeuristicPredicate = (track, bytesLoaded) => /* bytesLoaded >= track.Bitrate || */ bytesLoaded == track.Size; 
+            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate ||  bytesLoaded == track.Size; 
 
             _mediaElement.SetBinding(MediaElement.PositionProperty, new Binding { Source = this, Mode = BindingMode.TwoWay, Path = new PropertyPath(PositionPropertyName)  });
             _mediaElement.CurrentStateChanged += OnCurrentStateChanged;
@@ -133,13 +133,8 @@ namespace OpenSyno.Services
             {
                 return;
             }
-            lock (bufferingProgressUpdate)
-            {
-                var oldPosition = targetStream.Position;
-                targetStream.Position = targetStream.Length;
-                targetStream.Write(buffer, 0, readCount);
-                targetStream.Position = oldPosition;
-            }
+            targetStream.Write(buffer, 0, readCount);
+
 
             var bufferingProgressUpdatedEventArgs = new BufferingProgressUpdatedEventArgs { BytesLeft = bytesLeft, FileSize = fileSize, FileName = filePath, BufferingStream = targetStream, SynoTrack = synoTrack};
             
@@ -293,7 +288,7 @@ namespace OpenSyno.Services
             // The trackstream is not readable.
             _isPlayable = false;
 
-            Stream targetStream = new MemoryStream((int)trackStream.Length);
+            Stream targetStream = new ReadWriteMemoryStream((int)trackStream.Length);
 
             DownloadToTemporaryFile(trackStream, response.ContentLength, targetStream, synoTrack, string.Empty, BufferedProgressUpdated);
             

@@ -95,6 +95,7 @@
     </Compile>
     <Compile Include="OpenSynoSettings.xaml.cs" />
     <Compile Include="Services\MediaEndedEventArgs.cs" />
+    <Compile Include="ReadWriteMemoryStream.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.xaml.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
     <Compile Include="ViewModels\SearchResultsViewModel.cs" />
@@ -117,7 +118,7 @@
     <Compile Include="Behaviors\EnterKeyUpToCommandBehavior.cs" />
     <Compile Include="Converters\BindingDebuggerConverter.cs" />
     <Compile Include="Group.cs" />
-    <Compile Include="IoC.xaml.cs" />
+    <Compile Include="IoC.cs" />
     <Compile Include="PlayListOperation.cs" />
     <Compile Include="PlayListOperationAggregatedEvent.cs" />
     <Compile Include="PlayQueueView.xaml.cs">
