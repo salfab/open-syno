@@ -12,6 +12,8 @@ namespace OpenSyno
 {
     using System.Windows;
 
+    using OpenSyno.ViewModels;
+
     public class ArtistPanoramaAlbumDetailItem : ArtistPanoramaItem
     {
         private readonly ISearchService _searchService;

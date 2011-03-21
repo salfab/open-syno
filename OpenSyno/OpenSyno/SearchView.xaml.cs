@@ -45,5 +45,11 @@ namespace OpenSyno
         {
             NavigationService.Navigate(new Uri("/LoginView.xaml", UriKind.RelativeOrAbsolute));
         }
+
+        private void AboutBoxApplicationBarButtonClicked(object sender, EventArgs e)
+        {
+            var viewModel = (SearchViewModel)DataContext;
+            viewModel.ShowAboutBoxCommand.Execute(null);
+        }
     }
 }

@@ -44,7 +44,7 @@ namespace OpenSyno.Services
             _mediaElement = (MediaElement)App.Current.Resources["MediaElement"];
 
             // for now, a predicate that allows a partially loaded track will only work on the emulator, and I have no clue why.
-            BufferPlayableHeuristicPredicate = (track, bytesLoaded) => /* bytesLoaded >= track.Bitrate || */ bytesLoaded == track.Size; 
+            BufferPlayableHeuristicPredicate = (track, bytesLoaded) => /* bytesLoaded >= track.Bitrate || */ bytesLoaded == track.Size || bytesLoaded > track.Size/4; 
 
             _mediaElement.SetBinding(MediaElement.PositionProperty, new Binding { Source = this, Mode = BindingMode.TwoWay, Path = new PropertyPath(PositionPropertyName)  });
             _mediaElement.CurrentStateChanged += OnCurrentStateChanged;
@@ -133,6 +133,8 @@ namespace OpenSyno.Services
             {
                 return;
             }
+
+            // FIXME : a lock is useless : we need to use the thread priority and use a higher priority thread in order to make sure we won't get interrupted by the Media Streaming Source !
             lock (bufferingProgressUpdate)
             {
                 var oldPosition = targetStream.Position;

@@ -1,4 +1,4 @@
-﻿namespace OpenSyno
+﻿namespace OpenSyno.ViewModels
 {
     using System.Collections.Generic;
 

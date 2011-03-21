@@ -1,9 +1,9 @@
-﻿using System;
-using OpenSyno.ViewModels;
-using Synology.AudioStationApi;
-
-namespace OpenSyno
+﻿namespace OpenSyno.ViewModels
 {
+    using System;
+
+    using Synology.AudioStationApi;
+
     public class TrackViewModel : ViewModelBase
     {
         private bool _isSelected;

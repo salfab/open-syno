@@ -1,6 +1,5 @@
-﻿namespace OpenSyno
+﻿namespace OpenSyno.ViewModels
 {
-    using System;
     using System.Collections.Generic;
     using System.Windows.Input;
 
@@ -8,7 +7,6 @@
     using Microsoft.Practices.Prism.Events;
 
     using OpenSyno.Services;
-    using OpenSyno.ViewModels;
 
     using Synology.AudioStationApi;
 
@@ -32,6 +30,12 @@
             _eventAggregator = eventAggregator;
 
             StartSearchCommand = new DelegateCommand(OnStartSearch);
+            ShowAboutBoxCommand = new DelegateCommand(OnShowAboutBox);
+        }
+
+        private void OnShowAboutBox()
+        {
+            _pageSwitchingService.NavigateToAboutBox();
         }
 
         public ICommand StartSearchCommand { get; set; }
@@ -61,6 +65,8 @@
                 OnPropertyChanged(IsBusyPropertyName);
             }
         }
+
+        public ICommand ShowAboutBoxCommand { get; set; }
 
         /// <summary>
         /// Called when the search gets started.

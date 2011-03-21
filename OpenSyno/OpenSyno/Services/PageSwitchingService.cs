@@ -11,6 +11,8 @@ namespace OpenSyno.Services
     {
         private readonly NavigationService _navigationService;
 
+        private const string AboutBoxUri = "/AboutBoxView.xaml";
+
         private const string PlayQueueResultsUri = "/PlayQueueView.xaml";
 
         private const string ArtistPanoramaUri = "/ArtistPanoramaView.xaml";
@@ -34,6 +36,11 @@ namespace OpenSyno.Services
         public void NavigateToPreviousPage()
         {
             _navigationService.GoBack();
+        }
+
+        public void NavigateToAboutBox()
+        {
+            _navigationService.Navigate(new Uri(AboutBoxUri, UriKind.RelativeOrAbsolute));                        
         }
 
         public void NavigateToPlayQueue()

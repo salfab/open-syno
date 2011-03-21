@@ -1,17 +1,16 @@
-﻿using System.Collections;
-using System.Linq;
-using Microsoft.Practices.Prism.Events;
-using OpenSyno.ViewModels;
-
-namespace OpenSyno
+﻿namespace OpenSyno.ViewModels
 {
+    using System.Collections;
+    using System.Linq;
+
+    using Microsoft.Practices.Prism.Events;
+
     using System;
     using System.Collections.Generic;
 
     using OpenSyno.Services;
 
     using Synology.AudioStationApi;
-
 
     public class SearchResultsViewModel : ViewModelBase, ISearchResultsViewModel
     {

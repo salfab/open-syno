@@ -1,11 +1,14 @@
-﻿using System;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Events;
-using OpenSyno.Services;
-using Synology.AudioStationApi;
-
-namespace OpenSyno
+﻿namespace OpenSyno.ViewModels
 {
+    using System;
+
+    using Microsoft.Practices.Prism.Commands;
+    using Microsoft.Practices.Prism.Events;
+
+    using OpenSyno.Services;
+
+    using Synology.AudioStationApi;
+
     public class SearchResultItemViewModel
     {
         private IEventAggregator _eventAggregator;

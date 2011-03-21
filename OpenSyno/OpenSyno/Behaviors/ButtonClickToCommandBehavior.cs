@@ -11,6 +11,8 @@ using System.Windows.Shapes;
 
 namespace OpenSyno.Behaviors
 {
+    using System.Windows.Controls.Primitives;
+
     public class ButtonClickToCommandBehavior
     {
 
@@ -32,7 +34,7 @@ namespace OpenSyno.Behaviors
         private static void CommandPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             // Note : It should be a OneTime binding, since we never unregister the event !                        
-            ((Button) d).Click += (o, ea) => GetCommand(d).Execute(GetCommandParameter(d));
+            ((ButtonBase) d).Click += (o, ea) => GetCommand(d).Execute(GetCommandParameter(d));
         }
 
 
@@ -50,7 +52,5 @@ namespace OpenSyno.Behaviors
         // Using a DependencyProperty as the backing store for CommandParameter.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CommandParameterProperty =
             DependencyProperty.RegisterAttached("CommandParameter", typeof(object), typeof(ButtonClickToCommandBehavior), new PropertyMetadata(null));
-
-        
     }
 }
