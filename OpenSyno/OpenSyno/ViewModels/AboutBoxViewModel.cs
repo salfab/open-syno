@@ -5,8 +5,6 @@
     using Microsoft.Phone.Tasks;
     using Microsoft.Practices.Prism.Commands;
 
-    using OpenSyno.Services;
-
     public class AboutBoxViewModel
     {
         /// <summary>

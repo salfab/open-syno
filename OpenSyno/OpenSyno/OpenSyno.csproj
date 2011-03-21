@@ -78,7 +78,7 @@
     <Compile Include="ArtistPanoramaView.xaml.cs">
       <DependentUpon>ArtistPanoramaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ArtistPanoramaViewModelFactory.xaml.cs" />
+    <Compile Include="ViewModels\ArtistPanoramaViewModelFactory.xaml.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\ItemsCountToBrushValueConverter.cs" />
     <Compile Include="Converters\TimeSpanToTimeCodeConverter.cs" />
@@ -133,7 +133,7 @@
     <Compile Include="Services\PageSwitchingService.cs" />
     <Compile Include="Services\SearchResultsRetrievedAggregatedEvent.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="LoginViewModel.cs" />
+    <Compile Include="ViewModels\LoginViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
