@@ -1,6 +1,5 @@
 ﻿namespace OpenSyno
 {
-    using System;
     using System.Collections.Generic;
     using System.Windows.Input;
 
@@ -67,8 +66,8 @@
         /// </summary>
         private void OnStartSearch()
         {
-            _searchService.SearchArtists(SearchPattern, SearchCompleted);
-            IsBusy = true;
+            var isSearchIssued = _searchService.SearchArtists(SearchPattern, SearchCompleted);
+            IsBusy = isSearchIssued;
         }
 
         private void SearchCompleted(IEnumerable<SynoItem> results)

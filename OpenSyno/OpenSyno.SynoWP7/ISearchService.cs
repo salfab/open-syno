@@ -8,7 +8,13 @@
     public interface ISearchService
     {
         void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback);
-        void SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback);
+        /// <summary>
+        /// Searches the artists.
+        /// </summary>
+        /// <param name="pattern">The pattern.</param>
+        /// <param name="callback">The callback.</param>
+        /// <returns><c>true</c> if the search could be issued; <c>false</c> if it had to be canceled.</returns>
+        bool SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback);
         void GetAllArtists(Action<IEnumerable<SynoItem>> callback);
 
         /// <summary>

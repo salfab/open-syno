@@ -38,7 +38,7 @@
             callback(items);
         }
 
-        public void SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback)
+        public bool SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback)
         {
             var results = new List<SynoItem>();
 
@@ -61,6 +61,7 @@
                 });
 
             callback(results);
+            return true;
         }
 
         public void GetAllArtists(Action<IEnumerable<SynoItem>> callback)

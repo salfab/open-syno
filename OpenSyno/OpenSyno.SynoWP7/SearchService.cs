@@ -20,15 +20,18 @@
             _audioStationSession.SearchAllMusic(pattern, callback, OnOperationReturnedWithError);
         }
 
-        public void SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback)
+        public bool SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback)
         {
             if (_audioStationSession.IsSignedIn)
             {
-                _audioStationSession.SearchArtist(pattern, callback, OnOperationReturnedWithError);                
+                _audioStationSession.SearchArtist(pattern, callback, OnOperationReturnedWithError);
+                return true;
             }
             else
             {
+                // FIXME : Use a service in order to separate visual feedback from viewmodels.
                 MessageBox.Show("You are not signed in. Please enter credentials in the settings.");
+                return false;
             }
         }
 

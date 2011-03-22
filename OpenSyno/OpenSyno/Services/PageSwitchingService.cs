@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Navigation;
-using Microsoft.Practices.Prism.Events;
-using OpenSyno.ViewModels;
-using Synology.AudioStationApi;
 
 namespace OpenSyno.Services
 {
