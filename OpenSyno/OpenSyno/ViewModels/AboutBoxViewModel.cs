@@ -1,5 +1,9 @@
 ﻿namespace OpenSyno.ViewModels
 {
+    using System.Linq;
+    using System.Reflection;
+    using System.Text.RegularExpressions;
+    using System.Windows;
     using System.Windows.Input;
 
     using Microsoft.Phone.Tasks;
@@ -13,6 +17,8 @@
         public AboutBoxViewModel()
         {
             OpenWebsiteCommand = new DelegateCommand<string>(OnOpenWebsite);
+            var versionRegex = new Regex("Version=([0-9\\.]+),");
+            Version = versionRegex.Match(Assembly.GetExecutingAssembly().FullName).Groups[1].Value;
         }
 
         /// <summary>
@@ -30,5 +36,7 @@
         /// </summary>
         /// <value>The command to open the website.</value>
         public ICommand OpenWebsiteCommand { get; set; }
+
+        public string Version { get; set; }
     }
 }

@@ -95,7 +95,6 @@
     <Compile Include="Services\MediaEndedEventArgs.cs" />
     <Compile Include="ReadWriteMemoryStream.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />
-    <Compile Include="ViewModels\SearchResultsViewModelFactory.xaml.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
     <Compile Include="ViewModels\SearchResultsViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />

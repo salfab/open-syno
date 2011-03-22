@@ -128,15 +128,8 @@ namespace OpenSyno.Services
             Action<double> bufferingProgressUpdate = args.BufferingProgressUpdate;
             bytesLeft = bytesLeft - readCount;
 
-            // that probably means the stream has been closed by the media element before it had a chance to be transfered completely, so we'll abort the download.
-            if (!targetStream.CanRead)
-            {
-                return;
-            }
-
-            // FIXME : a lock is useless : we need to use the thread priority and use a higher priority thread in order to make sure we won't get interrupted by the Media Streaming Source !
+            // Note : this targetstream is protected against synchronous concurrent reading/writing, since it is a ReadWriteMemoryStream.
             targetStream.Write(buffer, 0, readCount);
-
 
             var bufferingProgressUpdatedEventArgs = new BufferingProgressUpdatedEventArgs { BytesLeft = bytesLeft, FileSize = fileSize, FileName = filePath, BufferingStream = targetStream, SynoTrack = synoTrack};
             
