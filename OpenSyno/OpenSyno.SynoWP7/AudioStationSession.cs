@@ -45,8 +45,10 @@ namespace Synology.AudioStationApi
             //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; InfoPath.2; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; Zune 4.7)";
             //request.Headers.Set(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
             //request.Headers.Set(HttpRequestHeader.Cookie, @"__utma=11735858.713408819.1284879944.1294622128.1297023459.8; __utmz=11735858.1297023459.8.8.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=TiltEffect%20Toolkit; __qca=P0-1026483267-1284879945945");
-
+            
+            request.AllowReadStreamBuffering = false;
             request.BeginGetResponse(OnFileDownloadResponseReceived, new FileDownloadResponseReceivedUserState(request, callback, synoTrack));
+            
         }
 
         private void OnFileDownloadResponseReceived(IAsyncResult ar)

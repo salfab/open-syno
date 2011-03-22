@@ -1,4 +1,5 @@
 ﻿using System.Windows.Data;
+using Media;
 
 namespace OpenSyno.Services
 {
@@ -10,8 +11,6 @@ namespace OpenSyno.Services
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
-
-    using Media;
 
     using Synology.AudioStationApi;
 
@@ -109,7 +108,7 @@ namespace OpenSyno.Services
             int bufferSize = 1024;
             var buffer = new byte[bufferSize];
 
-            stream.BeginRead(buffer, 0, buffer.Length, DownloadTrackCallback, new DownloadFileState(stream, contentLength, targetStream,synoTrack, buffer, filePath, stream.Length, bufferingProgressUpdate));          
+            stream.BeginRead(buffer, 0, buffer.Length, DownloadTrackCallback, new DownloadFileState(stream, contentLength, targetStream, synoTrack, buffer, filePath, contentLength, bufferingProgressUpdate));          
         }
 
 
@@ -127,6 +126,13 @@ namespace OpenSyno.Services
             var synoTrack = args.SynoTrack;
             Action<double> bufferingProgressUpdate = args.BufferingProgressUpdate;
             bytesLeft = bytesLeft - readCount;
+
+            // that probably means the stream has been closed by the media element before it had a chance to be transfered completely, so we have abort the download
+            // to avoid trying to read from a closed stream.
+            if (!targetStream.CanRead)
+            {
+                return;
+            }
 
             // Note : this targetstream is protected against synchronous concurrent reading/writing, since it is a ReadWriteMemoryStream.
             targetStream.Write(buffer, 0, readCount);
@@ -147,7 +153,7 @@ namespace OpenSyno.Services
                         0,
                         buffer.Length, 
                         DownloadTrackCallback,
-                        new DownloadFileState(sourceStream, bytesLeft, targetStream,synoTrack, buffer, filePath, sourceStream.Length, bufferingProgressUpdate)));
+                        new DownloadFileState(sourceStream, bytesLeft, targetStream, synoTrack, buffer, filePath, fileSize, bufferingProgressUpdate)));
             }
             else
             {
@@ -283,7 +289,7 @@ namespace OpenSyno.Services
             // The trackstream is not readable.
             _isPlayable = false;
 
-            Stream targetStream = new ReadWriteMemoryStream((int)trackStream.Length);
+            Stream targetStream = new ReadWriteMemoryStream((int)response.ContentLength);
 
             DownloadToTemporaryFile(trackStream, response.ContentLength, targetStream, synoTrack, string.Empty, BufferedProgressUpdated);
             
