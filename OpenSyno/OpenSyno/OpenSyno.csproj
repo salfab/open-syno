@@ -50,9 +50,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MediaParsers.Phone">
-      <HintPath>..\3rd party\ManagedMediaHelpers\MediaParsers.Phone.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Controls" />
     <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL">
@@ -62,9 +59,6 @@
     <Reference Include="Microsoft.Practices.Prism">
       <HintPath>..\3rd party\prism4\Microsoft.Practices.Prism.dll</HintPath>
     </Reference>
-    <Reference Include="Mp3MediaStreamSource.Phone">
-      <HintPath>..\3rd party\ManagedMediaHelpers\Mp3MediaStreamSource.Phone.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -72,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewModels\AboutBoxViewModel.cs" />
     <Compile Include="AlbumViewModel.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -83,11 +78,14 @@
     <Compile Include="ArtistPanoramaView.xaml.cs">
       <DependentUpon>ArtistPanoramaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ArtistPanoramaViewModelFactory.xaml.cs" />
+    <Compile Include="ViewModels\ArtistPanoramaViewModelFactory.xaml.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\ItemsCountToBrushValueConverter.cs" />
     <Compile Include="Converters\TimeSpanToTimeCodeConverter.cs" />
     <Compile Include="Converters\UrlToBitmapImageConverter.cs" />
+    <Compile Include="AboutBoxView.xaml.cs">
+      <DependentUpon>AboutBoxView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\AppBarBindingsHelper.cs" />
     <Compile Include="IOpenSynoSettings.cs" />
     <Compile Include="LoginView.xaml.cs">
@@ -96,10 +94,10 @@
     <Compile Include="OpenSynoSettings.xaml.cs" />
     <Compile Include="Services\MediaEndedEventArgs.cs" />
     <Compile Include="ReadWriteMemoryStream.cs" />
-    <Compile Include="ViewModels\SearchResultsViewModelFactory.xaml.cs" />
+    <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
     <Compile Include="ViewModels\SearchResultsViewModel.cs" />
-    <Compile Include="ViewModels\SearchViewModel.xaml.cs" />
+    <Compile Include="ViewModels\SearchViewModel.cs" />
     <Compile Include="ViewModels\SearchResultItemViewModel.cs" />
     <Compile Include="SelectedArtistChangedAggregatedEvent.cs" />
     <Compile Include="Services\AudioRenderingService.cs" />
@@ -136,7 +134,7 @@
     <Compile Include="Services\PageSwitchingService.cs" />
     <Compile Include="Services\SearchResultsRetrievedAggregatedEvent.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="LoginViewModel.cs" />
+    <Compile Include="ViewModels\LoginViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -166,6 +164,14 @@
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MediaParsers.Phone\MediaParsers.Phone.csproj">
+      <Project>{48BDE09B-2D1F-4728-A52D-3934D9CE87D4}</Project>
+      <Name>MediaParsers.Phone</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mp3MediaStreamSource.Phone\Mp3MediaStreamSource.Phone.csproj">
+      <Project>{F215B4D7-B079-4965-B330-2400AEF7993F}</Project>
+      <Name>Mp3MediaStreamSource.Phone</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OpenSyno.SynoWP7\OpenSyno.SynoWP7.csproj">
       <Project>{16DA973A-2885-4E6E-89CD-5CA3825B3CA6}</Project>
       <Name>OpenSyno.SynoWP7</Name>
@@ -179,6 +185,10 @@
     <Page Include="ArtistPanoramaView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AboutBoxView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="LoginView.xaml">
       <Generator>MSBuild:Compile</Generator>

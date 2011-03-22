@@ -1,0 +1,75 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="OpenSyno.AboutBoxView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480"
+    shell:SystemTray.IsVisible="True">
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!--TitlePanel contains the name of the application and page title-->
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="ApplicationTitle" Text="{StaticResource AppName}" Style="{StaticResource PhoneTextNormalStyle}"/>
+                <TextBlock x:Name="ApplicationVersion" Grid.Column="1" Text="{Binding Version}" Style="{StaticResource PhoneTextNormalStyle}"/>
+            </Grid>
+            <TextBlock x:Name="PageTitle" Text="About" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+        </StackPanel>
+
+        <!--ContentPanel - place additional content here-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+            <StackPanel>
+                <!--<TextBlock Margin="12,0" Text="What are you looking for ?" />
+                <TextBox VerticalAlignment="Top" Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding StartSearchCommand}">
+                    <TextBox.InputScope>
+                        <InputScope>
+                            <InputScopeName NameValue="Search" />
+                        </InputScope>
+                    </TextBox.InputScope>
+                </TextBox>-->
+                <TextBlock Name="Description" TextWrapping="Wrap"
+                    Text="Open Syno is an unofficial WP7 client for Synology's Audio Station. It provides the proud owners of a Synology NAS to listen to their music library on the go without having to store any file on their hard drive. Therefore, Open Syno is very bandwidth greedy, and it is not recommended to use it with a 3G connection unless the user has an unlimited dataplan." FontSize="19" FontFamily="Segoe WP" />
+                <TextBlock Margin="0,15,0,0" Name="OpenSource" TextWrapping="Wrap"
+                    Text="Note that Open Syno is free and always will be. furthermore, we are working on cleaning-up the source-code to open-source it !" FontSize="19" FontFamily="Segoe WP" />
+                <TextBlock Margin="0,15,0,0" Name="PoCDisclaimer" TextWrapping="Wrap"
+                    Text="The current version of Open Syno is a proof-of-concept in a very early stage. There is still a lot of work to do to reach a fully functionnal release, but we wanted you to be able to test this app asap so you can post your precious feedback on our website." FontSize="19" FontFamily="Segoe WP" />
+                <TextBlock Name="contact" TextWrapping="Wrap"
+                    Text="Don't forget to visit us on " FontSize="19" FontFamily="Segoe WP" />
+                <HyperlinkButton Margin="0,15,0,0" FontSize="19" Content="http://opensyno.seesharp.ch" Behaviors:ButtonClickToCommandBehavior.Command="{Binding OpenWebsiteCommand}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="http://opensyno.seesharp.ch"/>
+                <TextBlock Margin="0,15,0,0" TextWrapping="Wrap"
+                           Text="Last but not least, a big thank you to Liliboude for her fantastic splashscreen. you can find more of her goodness on her website : " FontSize="19" />
+                <HyperlinkButton Margin="0,15,0,0" FontSize="19" Content="http://liliboude.over-blog.com" Behaviors:ButtonClickToCommandBehavior.Command="{Binding OpenWebsiteCommand}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="http://liliboude.over-blog.com"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+ 
+    <!--Sample code showing usage of ApplicationBar-->
+    <!--<phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="credentials" Click="CredentialsApplicationBarButtonClicked"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="about" Click="AboutBoxApplicationBarButtonClicked"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="Button 2"/>
+            <shell:ApplicationBar.MenuItems>
+                <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
+                <shell:ApplicationBarMenuItem Text="MenuItem 2"/>
+            </shell:ApplicationBar.MenuItems>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>-->
+
+</phone:PhoneApplicationPage>

@@ -9,5 +9,7 @@ namespace OpenSyno.Services
         void NavigateToSearchResults();
         void NavigateToArtistPanorama();
         void NavigateToPreviousPage();
+
+        void NavigateToAboutBox();
     }
 }
