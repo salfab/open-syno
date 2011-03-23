@@ -34,7 +34,9 @@ namespace Synology.AudioStationApi
             }
 
             var client = new WebClient();
-            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", _host, _port, HttpUtility.HtmlEncode(synoTrack.Res));
+
+            // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
+            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", _host, _port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20"));
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.CookieContainer = new CookieContainer();
