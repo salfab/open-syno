@@ -166,7 +166,13 @@ namespace OpenSyno
             var ex = e.ExceptionObject;
             while (ex != null)
             {
-                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButton.OK);
+                Exception exception = ex;
+
+                if (!Deployment.Current.Dispatcher.CheckAccess())
+                {
+                    Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK));
+                }
+
                 ex = ex.InnerException;
             }
 
