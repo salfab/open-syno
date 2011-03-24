@@ -66,7 +66,24 @@
                     return new List<Group<SearchResultItemViewModel>>();
                 }
 
-                var artists = new List<Group<SearchResultItemViewModel>>(from artist in SearchResults.Where(o => o.ItemInfo.ItemPid == "musiclib_music_aa") group artist by artist.ItemInfo.Title.FirstOrDefault() into c select new Group<SearchResultItemViewModel>(char.IsLetter(c.Key) ? c.Key.ToString().ToLower() : "#", c));
+                // var artists = new List<Group<SearchResultItemViewModel>>(from artist in SearchResults.Where(o => o.ItemInfo.ItemPid == "musiclib_music_aa") group artist by artist.ItemInfo.Title.FirstOrDefault() into c select new Group<SearchResultItemViewModel>(char.IsLetter(c.Key) ? c.Key.ToString().ToLower() : "#", c));
+                var groups = from artist in SearchResults.Where(o => o.ItemInfo.ItemPid == "musiclib_music_aa") group artist by artist.ItemInfo.Title.FirstOrDefault();
+                var artists = new List<Group<SearchResultItemViewModel>>();
+                foreach (var group in groups)
+                {
+                    char firstChar = group.Key.ToString().FirstOrDefault();
+                    string groupName = char.IsLetter(firstChar) ? firstChar.ToString().ToLower() : "#";
+                    if (artists.Any(o => o.Title == groupName))
+                    {
+                        // Add artist to group
+                        artists.First(o => o.Title == groupName).AddRange(group);
+                    }
+                    else
+                    {
+                        // Add a new group
+                        artists.Add(new Group<SearchResultItemViewModel>(groupName, group));
+                    }
+                }
 
                 AddEmptyGroups(artists);
 

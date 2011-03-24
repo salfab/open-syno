@@ -1,6 +1,10 @@
 ﻿namespace OpenSyno
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
+
+    using OpenSyno.ViewModels;
 
     public class Group<T> : IEnumerable<T>
     {
@@ -13,7 +17,7 @@
         public override bool Equals(object obj)
         {
             Group<T> that = obj as Group<T>;
-            return (that != null) && (this.Title.Equals(that.Title));
+            return (that != null) && (Title.Equals(that.Title));
         }
 
         public string Title { get; set; }
@@ -36,5 +40,13 @@
         }
 
         #endregion
+
+        public void AddRange(IGrouping<char, T> group)
+        {
+            foreach (var artist in group)
+            {
+                Items.Add(artist);
+            }
+        }
     }
 }
