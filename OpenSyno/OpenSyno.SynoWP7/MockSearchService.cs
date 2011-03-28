@@ -11,7 +11,7 @@
         {
             
         }
-        public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback)
+        public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback)
         {
             var items = new List<SynoTrack>();
             items.Add(new SynoTrack
@@ -36,6 +36,7 @@
                 });
 
             callback(items);
+            return true;
         }
 
         public bool SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback)

@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioStationSession.cs" />
+    <Compile Include="Helpers\CookieAwareWebClient.cs" />
     <Compile Include="FileDownloadResponseReceivedUserState.cs" />
     <Compile Include="IAudioStationSession.cs" />
     <Compile Include="ISearchService.cs" />

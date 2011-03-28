@@ -1,5 +1,6 @@
 ﻿namespace OpenSyno.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.Windows.Input;
 
@@ -30,8 +31,13 @@
             _eventAggregator = eventAggregator;
 
             StartSearchCommand = new DelegateCommand(OnStartSearch);
+            StartSearchAllCommand = new DelegateCommand<string>(OnStartSearchAll);
             ShowAboutBoxCommand = new DelegateCommand(OnShowAboutBox);
         }
+
+
+
+        public ICommand StartSearchAllCommand { get; set; }
 
         private void OnShowAboutBox()
         {
@@ -75,6 +81,17 @@
         {
             var isSearchIssued = _searchService.SearchArtists(SearchPattern, SearchCompleted);
             IsBusy = isSearchIssued;
+        }
+
+        private void OnStartSearchAll(string keyword)
+        {
+            var isSearchIssued = _searchService.SearchAllMusic(SearchPattern, SearchAllCompleted);
+            IsBusy = isSearchIssued;
+        }
+
+        private void SearchAllCompleted(IEnumerable<SynoTrack> results)
+        {
+            throw new NotImplementedException();
         }
 
         private void SearchCompleted(IEnumerable<SynoItem> results)
