@@ -15,11 +15,11 @@
             _audioStationSession = audioStationSession;            
         }
 
-        public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback)
+        public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>, string> callback)
         {
             if (_audioStationSession.IsSignedIn)
             {
-                _audioStationSession.SearchAllMusic(pattern, callback, OnOperationReturnedWithError);
+                _audioStationSession.SearchAllMusic(pattern, (o) =>  callback(o, pattern), OnOperationReturnedWithError);
                 return true;
             }
 

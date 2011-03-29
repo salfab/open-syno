@@ -7,7 +7,7 @@
 
     public interface ISearchService
     {
-        bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback);
+        bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>, string> callback);
         /// <summary>
         /// Searches the artists.
         /// </summary>

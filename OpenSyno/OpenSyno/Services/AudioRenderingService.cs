@@ -276,7 +276,6 @@ namespace OpenSyno.Services
 
             _currentTrack = track;
 
-
             _audioStationSession.GetFileStream(track, OnFileStreamOpened);
 
             // TODO : Start download

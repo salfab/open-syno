@@ -84,13 +84,15 @@ namespace OpenSyno
             //var searchService = new MockSearchService();
             var searchService = new SearchService(audioStation);
 
+            // FIXME : Replace home-made IoC by MicroIoc.
+
             IoC.Current.RegisterInstance<ISearchService>(searchService);
 
             IoC.Current.RegisterInstance(new ArtistPanoramaViewModelFactory(searchService, eventAggregator));
 
             IoC.Current.RegisterInstance(new SearchResultsViewModelFactory(eventAggregator));
 
-
+            IoC.Current.RegisterInstance<ISearchAllResultsViewModelFactory>(new SearchAllResultsViewModelFactory(eventAggregator));
 
 
             // Retrieve the type LocalAudioRenderingService from a config file, so we can change it.

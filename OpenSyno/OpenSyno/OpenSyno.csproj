@@ -72,6 +72,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SearchAllResultsView.xaml.cs">
+      <DependentUpon>SearchAllResultsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\AboutBoxViewModel.cs" />
     <Compile Include="AlbumViewModel.cs" />
     <Compile Include="App.xaml.cs">
@@ -205,6 +208,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PlayQueueView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchAllResultsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

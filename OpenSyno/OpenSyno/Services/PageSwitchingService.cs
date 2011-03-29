@@ -7,6 +7,8 @@ namespace OpenSyno.Services
     {
         private readonly NavigationService _navigationService;
 
+        private const string SearchAllResultsUri = "/SearchAllResultsView.xaml?keyword={0}";
+
         private const string AboutBoxUri = "/AboutBoxView.xaml";
 
         private const string PlayQueueResultsUri = "/PlayQueueView.xaml";
@@ -39,10 +41,14 @@ namespace OpenSyno.Services
             _navigationService.Navigate(new Uri(AboutBoxUri, UriKind.RelativeOrAbsolute));                        
         }
 
+        public void NavigateToSearchAllResults(string keyword)
+        {
+            _navigationService.Navigate(new Uri(string.Format(SearchAllResultsUri, keyword), UriKind.RelativeOrAbsolute));
+        }
+
         public void NavigateToPlayQueue()
         {
             _navigationService.Navigate(new Uri(PlayQueueResultsUri, UriKind.RelativeOrAbsolute));                        
-
         }
     }
 }

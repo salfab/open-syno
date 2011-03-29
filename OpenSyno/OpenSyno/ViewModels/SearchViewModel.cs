@@ -1,4 +1,6 @@
-﻿namespace OpenSyno.ViewModels
+﻿using System.Linq;
+
+namespace OpenSyno.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -89,16 +91,16 @@
             IsBusy = isSearchIssued;
         }
 
-        private void SearchAllCompleted(IEnumerable<SynoTrack> results)
+        private void SearchAllCompleted(IEnumerable<SynoTrack> results, string keyword)
         {
-            var list = new List<SynoTrack>(results);
-            throw new NotImplementedException();
+            _pageSwitchingService.NavigateToSearchAllResults(keyword);
+            _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Publish(new SearchResultsRetrievedAggregatedEvent(results.Cast<SynoItem>()));
         }
 
         private void SearchCompleted(IEnumerable<SynoItem> results)
         {
             IsBusy = false;
-            _pageSwitchingService.NavigateToSearchResults();
+            _pageSwitchingService.NavigateToSearchAllResults(null);
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Publish(new SearchResultsRetrievedAggregatedEvent(results));
         }
 

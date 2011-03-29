@@ -11,9 +11,9 @@
         {
             
         }
-        public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback)
+        public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>, string> callback)
         {
-            var items = new List<SynoTrack>();
+            var items = new List<SynoItem>();
             items.Add(new SynoTrack
                 {
                     Artist = "Tom Waits",
@@ -35,7 +35,7 @@
                     Title = "Fawn",
                 });
 
-            callback(items);
+            callback((IEnumerable<SynoTrack>) items, "my keyword");
             return true;
         }
 

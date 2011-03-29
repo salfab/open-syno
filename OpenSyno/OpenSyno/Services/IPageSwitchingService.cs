@@ -11,5 +11,6 @@ namespace OpenSyno.Services
         void NavigateToPreviousPage();
 
         void NavigateToAboutBox();
+        void NavigateToSearchAllResults(string keyword);
     }
 }
