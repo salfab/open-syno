@@ -39,6 +39,8 @@
 
                 </TextBox>-->
                 <Button Content="Artists" Behaviors:ButtonClickToCommandBehavior.Command="{Binding StartSearchCommand}" />
+                <TextBlock Text="Search" Margin="12,0" />
+                <TextBox Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding StartSearchAllCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
             </StackPanel>
         </Grid>
     </Grid>
