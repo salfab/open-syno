@@ -30,7 +30,7 @@
             _pageSwitchingService = pageSwitchingService;
             _eventAggregator = eventAggregator;
 
-            StartSearchCommand = new DelegateCommand(OnStartSearch);
+            StartSearchCommand = new DelegateCommand<string>(OnStartSearch);
             StartSearchAllCommand = new DelegateCommand<string>(OnStartSearchAll);
             ShowAboutBoxCommand = new DelegateCommand(OnShowAboutBox);
         }
@@ -46,18 +46,18 @@
 
         public ICommand StartSearchCommand { get; set; }
 
-        protected string SearchPattern
-        {
-            get
-            {
-                return _searchPattern;
-            }
-            set
-            {
-                _searchPattern = value;
-                OnPropertyChanged(SearchPatternPropertyName);
-            }
-        }
+        //protected string SearchPattern
+        //{
+        //    get
+        //    {
+        //        return _searchPattern;
+        //    }
+        //    set
+        //    {
+        //        _searchPattern = value;
+        //        OnPropertyChanged(SearchPatternPropertyName);
+        //    }
+        //}
 
         public bool IsBusy
         {
@@ -77,20 +77,21 @@
         /// <summary>
         /// Called when the search gets started.
         /// </summary>
-        private void OnStartSearch()
+        private void OnStartSearch(string keyword)
         {
-            var isSearchIssued = _searchService.SearchArtists(SearchPattern, SearchCompleted);
+            var isSearchIssued = _searchService.SearchArtists(keyword, SearchCompleted);
             IsBusy = isSearchIssued;
         }
 
         private void OnStartSearchAll(string keyword)
         {
-            var isSearchIssued = _searchService.SearchAllMusic(SearchPattern, SearchAllCompleted);
+            var isSearchIssued = _searchService.SearchAllMusic(keyword, SearchAllCompleted);
             IsBusy = isSearchIssued;
         }
 
         private void SearchAllCompleted(IEnumerable<SynoTrack> results)
         {
+            var list = new List<SynoTrack>(results);
             throw new NotImplementedException();
         }
 

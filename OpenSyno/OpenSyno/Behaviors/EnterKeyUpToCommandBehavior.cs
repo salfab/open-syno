@@ -51,8 +51,24 @@ namespace OpenSyno.Behaviors
             if (e.Key == Key.Enter)
             {
                 // If ony the enter key was pressed
-                GetCommand(_attachedElement).Execute(null);                
+                GetCommand(_attachedElement).Execute(GetCommandParameter(_attachedElement));                
             }
         }
+
+
+
+        public static object GetCommandParameter(DependencyObject obj)
+        {
+            return (object)obj.GetValue(CommandParameterProperty);
+        }
+
+        public static void SetCommandParameter(DependencyObject obj, object value)
+        {
+            obj.SetValue(CommandParameterProperty, value);
+        }
+
+        // Using a DependencyProperty as the backing store for CommandParameter.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CommandParameterProperty =
+            DependencyProperty.RegisterAttached("CommandParameter", typeof(object), typeof(EnterKeyUpToCommandBehavior), new PropertyMetadata(null));
     }
 }

@@ -108,6 +108,56 @@ namespace Synology.AudioStationApi
             int limit = 100;
             string postString = string.Format(@"action=search&target=musiclib_root&server=musiclib_root&category=all&keyword={0}&start=0&limit={1}", pattern, limit);
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+
+            request.BeginGetRequestStream(ar =>
+            {
+                // Just make sure we retrieve the right web request : no access to modified closure.
+                HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
+
+                var requestStream = webRequest.EndGetRequestStream(ar);
+                requestStream.Write(postBytes, 0, postBytes.Length);
+                requestStream.Close();
+
+                request.BeginGetResponse(
+                    responseAr =>
+                    {
+                        // Just make sure we retrieve the right web request : no access to modified closure.                        
+                        var httpWebRequest = responseAr.AsyncState;
+
+                        var webResponse = webRequest.EndGetResponse(responseAr);
+                        var responseStream = webResponse.GetResponseStream();
+                        var reader = new StreamReader(responseStream);
+                        var content = reader.ReadToEnd();
+
+                        long count;
+                        IEnumerable<SynoTrack> tracks;
+                        SynologyJsonDeserializationHelper.ParseSynologyTracks(content, out tracks, out count, urlBase);
+
+                        var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                        if (isOnUiThread)
+                        {
+                            if (count > limit)
+                            {
+                                MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                            }
+                            callback(tracks);
+                        }
+                        else
+                        {
+                            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                if (count > limit)
+                                {
+                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                }
+                                callback(tracks);
+                            });
+                        }
+                    },
+                    webRequest);
+            },
+                request);
         }
 
         public void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError)
@@ -122,130 +172,90 @@ namespace Synology.AudioStationApi
             string postString = string.Format(@"sort=title&dir=ASC&action=browse&target=musiclib_music_aa&server=musiclib_music_aa&category=&keyword={0}&start=0&limit={1}", pattern, limit);
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 
-            //request.BeginGetRequestStream(ar =>
-            //    {
-            //        // Just make sure we retrieve the right web request : no access to modified closure.
-            //        HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
-
-            //        var requestStream = webRequest.EndGetRequestStream(ar);
-            //        requestStream.Write(postBytes, 0, postBytes.Length);
-            //        requestStream.Close();
-
-            //        request.BeginGetResponse(
-            //            responseAr =>
-            //                {
-            //                    // Just make sure we retrieve the right web request : no access to modified closure.                        
-            //                    var httpWebRequest = responseAr.AsyncState;
-
-            //                    var webResponse = webRequest.EndGetResponse(responseAr);
-            //                    var responseStream = webResponse.GetResponseStream();
-            //                    var reader = new StreamReader(responseStream);
-            //                    var content = reader.ReadToEnd();
-
-            //                    long count;
-            //                    IEnumerable<SynoItem> artists;
-            //                    SynologyJsonDeserializationHelper.ParseSynologyArtists(content, out artists, out count, urlBase);
-
-
-
-            //                    var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
-            //                    if (isOnUiThread)
-            //                    {
-            //                        if (count > limit)
-            //                        {
-            //                            MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
-            //                        }
-            //                        callback(artists);                                    
-            //                    }
-            //                    else
-            //                    {
-            //                        Deployment.Current.Dispatcher.BeginInvoke(() =>
-            //                            {
-            //                                if (count > limit)
-            //                                {
-            //                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
-            //                                }
-            //                                callback(artists);
-            //                            });
-            //                    }
-            //                },
-            //            webRequest);
-            //    },
-            //    request);
-
-            CookieAwareWebClient wc = new CookieAwareWebClient();
-
-            Uri uri =
-                new UriBuilder
+            request.BeginGetRequestStream(ar =>
                 {
-                    Host = _host,
-                    Path = @"/webman/login.cgi",
-                    Query = postString,
-                    Port = _port
-                }.Uri;
+                    // Just make sure we retrieve the right web request : no access to modified closure.
+                    HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
 
-            HttpWebRequest webRequest = (HttpWebRequest)wc.GetWebRequest(uri);
+                    var requestStream = webRequest.EndGetRequestStream(ar);
+                    requestStream.Write(postBytes, 0, postBytes.Length);
+                    requestStream.Close();
 
-            webRequest.CookieContainer = new CookieContainer();
-            webRequest.CookieContainer.SetCookies(new Uri(url), _token);
+                    request.BeginGetResponse(
+                        responseAr =>
+                        {
+                            // Just make sure we retrieve the right web request : no access to modified closure.                        
+                            var httpWebRequest = responseAr.AsyncState;
 
-            wc.DownloadStringCompleted += (sender, ea) =>
-                                              {
-                                                  if (ea.Error != null)
-                                                  {
-                                                      callbackError(ea.Error);
-                                                      return;
-                                                  }
-                                                  long count;
-                                                  IEnumerable<SynoItem> artists;
-                                                  SynologyJsonDeserializationHelper.ParseSynologyArtists(
-                                                                                    ea.Result,
-                                                                                    out artists,
-                                                                                    out count,
-                                                                                    urlBase);
-                                                  callback(artists);
-                                              };
-            wc.DownloadStringAsync(uri);
-            // HttpWebResponse response = null;
+                            var webResponse = webRequest.EndGetResponse(responseAr);
+                            var responseStream = webResponse.GetResponseStream();
+                            var reader = new StreamReader(responseStream);
+                            var content = reader.ReadToEnd();
 
-            //try
-            //{
-            //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://hamilcar.serveftp.com:5000/audio/webUI/audio_browse.cgi");
+                            long count;
+                            IEnumerable<SynoItem> artists;
+                            SynologyJsonDeserializationHelper.ParseSynologyArtists(content, out artists, out count, urlBase);
 
-            //    request.Accept = "*/*";
-            //    request.Headers.Set(HttpRequestHeader.AcceptLanguage, "en-US");
-            //    request.Referer = "http://hamilcar.serveftp.com:5000/audio/";
-            //    request.Headers.Add("x-requested-with", "XMLHttpRequest");
-            //    request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-            //    request.Headers.Set(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
-            //    request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; InfoPath.2; OfficeLiveConnector.1.5; OfficeLivePatch.1.3; Zune 4.7)";
-            //    request.Headers.Set(HttpRequestHeader.Pragma, "no-cache");
-            //    request.Headers.Set(HttpRequestHeader.Cookie, @"ys-ActivedPlayerPanel=s%3Astream-grid; ys-grid-view=o%3Acolumns%3Da%253Ao%25253Aid%25253Dn%2525253A0%25255Ewidth%25253Dn%2525253A600%255Eo%25253Aid%25253Dn%2525253A1%25255Ewidth%25253Dn%2525253A205%255Eo%25253Aid%25253Dn%2525253A2%25255Ewidth%25253Dn%2525253A205%255Eo%25253Aid%25253Dn%2525253A3%25255Ewidth%25253Dn%2525253A50%25255Ehidden%25253Db%2525253A1%255Eo%25253Aid%25253Dn%2525253A4%25255Ewidth%25253Dn%2525253A205%255Eo%25253Aid%25253Dn%2525253A5%25255Ewidth%25253Dn%2525253A50%25255Ehidden%25253Db%2525253A1%255Eo%25253Aid%25253Dn%2525253A6%25255Ewidth%25253Dn%2525253A50%25255Ehidden%25253Db%2525253A1%255Eo%25253Aid%25253Dn%2525253A7%25255Ewidth%25253Dn%2525253A205%5Esort%3Do%253Afield%253Ds%25253Atitle%255Edirection%253Ds%25253AASC; id=rQQWQkkDR9i5U");
 
-            //    request.Method = "POST";
 
-            //    string postString = @"sort=title&dir=ASC&action=browse&target=musiclib_music_aa&server=musiclib_music_aa&category=&keyword=Nirvana&start=0&limit=50";
-            //    byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
-            //    request.ContentLength = postBytes.Length;
-            //    Stream stream = request.GetRequestStream();
-            //    stream.Write(postBytes, 0, postBytes.Length);
-            //    stream.Close();
+                            var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                            if (isOnUiThread)
+                            {
+                                if (count > limit)
+                                {
+                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                }
+                                callback(artists);
+                            }
+                            else
+                            {
+                                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                                    {
+                                        if (count > limit)
+                                        {
+                                            MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                        }
+                                        callback(artists);
+                                    });
+                            }
+                        },
+                        webRequest);
+                },
+                request);
 
-            //    response = (HttpWebResponse)request.GetResponse();
-            //}
-            //catch (WebException e)
-            //{
-            //    if (e.Status == WebExceptionStatus.ProtocolError) response = (HttpWebResponse)e.Response;
-            //    else return false;
-            //}
-            //catch (Exception)
-            //{
-            //    if (response != null) response.Close();
-            //    return false;
-            //}
+            //CookieAwareWebClient wc = new CookieAwareWebClient();
 
-            //return true;
+            //Uri uri =
+            //    new UriBuilder
+            //    {
+            //        Host = _host,
+            //        Path = @"/webman/login.cgi",
+            //        Query = postString,
+            //        Port = _port
+            //    }.Uri;
 
+            //HttpWebRequest webRequest = (HttpWebRequest)wc.GetWebRequest(uri);
+
+            //webRequest.CookieContainer = new CookieContainer();
+            //webRequest.CookieContainer.SetCookies(new Uri(url), _token);
+
+            //wc.DownloadStringCompleted += (sender, ea) =>
+            //                                  {
+            //                                      if (ea.Error != null)
+            //                                      {
+            //                                          callbackError(ea.Error);
+            //                                          return;
+            //                                      }
+            //                                      long count;
+            //                                      IEnumerable<SynoItem> artists;
+            //                                      SynologyJsonDeserializationHelper.ParseSynologyArtists(
+            //                                                                        ea.Result,
+            //                                                                        out artists,
+            //                                                                        out count,
+            //                                                                        urlBase);
+            //                                      callback(artists);
+            //                                  };
+            //wc.DownloadStringAsync(uri);          
         }
 
         private HttpWebRequest BuildRequest(string url)
