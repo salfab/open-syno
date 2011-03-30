@@ -60,6 +60,8 @@ namespace OpenSyno
                 Albums.Add(albumViewModel);
             }
 
+            IsBusy = false;
+
             ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
 
         }

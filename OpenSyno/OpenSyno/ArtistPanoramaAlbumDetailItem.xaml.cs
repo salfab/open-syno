@@ -15,6 +15,8 @@ namespace OpenSyno
 
     public class ArtistPanoramaAlbumDetailItem : ArtistPanoramaItem
     {
+        private const string TracksPropertyName = "Tracks";
+
         private readonly ISearchService _searchService;
 
         public SynoItem AlbumItemInfo { get; set; }
@@ -35,6 +37,7 @@ namespace OpenSyno
             set
             {
                 _tracks = value;
+                OnPropertyChanged(TracksPropertyName);
             }
         }
 
@@ -46,6 +49,8 @@ namespace OpenSyno
             Header = album.Title;
 
             Tracks = new ObservableCollection<TrackViewModel>();
+
+            IsBusy = true;
             
             // TODO : List tracks of the album.
             _searchService.GetTracksForAlbum(album, GetTracksForAlbumCompleted);
@@ -57,7 +62,7 @@ namespace OpenSyno
         private void OnPlayListOperation()
         {
             var operation = PlayListOperation.Append;
-            IEnumerable<TrackViewModel> selectedItems = Tracks.Where(o=> o.IsSelected);
+            IEnumerable<TrackViewModel> selectedItems = Tracks.Where(o => o.IsSelected);
             if (selectedItems.Count() < 1)
             {
                 // FIXME : Use a service to de-couple the viewmodel and the way a message is visually shown to the user. (i.e. use a service)
@@ -82,11 +87,17 @@ namespace OpenSyno
         }
 
         private void GetTracksForAlbumCompleted(IEnumerable<SynoTrack> tracks, long l, SynoItem arg3)
-        {                            
+        {
+            // We first want to populate a collection and then assign it to the bound property, otherwise, there will be just too many collection changed notiications.
+            // we could also have disabled the binding and re-enabled, but hey, what's the gain ?
+            var newTracks = new ObservableCollection<TrackViewModel>();
             foreach(var track in tracks.Select(o => new TrackViewModel(o)))
-            {
-                Tracks.Add(track);
+            {                
+                newTracks.Add(track);
             }
+
+            Tracks = newTracks;
+            IsBusy = false;
         }
     }
 }

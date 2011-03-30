@@ -17,7 +17,7 @@ namespace OpenSyno.ViewModels
 
         private readonly PageSwitchingService _pageSwitchingService;
 
-        public ObservableCollection<ArtistPanoramaItem> PanoramaItems { get; set; }
+        public ObservableCollection<ArtistPanoramaItem> ArtistItems { get; set; }
 
         private string _artistName;
         private const string  ArtistNamePropertyName = "ArtistName";
@@ -40,13 +40,16 @@ namespace OpenSyno.ViewModels
             {
                 throw new ArgumentNullException("pageSwitchingService");
             }
-            if (artist == null) throw new ArgumentNullException("artist");
 
-            
+            if (artist == null)
+            {
+                throw new ArgumentNullException("artist");
+            }
+
             _searchService = searchService;
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
-            PanoramaItems = new ObservableCollection<ArtistPanoramaItem>();
+            ArtistItems = new ObservableCollection<ArtistPanoramaItem>();
             eventAggregator.GetEvent<CompositePresentationEvent<SelectedArtistChangedAggregatedEvent>>().Subscribe(OnSelectedArtistChanged, true);
             LoadArtistInfo(artist);
 
@@ -84,18 +87,17 @@ namespace OpenSyno.ViewModels
         private void GetAlbumsForArtistCompleted(IEnumerable<SynoItem> albums, long total, SynoItem artist)
         {
             // make sure the old items are cleared.
-            PanoramaItems.Clear();
+            ArtistItems.Clear();
 
             // add the page for the list of albums.
             var albumsListPanel = new ArtistPanoramaAlbumsListItem(albums, artist, _pageSwitchingService);
 
-            PanoramaItems.Add(albumsListPanel);
+            ArtistItems.Add(albumsListPanel);
 
             foreach (var album in albums)
             {
                 var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator);                
-                PanoramaItems.Add(albumDetail);
-
+                ArtistItems.Add(albumDetail);
             }
         }
     }

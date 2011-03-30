@@ -93,6 +93,7 @@ namespace OpenSyno.ViewModels
 
         private void SearchAllCompleted(IEnumerable<SynoTrack> results, string keyword)
         {
+            IsBusy = false;
             _pageSwitchingService.NavigateToSearchAllResults(keyword);
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Publish(new SearchResultsRetrievedAggregatedEvent(results.Cast<SynoItem>()));
         }
@@ -100,7 +101,7 @@ namespace OpenSyno.ViewModels
         private void SearchCompleted(IEnumerable<SynoItem> results)
         {
             IsBusy = false;
-            _pageSwitchingService.NavigateToSearchAllResults(null);
+            _pageSwitchingService.NavigateToSearchResults();
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Publish(new SearchResultsRetrievedAggregatedEvent(results));
         }
 

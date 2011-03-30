@@ -2,8 +2,12 @@
 
 namespace OpenSyno
 {
-    public class ArtistPanoramaItem : ViewModelBase
+    using OpenSyno.Converters;
+
+    public class ArtistPanoramaItem : ViewModelBase, IBusyable
     {
+        public bool IsBusy { get; set; }
+
         private ArtistPanoramaItemKind _panoramaItemKind;
 
         private const string PanoramaItemKindPropertyName = "PanoramaItemKind";

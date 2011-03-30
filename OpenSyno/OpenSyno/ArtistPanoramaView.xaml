@@ -6,7 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:OpenSyno="clr-namespace:OpenSyno" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:OpenSyno="clr-namespace:OpenSyno" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" xmlns:Converters="clr-namespace:OpenSyno.Converters" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -15,16 +15,18 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <phone:PhoneApplicationPage.Resources>
-        
+
+        <Converters:BusyableItemsToVisibilityConverter x:Key="BusyableItemsToVisibilityConverter" />
     </phone:PhoneApplicationPage.Resources>
     <Grid x:Name="LayoutRoot">
 
-        
-        <controls:Panorama  Title="{Binding ArtistName, Mode=TwoWay}" ItemsSource="{Binding PanoramaItems, Mode=TwoWay}" ItemTemplate="{StaticResource PanoramaItemTemplate}" HeaderTemplate="{StaticResource PanoramaHeaderTemplate}" >            
-            <controls:Panorama.Background>
-                <ImageBrush ImageSource="Untitled.png" Opacity=".5" />
-            </controls:Panorama.Background>
-        </controls:Panorama>
+
+        <controls:Pivot  Title="{Binding ArtistName, Mode=TwoWay}" ItemsSource="{Binding ArtistItems, Mode=TwoWay}" ItemTemplate="{StaticResource PanoramaItemTemplate}" HeaderTemplate="{StaticResource PanoramaHeaderTemplate}" >
+            <controls:Pivot.Background>
+                <ImageBrush AlignmentX="Right" Stretch="UniformToFill" ImageSource="Untitled.png" Opacity=".5" />
+            </controls:Pivot.Background>
+        </controls:Pivot>
+        <ProgressBar VerticalAlignment="Top" HorizontalAlignment="Stretch" IsIndeterminate="True" Visibility="{Binding ArtistItems, Converter={StaticResource BusyableItemsToVisibilityConverter}}" />
     </Grid>
 
     <!--Panorama-based applications should not show an ApplicationBar-->

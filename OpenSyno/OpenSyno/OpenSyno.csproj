@@ -72,6 +72,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\BusyableItemsToVisibilityConverter.cs" />
+    <Compile Include="IBusyable.cs" />
     <Compile Include="SearchAllResultsView.xaml.cs">
       <DependentUpon>SearchAllResultsView.xaml</DependentUpon>
     </Compile>
