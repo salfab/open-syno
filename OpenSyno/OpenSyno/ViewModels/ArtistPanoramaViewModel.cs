@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
 using Microsoft.Practices.Prism.Events;
 using Synology.AudioStationApi;
 
@@ -20,7 +23,8 @@ namespace OpenSyno.ViewModels
         public ObservableCollection<ArtistPanoramaItem> ArtistItems { get; set; }
 
         private string _artistName;
-        private const string  ArtistNamePropertyName = "ArtistName";
+        private const string ArtistNamePropertyName = "ArtistName";
+        private const string IsBusyPropertyName = "IsBusy";
 
         public ArtistPanoramaItemKind PanoramaItemKind { get; set; }
 
@@ -50,9 +54,54 @@ namespace OpenSyno.ViewModels
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
             ArtistItems = new ObservableCollection<ArtistPanoramaItem>();
+            ArtistItems.CollectionChanged += StartMonitoringElements;
+            foreach (ArtistPanoramaItem artistItem in ArtistItems)
+            {
+                artistItem.PropertyChanged += UpdateBusyness;
+            }
+
+
             eventAggregator.GetEvent<CompositePresentationEvent<SelectedArtistChangedAggregatedEvent>>().Subscribe(OnSelectedArtistChanged, true);
             LoadArtistInfo(artist);
 
+        }
+
+        private void UpdateBusyness(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == ArtistPanoramaItem.IsBusyPropertyName)
+            {
+                IsBusy = ArtistItems.Any(o => o.IsBusy);
+            }
+        }
+
+        private bool _isBusy;
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                OnPropertyChanged(IsBusyPropertyName);
+            }
+        }
+
+        private void StartMonitoringElements(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (ArtistPanoramaItem artistItem in e.NewItems)
+                {
+                    artistItem.PropertyChanged += UpdateBusyness;
+                } 
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (ArtistPanoramaItem artistItem in e.OldItems)
+                {
+                    artistItem.PropertyChanged -= UpdateBusyness;
+                }
+            }
         }
 
         private void OnSelectedArtistChanged(SelectedArtistChangedAggregatedEvent ea)
@@ -94,11 +143,21 @@ namespace OpenSyno.ViewModels
 
             ArtistItems.Add(albumsListPanel);
 
-            foreach (var album in albums)
+            // the "all albums" items
+            var allmusic = albums.Where(o => o.ItemID.StartsWith("musiclib_music_artist"));
+
+            foreach (var album in albums.Except(allmusic))
             {
                 var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator);                
                 ArtistItems.Add(albumDetail);
             }
+
+            foreach (var album in allmusic)
+            {
+                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator);
+                ArtistItems.Add(albumDetail);
+            }
+            
         }
     }
 }

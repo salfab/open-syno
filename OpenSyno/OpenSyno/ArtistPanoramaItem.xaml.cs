@@ -6,9 +6,19 @@ namespace OpenSyno
 
     public class ArtistPanoramaItem : ViewModelBase, IBusyable
     {
-        public bool IsBusy { get; set; }
+        private bool _isBusy;
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                OnPropertyChanged(IsBusyPropertyName);
+            }
+        }
 
         private ArtistPanoramaItemKind _panoramaItemKind;
+        public const string IsBusyPropertyName = "IsBusy";
 
         private const string PanoramaItemKindPropertyName = "PanoramaItemKind";
 
