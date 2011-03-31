@@ -6,3 +6,7 @@ bin/
 obj/
 OpenSyno/OpenSyno.suo
 OpenSyno/OpenSyno.5.1.ReSharper.user
+OpenSyno/MediaParsers.Desktop/
+OpenSyno/MediaParsers.Phone
+OpenSyno/Mp3MediaStreamSource.Phone/
+OpenSyno/Mp3MediaStreamSource.SL4/
