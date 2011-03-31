@@ -65,6 +65,9 @@
     <Reference Include="Mp3MediaStreamSource.Phone, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\3rd party\ManagedMediaHelpers\Mp3MediaStreamSource.Phone.dll</HintPath>
     </Reference>
+    <Reference Include="PhonePerformance">
+      <HintPath>..\3rd party\PhonePerformance\PhonePerformance.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -72,8 +75,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converters\BusyableItemsToVisibilityConverter.cs" />
     <Compile Include="IBusyable.cs" />
+    <Compile Include="PerformanceProgressBar\RelativeAnimatingContentControl.cs" />
     <Compile Include="SearchAllResultsView.xaml.cs">
       <DependentUpon>SearchAllResultsView.xaml</DependentUpon>
     </Compile>

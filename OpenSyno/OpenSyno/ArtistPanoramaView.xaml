@@ -16,7 +16,6 @@
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <phone:PhoneApplicationPage.Resources>
 
-        <Converters:BusyableItemsToVisibilityConverter x:Key="BusyableItemsToVisibilityConverter" />
     </phone:PhoneApplicationPage.Resources>
     <Grid x:Name="LayoutRoot">
 
@@ -26,7 +25,7 @@
                 <ImageBrush AlignmentX="Right" Stretch="UniformToFill" ImageSource="Untitled.png" Opacity=".5" />
             </controls:Pivot.Background>
         </controls:Pivot>
-        <ProgressBar VerticalAlignment="Top" HorizontalAlignment="Stretch" IsIndeterminate="True" Visibility="{Binding ArtistItems, Converter={StaticResource BusyableItemsToVisibilityConverter}}" />
+        <ProgressBar Style="{StaticResource PerformanceProgressBar}" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 
     <!--Panorama-based applications should not show an ApplicationBar-->
