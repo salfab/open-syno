@@ -174,6 +174,10 @@ namespace OpenSyno
                 {
                     Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK));
                 }
+                else
+                {
+                    MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
+                }
 
                 ex = ex.InnerException;
             }

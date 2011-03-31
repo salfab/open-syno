@@ -2,21 +2,35 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls" xmlns:controlsPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls" xmlns:Tilt="clr-namespace:Microsoft.Unsupported"
-    xmlns:local="clr-namespace:OpenSyno" xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance">
+    xmlns:local="clr-namespace:OpenSyno" xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance" xmlns:Helpers="clr-namespace:OpenSyno.Helpers">
 
     <Behaviors:ArtistPanoramaItemKindToStyleConverter x:Key="ArtistPanoramaItemKindToStyleConverter" />
     
     <Style TargetType="ContentControl" x:Key="AlbumsItemStyle">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate>
+                <ControlTemplate>                    
                     <Grid>
+                        <Grid.Resources>
+                            <!--Dirty hack to workaround the ElementName not being cross-DataTemplate on WP7 !-->
+                            <ContentControl x:Key="ViewModelProxy" Content="{Binding}" />                            
+                        </Grid.Resources>
                         <Grid.RowDefinitions>
                             <RowDefinition />                                            
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>	
-                        <!--Use a value converter to template-select according to the Type. either Tracks ,Either ALbums : Not both :)-->
-                        <ListBox Grid.Row="0" ItemsSource="{Binding Albums, Mode=TwoWay}" DisplayMemberPath="Album.Title" />                        
+                        <!--Use a value converter to template-select according to the Type. either Tracks ,Either Albums : Not both :)-->
+                        <ListBox Grid.Row="0" ItemsSource="{Binding Albums, Mode=TwoWay}">
+                            <ListBox.Resources>
+                            </ListBox.Resources>
+                                <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding Source={StaticResource ViewModelProxy}, Path=Content.ShowAlbumDetailCommand, Converter={StaticResource BindingDebuggerConverter}}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="{Binding}" >                                        
+                                        <TextBlock Text="{Binding Album.Title}" />
+                                    </Button>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                         <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding ShowPlayQueueCommand}" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" BorderThickness="0" >
                             <Grid>
                                 <Grid.ColumnDefinitions>

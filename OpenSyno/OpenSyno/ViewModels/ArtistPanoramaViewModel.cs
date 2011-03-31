@@ -26,6 +26,8 @@ namespace OpenSyno.ViewModels
         private const string ArtistNamePropertyName = "ArtistName";
         private const string IsBusyPropertyName = "IsBusy";
 
+        private const string CurrentArtistItemIndexPropertyName = "CurrentArtistItemIndex";
+
         public ArtistPanoramaItemKind PanoramaItemKind { get; set; }
 
         public ArtistPanoramaViewModel(ISearchService searchService, IEventAggregator eventAggregator, PageSwitchingService pageSwitchingService, SynoItem artist)
@@ -51,6 +53,11 @@ namespace OpenSyno.ViewModels
             }
 
             _searchService = searchService;
+
+            // TODO : Use IoC or Factory or whatever, but something to be able to inject our own implementation
+            _panoramaItemSwitchingService = new PanoramaItemSwitchingService();
+
+            _panoramaItemSwitchingService.ActiveItemChangeRequested += (s, e) => CurrentArtistItemIndex = e.NewItemIndex;
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
             ArtistItems = new ObservableCollection<ArtistPanoramaItem>();
@@ -66,6 +73,20 @@ namespace OpenSyno.ViewModels
 
         }
 
+        public int CurrentArtistItemIndex
+        {
+            get
+            {
+                return _currentArtistItemIndex;
+            }
+
+            set
+            {
+                _currentArtistItemIndex = value;
+                OnPropertyChanged(CurrentArtistItemIndexPropertyName);
+            }
+        }
+
         private void UpdateBusyness(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == ArtistPanoramaItem.IsBusyPropertyName)
@@ -75,6 +96,11 @@ namespace OpenSyno.ViewModels
         }
 
         private bool _isBusy;
+
+        private IPanoramaItemSwitchingService _panoramaItemSwitchingService;
+
+        private int _currentArtistItemIndex;
+
         public bool IsBusy
         {
             get { return _isBusy; }
@@ -139,7 +165,7 @@ namespace OpenSyno.ViewModels
             ArtistItems.Clear();
 
             // add the page for the list of albums.
-            var albumsListPanel = new ArtistPanoramaAlbumsListItem(albums, artist, _pageSwitchingService);
+            var albumsListPanel = new ArtistPanoramaAlbumsListItem(albums, artist, _pageSwitchingService, _panoramaItemSwitchingService);
 
             ArtistItems.Add(albumsListPanel);
 

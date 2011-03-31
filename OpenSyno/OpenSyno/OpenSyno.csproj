@@ -80,6 +80,8 @@
     <Compile Include="SearchAllResultsView.xaml.cs">
       <DependentUpon>SearchAllResultsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ViewModelProxy.cs" />
+    <Compile Include="Services\PanoramaItemSwitchingService.cs" />
     <Compile Include="ViewModels\AboutBoxViewModel.cs" />
     <Compile Include="AlbumViewModel.cs" />
     <Compile Include="App.xaml.cs">
@@ -108,6 +110,7 @@
     <Compile Include="OpenSynoSettings.xaml.cs" />
     <Compile Include="Services\MediaEndedEventArgs.cs" />
     <Compile Include="ReadWriteMemoryStream.cs" />
+    <Compile Include="Services\IPanoramaItemSwitchingService.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
     <Compile Include="ViewModels\SearchResultsViewModel.cs" />
