@@ -172,11 +172,16 @@ namespace OpenSyno
 
                 if (!Deployment.Current.Dispatcher.CheckAccess())
                 {
-                    Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK));
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                                                                  {
+                                                                      MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
+                                                                      MessageBox.Show(exception.StackTrace, exception.GetType().Name, MessageBoxButton.OK);
+                                                                  });
                 }
                 else
                 {
                     MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
+                    MessageBox.Show(exception.StackTrace, exception.GetType().Name, MessageBoxButton.OK);
                 }
 
                 ex = ex.InnerException;

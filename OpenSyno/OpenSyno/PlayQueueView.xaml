@@ -6,7 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Converters="clr-namespace:OpenSyno.Converters" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Converters="clr-namespace:OpenSyno.Converters" xmlns:Delay="clr-namespace:Delay;assembly=PhonePerformance" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -34,7 +34,7 @@
                         <ColumnDefinition Width="200" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Column="0" HorizontalAlignment="Center" Source="{Binding CurrentArtwork}" Stretch="None" VerticalAlignment="Top" />
+                    <Image Grid.Column="0" HorizontalAlignment="Center" Delay:LowProfileImageLoader.UriSource="{Binding CurrentArtwork}" Stretch="None" VerticalAlignment="Top" />
                     <ListBox Grid.RowSpan="3" Grid.Column="1" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay}" DisplayMemberPath="TrackInfo.Title" ItemContainerStyle="{StaticResource PlayQueueItemStyle}" />
                     <TextBlock Grid.ColumnSpan="2" Grid.Row="1" Text="{Binding ActiveTrack.TrackInfo.Artist}" />
                     <TextBlock Grid.ColumnSpan="2" Grid.Row="2" Text="{Binding ActiveTrack.TrackInfo.Title}" />

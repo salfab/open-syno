@@ -105,7 +105,7 @@ namespace OpenSyno.Services
                 throw new ArgumentNullException("targetStream");
             }
 
-            int bufferSize = 1024;
+            int bufferSize = 10240;
             var buffer = new byte[bufferSize];
 
             stream.BeginRead(buffer, 0, buffer.Length, DownloadTrackCallback, new DownloadFileState(stream, contentLength, targetStream, synoTrack, buffer, filePath, contentLength, bufferingProgressUpdate));          
