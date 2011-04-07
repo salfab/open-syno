@@ -3,40 +3,15 @@ using System.Collections.Generic;
 
 namespace OpenSyno
 {
+    using MicroIoc;
+
     public class IoC
     {
-        private Dictionary<Type, object> _registeredInstances = new Dictionary<Type, object>();
-        static private readonly IoC _current = new IoC();
-        static public IoC Current
-        {
-            get { return _current; }            
-        }
+        static public IMicroIocContainer Container { get; set; }
 
-        public T Resolve<T>()
+        static IoC()
         {
-            if (_registeredInstances.ContainsKey(typeof(T)))
-            {
-                return (T) _registeredInstances[typeof (T)];
-            }
-
-            throw new ArgumentException(string.Format("The type {0} could not be resolved as it was not previously registered.", typeof (T).FullName));
-        }
-
-        public void RegisterInstance<T>(T instance)
-        {
-            if (_registeredInstances.ContainsKey(typeof(T)))
-            {
-                _registeredInstances[typeof (T)] = instance;
-            }
-            else
-            {
-                _registeredInstances.Add(typeof(T), instance);                
-            }
-        }
-
-        public bool CheckRegistered<T>()
-        {
-            return _registeredInstances.ContainsKey(typeof (T));
+            Container = new MicroIocContainer();
         }
     }
 }

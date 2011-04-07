@@ -31,7 +31,17 @@
         private static void ViewModelTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var view = (FrameworkElement)d;
-            view.DataContext = IoC.Current.Resolve<SearchViewModel>();
+
+            // If we're dealing with a viewmodel directly
+            if (((Type)e.NewValue).IsSubclassOf(typeof(ViewModelBase)))
+            {
+                view.DataContext = IoC.Container.Resolve((Type)e.NewValue);
+                return;
+            }
+
+            var factory = IoC.Container.Resolve((Type)e.NewValue);            
+            // if we're dealing with a factory which will build our view model
+            // ...
         }
     }
 }

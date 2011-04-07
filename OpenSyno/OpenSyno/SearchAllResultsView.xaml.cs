@@ -29,8 +29,8 @@ namespace OpenSyno
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
             string keyword = NavigationContext.QueryString["keyword"];
-            
-            DataContext = IoC.Current.Resolve<ISearchAllResultsViewModelFactory>().Create(keyword, new PageSwitchingService(NavigationService));
+
+            DataContext = IoC.Container.Resolve<ISearchAllResultsViewModelFactory>().Create(keyword, new PageSwitchingService(NavigationService));
         }
     }
 

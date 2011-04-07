@@ -27,12 +27,12 @@ namespace OpenSyno
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
             // FIXME : Use IoC or a ViewModelLocator
-            var eventAggregator = IoC.Current.Resolve<IEventAggregator>();
+            var eventAggregator = IoC.Container.Resolve<IEventAggregator>();
 
             // don't rebuild a viewmodel if we're navigating back from the navigation journal : it still exists in memory !
             if (DataContext == null)
             {
-                DataContext = new SearchViewModel(IoC.Current.Resolve<ISearchService>(), new PageSwitchingService(NavigationService), eventAggregator);                
+                DataContext = new SearchViewModel(IoC.Container.Resolve<ISearchService>(), new PageSwitchingService(NavigationService), eventAggregator);                
             }
         }
 

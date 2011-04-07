@@ -11,7 +11,7 @@
         /// </summary>
         public PlayQueueView()
         {
-            DataContext = IoC.Current.Resolve<PlayQueueViewModel>();
+            DataContext = IoC.Container.Resolve<PlayQueueViewModel>();
             InitializeComponent();
         }
     }

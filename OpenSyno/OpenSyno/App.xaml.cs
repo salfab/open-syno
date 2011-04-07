@@ -65,7 +65,7 @@ namespace OpenSyno
         private void InitializeSettings()
         {
             EventAggregator eventAggregator = new EventAggregator();
-            IoC.Current.RegisterInstance<IEventAggregator>(eventAggregator);
+            IoC.Container.RegisterInstance<IEventAggregator>(eventAggregator);
 
             string synoSettings = "SynoSettings";
             _openSynoSettings = IsolatedStorageSettings.ApplicationSettings.Contains(synoSettings) ? (OpenSynoSettings)IsolatedStorageSettings.ApplicationSettings[synoSettings] : new OpenSynoSettings();
@@ -75,8 +75,8 @@ namespace OpenSyno
             IAudioStationSession audioStation = new AudioStationSession();
 
             // FIXME : Try to get rid of thses registrations and use DI instead.
-            IoC.Current.RegisterInstance<IOpenSynoSettings>(_openSynoSettings);
-            IoC.Current.RegisterInstance<IAudioStationSession>(audioStation);
+            IoC.Container.RegisterInstance<IOpenSynoSettings>(_openSynoSettings);
+            IoC.Container.RegisterInstance<IAudioStationSession>(audioStation);
 
 
 
@@ -86,14 +86,13 @@ namespace OpenSyno
 
             // FIXME : Replace home-made IoC by MicroIoc.
 
-            IoC.Current.RegisterInstance<ISearchService>(searchService);
+            IoC.Container.RegisterInstance<ISearchService>(searchService);
 
-            IoC.Current.RegisterInstance(new ArtistPanoramaViewModelFactory(searchService, eventAggregator));
+            IoC.Container.RegisterInstance(new ArtistPanoramaViewModelFactory(searchService, eventAggregator));
 
-            IoC.Current.RegisterInstance(new SearchResultsViewModelFactory(eventAggregator));
+            IoC.Container.RegisterInstance(new SearchResultsViewModelFactory(eventAggregator));
 
-            IoC.Current.RegisterInstance<ISearchAllResultsViewModelFactory>(new SearchAllResultsViewModelFactory(eventAggregator));
-
+            IoC.Container.RegisterInstance<ISearchAllResultsViewModelFactory>(new SearchAllResultsViewModelFactory(eventAggregator));            
 
             // Retrieve the type LocalAudioRenderingService from a config file, so we can change it.
             LocalAudioRenderingService localAudioRenderingService = new LocalAudioRenderingService(audioStation);
@@ -101,7 +100,7 @@ namespace OpenSyno
             // Retrieve the type PlaybackService from a config file, so we can change it.
             IPlaybackService playbackService = new PlaybackService(localAudioRenderingService);
 
-            IoC.Current.RegisterInstance(new PlayQueueViewModel(eventAggregator, playbackService));
+            IoC.Container.RegisterInstance(new PlayQueueViewModel(eventAggregator, playbackService));
 
             if (_openSynoSettings.UserName == null || _openSynoSettings.Password == null || _openSynoSettings.Host == null)
             {

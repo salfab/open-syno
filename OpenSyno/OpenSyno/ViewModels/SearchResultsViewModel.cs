@@ -25,7 +25,7 @@
             if (lastSearchResults == null) throw new ArgumentNullException("lastSearchResults");
 
             // register for search results updates
-            _eventAggregator = IoC.Current.Resolve<IEventAggregator>();
+            _eventAggregator = IoC.Container.Resolve<IEventAggregator>();
             _pageSwitchingService = pageSwitchingService;
 
             // to catch up in case a search result has already been issued.
