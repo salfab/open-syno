@@ -20,20 +20,20 @@ namespace OpenSyno.Helpers
         // Note : Too bad, TypeNameConverter does not exist for WP7 :(
         // http://msdn.microsoft.com/en-us/library/system.configuration.typenameconverter.aspx
 
-        [TypeConverter(typeof(TypeTypeConverter))]
-        public static Type GetViewModelType(DependencyObject obj)
+        //[TypeConverter(typeof(TypeTypeConverter))]
+        public static string GetViewModelType(DependencyObject obj)
         {
-            return (Type)obj.GetValue(ViewModelTypeProperty);
+            return (string)obj.GetValue(ViewModelTypeProperty);
         }
 
-        public static void SetViewModelType(DependencyObject obj, Type value)
+        public static void SetViewModelType(DependencyObject obj, string value)
         {
             obj.SetValue(ViewModelTypeProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for ViewModelType.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ViewModelTypeProperty =
-            DependencyProperty.RegisterAttached("ViewModelType", typeof(Type), typeof(ViewModelResolver), new PropertyMetadata(ViewModelTypeChanged));
+            DependencyProperty.RegisterAttached("ViewModelType", typeof(string), typeof(ViewModelResolver), new PropertyMetadata(ViewModelTypeChanged));
         
         private static void ViewModelTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -41,9 +41,8 @@ namespace OpenSyno.Helpers
             view.Loaded += (s, ea) =>
                                {
                                    var loadedView = (FrameworkElement)d;
-
-                                   Type type = (Type) e.NewValue;
-
+                                   Type type = Type.GetType((string)e.NewValue);
+        
                                    // If we're dealing with a viewmodel directly
                                    if (type.IsSubclassOf(typeof (ViewModelBase)))
                                    {
