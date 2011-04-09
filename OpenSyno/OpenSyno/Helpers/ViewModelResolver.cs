@@ -37,7 +37,9 @@ namespace OpenSyno.Helpers
         
         private static void ViewModelTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            
             var view = (FrameworkElement)d;
+            
             view.Loaded += (s, ea) =>
                                {
                                    var loadedView = (FrameworkElement)d;
@@ -49,12 +51,8 @@ namespace OpenSyno.Helpers
                                        // Just in case we would have some view-specific dependency where the binding would change according to the view it comes from, then we can do it by binding with a specifiv named-registration constraint.
                                        // TODO : Double check if it would make more sense to use the name of the type of the view or the one of the viewmodel as the named-registration constraint.
 
-                                       // FIXME : Waiting for a bug to be solved in ninject to uncomment this. in the meantime, we need to resort to this ugly workaround which is 1) verbose and 2) making use of magic strings. The Issue ticket can be found there : https://github.com/ninject/ninject/issues#issue/33
-                                       //var parameters = new IParameter[1];
-                                       //var parameter = new Parameter("pageSwitchingService", IoC.Container.Get<IPageSwitchingService>(loadedView.GetType().FullName),false);
-                                       //parameters[0] = parameter;                                      
-                                       //loadedView.DataContext = IoC.Container.Get(type, parameters);
-                                       loadedView.DataContext = IoC.Container.Get(type,  o =>
+                                       // FIXME : Waiting for a bug to be solved in ninject to uncomment this. in the meantime, we need to resort to this ugly workaround which is 1) verbose and 2) making use of magic strings. The Issue ticket can be found there : https://github.com/ninject/ninject/issues#issue/33                                  
+                                       loadedView.DataContext = IoC.Container.Get(type, o =>
                                                                                              {                                                                                                 
                                                                                                  if (o.Name == null)
                                                                                                  {

@@ -70,35 +70,10 @@ namespace OpenSyno
 
             string synoSettings = "SynoSettings";
             _openSynoSettings = IsolatedStorageSettings.ApplicationSettings.Contains(synoSettings) ? (OpenSynoSettings)IsolatedStorageSettings.ApplicationSettings[synoSettings] : new OpenSynoSettings();
-
-
-
             // FIXME : Try to get rid of thses registrations and use DI instead.
             IoC.Container.Bind<IOpenSynoSettings>().ToConstant(_openSynoSettings);
 
-            // Retrieve the type IAudioStationSession from a config file, so we can change it.
-            // Also possible : RemoteFileMockAudioStationSession
-            IoC.Container.Bind<IAudioStationSession>().To(typeof(AudioStationSession)).InSingletonScope();
-
-            // Retrieve the type SearchService from a config file, so we can change it.
-            // also possible: MockSearchService;
-            IoC.Container.Bind<ISearchService>().To(typeof(SearchService)).InSingletonScope();
-                        
-
-            //IoC.Container.RegisterInstance(new ArtistPanoramaViewModelFactory(searchService, eventAggregator));
-
-            //IoC.Container.RegisterInstance(new SearchResultsViewModelFactory(eventAggregator));
-
-            IoC.Container.Bind<ISearchAllResultsViewModelFactory>().To(typeof(SearchAllResultsViewModelFactory)).InSingletonScope();            
-
-            // Retrieve the type PlaybackService from a config file, so we can change it.
-            IoC.Container.Bind<IPlaybackService>().To(typeof (PlaybackService)).InSingletonScope();
-
-            //IoC.Container.RegisterInstance(new PlayQueueViewModel(eventAggregator, playbackService));))
-
-            // bullshit : remove
-            IoC.Container.Bind<IPageSwitchingService>().ToConstant(new PageSwitchingService(null));
-
+           
 
             if (_openSynoSettings.UserName == null || _openSynoSettings.Password == null || _openSynoSettings.Host == null)
             {
