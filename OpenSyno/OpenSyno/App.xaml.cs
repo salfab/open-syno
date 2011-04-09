@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Practices.Prism.Events;
+using Ninject;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;
 using Synology.AudioStationApi;
@@ -65,42 +66,39 @@ namespace OpenSyno
         private void InitializeSettings()
         {
             EventAggregator eventAggregator = new EventAggregator();
-            IoC.Container.RegisterInstance<IEventAggregator>(eventAggregator);
+            IoC.Container.Bind<IEventAggregator>().ToConstant(eventAggregator);
 
             string synoSettings = "SynoSettings";
             _openSynoSettings = IsolatedStorageSettings.ApplicationSettings.Contains(synoSettings) ? (OpenSynoSettings)IsolatedStorageSettings.ApplicationSettings[synoSettings] : new OpenSynoSettings();
 
-            // Retrieve the type IAudioStationSession from a config file, so we can change it.
-            //IAudioStationSession audioStation = new RemoteFileMockAudioStationSession();
-            IAudioStationSession audioStation = new AudioStationSession();
+
 
             // FIXME : Try to get rid of thses registrations and use DI instead.
-            IoC.Container.RegisterInstance<IOpenSynoSettings>(_openSynoSettings);
-            IoC.Container.RegisterInstance<IAudioStationSession>(audioStation);
+            IoC.Container.Bind<IOpenSynoSettings>().ToConstant(_openSynoSettings);
 
-
+            // Retrieve the type IAudioStationSession from a config file, so we can change it.
+            // Also possible : RemoteFileMockAudioStationSession
+            IoC.Container.Bind<IAudioStationSession>().To(typeof(AudioStationSession)).InSingletonScope();
 
             // Retrieve the type SearchService from a config file, so we can change it.
-            //var searchService = new MockSearchService();
-            var searchService = new SearchService(audioStation);
+            // also possible: MockSearchService;
+            IoC.Container.Bind<ISearchService>().To(typeof(SearchService)).InSingletonScope();
+                        
 
-            // FIXME : Replace home-made IoC by MicroIoc.
+            //IoC.Container.RegisterInstance(new ArtistPanoramaViewModelFactory(searchService, eventAggregator));
 
-            IoC.Container.RegisterInstance<ISearchService>(searchService);
+            //IoC.Container.RegisterInstance(new SearchResultsViewModelFactory(eventAggregator));
 
-            IoC.Container.RegisterInstance(new ArtistPanoramaViewModelFactory(searchService, eventAggregator));
-
-            IoC.Container.RegisterInstance(new SearchResultsViewModelFactory(eventAggregator));
-
-            IoC.Container.RegisterInstance<ISearchAllResultsViewModelFactory>(new SearchAllResultsViewModelFactory(eventAggregator));            
-
-            // Retrieve the type LocalAudioRenderingService from a config file, so we can change it.
-            LocalAudioRenderingService localAudioRenderingService = new LocalAudioRenderingService(audioStation);
+            IoC.Container.Bind<ISearchAllResultsViewModelFactory>().To(typeof(SearchAllResultsViewModelFactory)).InSingletonScope();            
 
             // Retrieve the type PlaybackService from a config file, so we can change it.
-            IPlaybackService playbackService = new PlaybackService(localAudioRenderingService);
+            IoC.Container.Bind<IPlaybackService>().To(typeof (PlaybackService)).InSingletonScope();
 
-            IoC.Container.RegisterInstance(new PlayQueueViewModel(eventAggregator, playbackService));
+            //IoC.Container.RegisterInstance(new PlayQueueViewModel(eventAggregator, playbackService));))
+
+            // bullshit : remove
+            IoC.Container.Bind<IPageSwitchingService>().ToConstant(new PageSwitchingService(null));
+
 
             if (_openSynoSettings.UserName == null || _openSynoSettings.Password == null || _openSynoSettings.Host == null)
             {
@@ -108,6 +106,7 @@ namespace OpenSyno
             }
             else
             {
+                var audioStation = IoC.Container.Get<IAudioStationSession>();
                 audioStation.LoginAsync(_openSynoSettings.UserName, _openSynoSettings.Password, _openSynoSettings.Host, _openSynoSettings.Port, LoginCompleted, LoginError);
             }
         }

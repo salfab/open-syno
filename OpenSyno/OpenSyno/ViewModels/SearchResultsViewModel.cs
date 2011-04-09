@@ -1,4 +1,6 @@
-﻿namespace OpenSyno.ViewModels
+﻿using Ninject;
+
+namespace OpenSyno.ViewModels
 {
     using System.Collections;
     using System.Linq;
@@ -25,7 +27,7 @@
             if (lastSearchResults == null) throw new ArgumentNullException("lastSearchResults");
 
             // register for search results updates
-            _eventAggregator = IoC.Container.Resolve<IEventAggregator>();
+            _eventAggregator = IoC.Container.Get<IEventAggregator>();
             _pageSwitchingService = pageSwitchingService;
 
             // to catch up in case a search result has already been issued.

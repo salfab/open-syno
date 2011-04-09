@@ -12,6 +12,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Practices.Prism.Events;
+using Ninject;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;
 using Synology.AudioStationApi;
@@ -30,7 +31,7 @@ namespace OpenSyno
         {
             string keyword = NavigationContext.QueryString["keyword"];
 
-            DataContext = IoC.Container.Resolve<ISearchAllResultsViewModelFactory>().Create(keyword, new PageSwitchingService(NavigationService));
+            DataContext = IoC.Container.Get<ISearchAllResultsViewModelFactory>().Create(keyword, new PageSwitchingService(NavigationService));
         }
     }
 

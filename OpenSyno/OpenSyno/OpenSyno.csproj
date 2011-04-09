@@ -53,9 +53,7 @@
     <Reference Include="MediaParsers.Phone, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\3rd party\ManagedMediaHelpers\MediaParsers.Phone.dll</HintPath>
     </Reference>
-    <Reference Include="MicroIoc">
-      <HintPath>..\3rd party\MicroIoC\MicroIoc.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.Devices.Sensors" />
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Controls" />
     <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL">
@@ -67,6 +65,9 @@
     </Reference>
     <Reference Include="Mp3MediaStreamSource.Phone, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\3rd party\ManagedMediaHelpers\Mp3MediaStreamSource.Phone.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\3rd party\Ninject\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="PhonePerformance">
       <HintPath>..\3rd party\PhonePerformance\PhonePerformance.dll</HintPath>

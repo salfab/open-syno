@@ -9,6 +9,10 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Practices.Prism.Events;
+using Ninject;
+using Ninject.Activation;
+using Ninject.Planning.Bindings;
+using OpenSyno.Helpers;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;
 
@@ -24,15 +28,19 @@ namespace OpenSyno
             InitializeComponent();
         }
 
+        // HACK : If NavigationService in silverlight was the same as in WPF, we wouldn't have to put this logic in the view : we could have it in a view factory and have it more decoupled, unfortunately
+        // when navigating in a SL / WP7 application there is no way for us to control the lifecycle of the page being navigated to.
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
-            // FIXME : Use IoC or a ViewModelLocator
-            var eventAggregator = IoC.Container.Resolve<IEventAggregator>();
+            var viewName = GetType().FullName;
 
-            // don't rebuild a viewmodel if we're navigating back from the navigation journal : it still exists in memory !
-            if (DataContext == null)
+            // Don't register if it has been already registered in the past.
+            if (IoC.Container.GetBindings(typeof(IPageSwitchingService)).Count(o => o.Metadata.Name == viewName) == 0)
             {
-                DataContext = new SearchViewModel(IoC.Container.Resolve<ISearchService>(), new PageSwitchingService(NavigationService), eventAggregator);                
+                // register the type binding...
+                IoC.Container.Bind<IPageSwitchingService>().ToConstant(new PageSwitchingService(NavigationService))
+                    // ... to only be valid when a resolvere with a set constraint validates our metadata. (https://github.com/ninject/ninject/issues/closed#issue/33/comment/977575)
+                    .When((o=>ViewModelResolver.ValidatedByAParentConstraint(o, viewName)));
             }
         }
 

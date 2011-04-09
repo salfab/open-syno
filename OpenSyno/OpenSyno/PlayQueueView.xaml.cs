@@ -1,4 +1,6 @@
-﻿namespace OpenSyno
+﻿using Ninject;
+
+namespace OpenSyno
 {
     using Microsoft.Phone.Controls;
 
@@ -11,7 +13,7 @@
         /// </summary>
         public PlayQueueView()
         {
-            DataContext = IoC.Container.Resolve<PlayQueueViewModel>();
+            DataContext = IoC.Container.Get<PlayQueueViewModel>();
             InitializeComponent();
         }
     }

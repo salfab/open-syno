@@ -1,4 +1,11 @@
-﻿namespace OpenSyno.Helpers
+﻿using System.Collections.Generic;
+using Ninject;
+using Ninject.Activation;
+using Ninject.Parameters;
+using Ninject.Planning.Bindings;
+using OpenSyno.Services;
+
+namespace OpenSyno.Helpers
 {
     using System;
     using System.ComponentModel;
@@ -31,17 +38,54 @@
         private static void ViewModelTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var view = (FrameworkElement)d;
+            view.Loaded += (s, ea) =>
+                               {
+                                   var loadedView = (FrameworkElement)d;
 
-            // If we're dealing with a viewmodel directly
-            if (((Type)e.NewValue).IsSubclassOf(typeof(ViewModelBase)))
+                                   Type type = (Type) e.NewValue;
+
+                                   // If we're dealing with a viewmodel directly
+                                   if (type.IsSubclassOf(typeof (ViewModelBase)))
+                                   {
+                                       // Just in case we would have some view-specific dependency where the binding would change according to the view it comes from, then we can do it by binding with a specifiv named-registration constraint.
+                                       // TODO : Double check if it would make more sense to use the name of the type of the view or the one of the viewmodel as the named-registration constraint.
+
+                                       // FIXME : Waiting for a bug to be solved in ninject to uncomment this. in the meantime, we need to resort to this ugly workaround which is 1) verbose and 2) making use of magic strings. The Issue ticket can be found there : https://github.com/ninject/ninject/issues#issue/33
+                                       //var parameters = new IParameter[1];
+                                       //var parameter = new Parameter("pageSwitchingService", IoC.Container.Get<IPageSwitchingService>(loadedView.GetType().FullName),false);
+                                       //parameters[0] = parameter;                                      
+                                       //loadedView.DataContext = IoC.Container.Get(type, parameters);
+                                       loadedView.DataContext = IoC.Container.Get(type,  o =>
+                                                                                             {                                                                                                 
+                                                                                                 if (o.Name == null)
+                                                                                                 {
+                                                                                                     return true;
+                                                                                                 }
+                                                                                                 return o.Name == loadedView.GetType().FullName;
+                                                                                                 
+                                                                                             });
+                                       return;
+                                   }
+                                   
+                                   var factory = IoC.Container.Get(type);
+                                   // if we're dealing with a factory which will build our view model
+                                   // ...
+                               };
+
+        }
+
+
+        public static bool ValidatedByAParentConstraint(IRequest arg, string bindingName)
+        {
+            IRequest request = arg;
+
+            // we bubble up the constraints, to find one that would be available
+            while (request.Constraint == null)
             {
-                view.DataContext = IoC.Container.Resolve((Type)e.NewValue);
-                return;
+                request = arg.ParentRequest;
             }
 
-            var factory = IoC.Container.Resolve((Type)e.NewValue);            
-            // if we're dealing with a factory which will build our view model
-            // ...
+            return request.Constraint(new BindingMetadata { Name = bindingName });                                                              
         }
     }
 }

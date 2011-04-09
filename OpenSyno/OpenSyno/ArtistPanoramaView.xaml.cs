@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using Ninject;
 using OpenSyno.Services;
 
 namespace OpenSyno
@@ -21,7 +22,7 @@ namespace OpenSyno
 
         private void OnArtistPanoramaViewLoaded(object sender, RoutedEventArgs e)
         {
-            var factory = IoC.Container.Resolve<ArtistPanoramaViewModelFactory>();
+            var factory = IoC.Container.Get<ArtistPanoramaViewModelFactory>();
             DataContext = factory.Create(new PageSwitchingService(NavigationService));
         }
     }

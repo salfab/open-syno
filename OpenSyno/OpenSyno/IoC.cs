@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ninject;
 
 namespace OpenSyno
 {
-    using MicroIoc;
+  
 
     public class IoC
     {
-        static public IMicroIocContainer Container { get; set; }
+        static public IKernel Container { get; set; }
 
         static IoC()
         {
-            Container = new MicroIocContainer();
+            Container = new StandardKernel();            
         }
     }
 }

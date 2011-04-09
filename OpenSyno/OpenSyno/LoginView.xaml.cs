@@ -9,6 +9,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Practices.Prism.Events;
+using Ninject;
 using OpenSyno.Helpers;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;
@@ -30,9 +31,9 @@ namespace OpenSyno
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
             // FIXME : Use and instanciate a LoginViewModelFactory at application startup and use it to create the LoginViewModelFactory.
-            var eventAggregator = IoC.Container.Resolve<IEventAggregator>();
+            var eventAggregator = IoC.Container.Get<IEventAggregator>();
             // FIXME : Use a factory.Create, and instanciate AudioStationSession and event aggregators at application startup
-            DataContext = new LoginViewModel(new PageSwitchingService(NavigationService), eventAggregator, IoC.Container.Resolve<IAudioStationSession>(), IoC.Container.Resolve<IOpenSynoSettings>());
+            DataContext = new LoginViewModel(new PageSwitchingService(NavigationService), eventAggregator, IoC.Container.Get<IAudioStationSession>(), IoC.Container.Get<IOpenSynoSettings>());
         }
 
         private void ApplicationBarSignInButtonClicked(object sender, EventArgs e)
