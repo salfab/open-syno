@@ -73,7 +73,21 @@ namespace OpenSyno
             // FIXME : Try to get rid of thses registrations and use DI instead.
             IoC.Container.Bind<IOpenSynoSettings>().ToConstant(_openSynoSettings);
 
-           
+            // FIXME : Load from config files instead of  hard-coded bindings.
+
+            // Retrieve the type IAudioStationSession from a config file, so we can change it.
+            // Also possible : RemoteFileMockAudioStationSession
+            IoC.Container.Bind<IAudioStationSession>().To(typeof(AudioStationSession)).InSingletonScope();
+
+            // Retrieve the type SearchService from a config file, so we can change it.
+            // also possible: MockSearchService;
+            IoC.Container.Bind<ISearchService>().To(typeof(SearchService)).InSingletonScope();
+
+            IoC.Container.Bind<ISearchAllResultsViewModelFactory>().To(typeof(SearchAllResultsViewModelFactory)).InSingletonScope();
+            IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
+
+            // Retrieve the type PlaybackService from a config file, so we can change it.
+            IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();
 
             if (_openSynoSettings.UserName == null || _openSynoSettings.Password == null || _openSynoSettings.Host == null)
             {
@@ -82,14 +96,21 @@ namespace OpenSyno
             else
             {
                 var audioStation = IoC.Container.Get<IAudioStationSession>();
-                audioStation.LoginAsync(_openSynoSettings.UserName, _openSynoSettings.Password, _openSynoSettings.Host, _openSynoSettings.Port, LoginCompleted, LoginError);
+                audioStation.LoginAsync(
+                    _openSynoSettings.UserName,
+                    _openSynoSettings.Password, 
+                    _openSynoSettings.Host,
+                    _openSynoSettings.Port, 
+                    token =>
+                            {
+                                _openSynoSettings.Token = token;
+                                eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Publish(new SynoTokenReceivedAggregatedEvent {Token = token});
+                            },
+                    LoginError);
             }
         }
 
-        private void LoginCompleted(string obj)
-        {
-            
-        }
+
 
         private void LoginError(Exception obj)
         {
@@ -205,5 +226,10 @@ namespace OpenSyno
         }
 
         #endregion
+    }
+
+    internal class SynoTokenReceivedAggregatedEvent
+    {
+        public string Token { get; set; }
     }
 }

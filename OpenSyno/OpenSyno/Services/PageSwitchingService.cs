@@ -6,6 +6,7 @@ namespace OpenSyno.Services
     public class PageSwitchingService : IPageSwitchingService
     {
         private readonly NavigationService _navigationService;
+        private const string SearchUri = "/SearchView.xaml";
 
         private const string SearchAllResultsUri = "/SearchAllResultsView.xaml?keyword={0}";
 
@@ -44,6 +45,11 @@ namespace OpenSyno.Services
         public void NavigateToSearchAllResults(string keyword)
         {
             _navigationService.Navigate(new Uri(string.Format(SearchAllResultsUri, keyword), UriKind.RelativeOrAbsolute));
+        }
+
+        public void NavigateToSearch()
+        {
+            _navigationService.Navigate(new Uri(SearchUri, UriKind.RelativeOrAbsolute));
         }
 
         public void NavigateToPlayQueue()

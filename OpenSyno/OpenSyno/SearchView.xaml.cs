@@ -23,6 +23,8 @@ namespace OpenSyno
     public class ViewNames
     {
         public const string SearchView = "SearchView";
+
+        public const string StartupView = "StartupView";
     }
 
     public partial class SearchView

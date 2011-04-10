@@ -20,10 +20,12 @@ namespace OpenSyno.ViewModels
 
         private const string SearchPatternPropertyName = "SearchPattern";
         private const string IsBusyPropertyName = "IsBusy";
+        private const string IsAppLoadingPropertyName = "IsAppLoading";
         private readonly IEventAggregator _eventAggregator;
 
         private readonly IPageSwitchingService _pageSwitchingService;
         private readonly ISearchService _searchService;
+        private bool _isAppLoading = true;
         private bool _isBusy;
         private string _searchPattern;
 
@@ -33,6 +35,8 @@ namespace OpenSyno.ViewModels
             _pageSwitchingService = pageSwitchingService;
             _eventAggregator = eventAggregator;
 
+            _eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Subscribe(o => IsAppLoading = false, true);
+
             StartSearchCommand = new DelegateCommand<string>(OnStartSearch);
             StartSearchAllCommand = new DelegateCommand<string>(OnStartSearchAll);
             ShowAboutBoxCommand = new DelegateCommand(OnShowAboutBox);
@@ -41,11 +45,6 @@ namespace OpenSyno.ViewModels
 
 
         public ICommand StartSearchAllCommand { get; set; }
-
-        private void OnShowAboutBox()
-        {
-            _pageSwitchingService.NavigateToAboutBox();
-        }
 
         public ICommand StartSearchCommand { get; set; }
 
@@ -75,7 +74,25 @@ namespace OpenSyno.ViewModels
             }
         }
 
+        public bool IsAppLoading
+        {
+            get
+            {
+                return _isAppLoading;
+            }
+            set
+            {
+                _isAppLoading = value;
+                OnPropertyChanged(IsAppLoadingPropertyName);
+            }
+        }
+
         public ICommand ShowAboutBoxCommand { get; set; }
+
+        private void OnShowAboutBox()
+        {
+            _pageSwitchingService.NavigateToAboutBox();
+        }
 
         /// <summary>
         /// Called when the search gets started.

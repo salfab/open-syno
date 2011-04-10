@@ -6,7 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:OpenSyno.Helpers"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Behavior="clr-namespace:OpenSyno" FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
@@ -41,9 +41,10 @@
                 <Button Content="Artist" Behaviors:ButtonClickToCommandBehavior.Command="{Binding StartSearchCommand}" />
                 <TextBlock Text="Search" Margin="12,0" />
                 <TextBox Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding StartSearchAllCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
-            </StackPanel>
+            </StackPanel>            
         </Grid>
-        <Image Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" Source="/SplashScreenImage.jpg" Stretch="Fill" Margin="0,-32,0,0"/>
+        <!--Behaviors:OverrideVisibilityBehavior.IsVisible="{Binding IsAppLoading, Converter={StaticResource BooleanToVisibilityConverter}}"-->
+        <Image Visibility="{Binding IsAppLoading, Converter={StaticResource BooleanToVisibilityConverter}}" Source="/SplashScreenImage.jpg" Stretch="Fill" Margin="0,-32,0,0"/>
     </Grid>
  
     <!--Sample code showing usage of ApplicationBar-->
