@@ -20,6 +20,11 @@ namespace OpenSyno
 {
     using System;
 
+    public class ViewNames
+    {
+        public const string SearchView = "SearchView";
+    }
+
     public partial class SearchView
     {
         public SearchView()
@@ -32,15 +37,13 @@ namespace OpenSyno
         // when navigating in a SL / WP7 application there is no way for us to control the lifecycle of the page being navigated to.
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
-            var viewName = GetType().FullName;
+            string viewName = ViewNames.SearchView;// "SearchView"; // GetType().FullName;
 
             // Don't register if it has been already registered in the past.
             if (IoC.Container.GetBindings(typeof(IPageSwitchingService)).Count(o => o.Metadata.Name == viewName) == 0)
             {
                 // register the type binding...
-                IoC.Container.Bind<IPageSwitchingService>().ToConstant(new PageSwitchingService(NavigationService))
-                    // ... to only be valid when a resolvere with a set constraint validates our metadata. (https://github.com/ninject/ninject/issues/closed#issue/33/comment/977575)
-                    .When((o=>ViewModelResolver.ValidatedByAParentConstraint(o, viewName)));
+                IoC.Container.Bind<IPageSwitchingService>().ToConstant(new PageSwitchingService(NavigationService)).Named(viewName);                
             }
         }
 

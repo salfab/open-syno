@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Ninject;
 
 namespace OpenSyno.ViewModels
 {
@@ -26,7 +27,7 @@ namespace OpenSyno.ViewModels
         private bool _isBusy;
         private string _searchPattern;
 
-        public SearchViewModel(ISearchService searchService, IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator)
+        public SearchViewModel(ISearchService searchService, [Named(ViewNames.SearchView)] IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator)
         {
             _searchService = searchService;
             _pageSwitchingService = pageSwitchingService;

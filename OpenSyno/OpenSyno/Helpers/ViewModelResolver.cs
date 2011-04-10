@@ -47,20 +47,8 @@ namespace OpenSyno.Helpers
         
                                    // If we're dealing with a viewmodel directly
                                    if (type.IsSubclassOf(typeof (ViewModelBase)))
-                                   {
-                                       // Just in case we would have some view-specific dependency where the binding would change according to the view it comes from, then we can do it by binding with a specifiv named-registration constraint.
-                                       // TODO : Double check if it would make more sense to use the name of the type of the view or the one of the viewmodel as the named-registration constraint.
-
-                                       // FIXME : Waiting for a bug to be solved in ninject to uncomment this. in the meantime, we need to resort to this ugly workaround which is 1) verbose and 2) making use of magic strings. The Issue ticket can be found there : https://github.com/ninject/ninject/issues#issue/33                                  
-                                       loadedView.DataContext = IoC.Container.Get(type, o =>
-                                                                                             {                                                                                                 
-                                                                                                 if (o.Name == null)
-                                                                                                 {
-                                                                                                     return true;
-                                                                                                 }
-                                                                                                 return o.Name == loadedView.GetType().FullName;
-                                                                                                 
-                                                                                             });
+                                   {                                       
+                                       loadedView.DataContext = IoC.Container.Get(type);
                                        return;
                                    }
                                    

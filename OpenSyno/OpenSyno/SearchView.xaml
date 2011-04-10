@@ -37,13 +37,13 @@
                             <InputScopeName NameValue="Search" />
                         </InputScope>
                     </TextBox.InputScope>
-
                 </TextBox>-->
                 <Button Content="Artist" Behaviors:ButtonClickToCommandBehavior.Command="{Binding StartSearchCommand}" />
                 <TextBlock Text="Search" Margin="12,0" />
                 <TextBox Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding StartSearchAllCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
             </StackPanel>
         </Grid>
+        <Image Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" Source="/SplashScreenImage.jpg" Stretch="Fill" Margin="0,-32,0,0"/>
     </Grid>
  
     <!--Sample code showing usage of ApplicationBar-->
