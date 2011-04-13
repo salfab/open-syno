@@ -87,7 +87,10 @@
       <DependentUpon>SearchAllResultsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ViewModelProxy.cs" />
+    <Compile Include="Services\ISignInService.cs" />
     <Compile Include="Services\PanoramaItemSwitchingService.cs" />
+    <Compile Include="Services\SignInCompletedEventArgs.cs" />
+    <Compile Include="Services\SignInService.cs" />
     <Compile Include="ViewModels\AboutBoxViewModel.cs" />
     <Compile Include="AlbumViewModel.cs" />
     <Compile Include="App.xaml.cs">

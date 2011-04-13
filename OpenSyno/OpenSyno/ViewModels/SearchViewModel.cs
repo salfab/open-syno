@@ -22,6 +22,7 @@ namespace OpenSyno.ViewModels
         private const string IsBusyPropertyName = "IsBusy";
         private const string IsAppLoadingPropertyName = "IsAppLoading";
         private readonly IEventAggregator _eventAggregator;
+        private readonly ISignInService _signInService;
 
         private readonly IPageSwitchingService _pageSwitchingService;
         private readonly ISearchService _searchService;
@@ -29,11 +30,18 @@ namespace OpenSyno.ViewModels
         private bool _isBusy;
         private string _searchPattern;
 
-        public SearchViewModel(ISearchService searchService, [Named(ViewNames.SearchView)] IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator)
+        public SearchViewModel(ISearchService searchService, [Named(ViewNames.SearchView)] IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator, ISignInService signInService)
         {
             _searchService = searchService;
             _pageSwitchingService = pageSwitchingService;
             _eventAggregator = eventAggregator;
+            _signInService = signInService;
+            
+            // make sure the IsAppLoading is always up-to-date.
+            signInService.SignInCompleted += (sender, ea) => IsAppLoading = ea.IsBusy;
+
+            // just in case the event has previously been fired : we set its default value to the current value.
+            IsAppLoading = _signInService.IsSigningIn;
 
             _eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Subscribe(o => IsAppLoading = false, true);
 

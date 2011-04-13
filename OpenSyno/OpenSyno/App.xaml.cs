@@ -82,45 +82,25 @@ namespace OpenSyno
             // Retrieve the type SearchService from a config file, so we can change it.
             // also possible: MockSearchService;
             IoC.Container.Bind<ISearchService>().To(typeof(SearchService)).InSingletonScope();
+            IoC.Container.Bind<ISignInService>().To(typeof(SignInService)).InSingletonScope();
 
             IoC.Container.Bind<ISearchAllResultsViewModelFactory>().To(typeof(SearchAllResultsViewModelFactory)).InSingletonScope();
             IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
-
+           
             // Retrieve the type PlaybackService from a config file, so we can change it.
             IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();
 
-            if (_openSynoSettings.UserName == null || _openSynoSettings.Password == null || _openSynoSettings.Host == null)
-            {
-                // MessageBox.Show("No Synology server configured.", "Configuration Error", MessageBoxButton.OK);
-            }
-            else
-            {
-                var audioStation = IoC.Container.Get<IAudioStationSession>();
-                audioStation.LoginAsync(
-                    _openSynoSettings.UserName,
-                    _openSynoSettings.Password, 
-                    _openSynoSettings.Host,
-                    _openSynoSettings.Port, 
-                    token =>
-                            {
-                                _openSynoSettings.Token = token;
-                                eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Publish(new SynoTokenReceivedAggregatedEvent {Token = token});
-                            },
-                    LoginError);
-            }
         }
 
 
 
-        private void LoginError(Exception obj)
-        {
-            throw new NotImplementedException();
-        }
+     
 
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            IoC.Container.Get<ISignInService>().SignIn();
         }
 
         // Code to execute when the application is activated (brought to foreground)

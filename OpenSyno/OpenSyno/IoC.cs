@@ -21,7 +21,7 @@ namespace OpenSyno
             // When in design-time : For blendability, look in a config file to retrieve the bindings to load.
             if (DesignerProperties.IsInDesignTool)
             {
-                Container.Bind<SearchViewModel>().ToConstant(new SearchViewModel(null, null, null));
+                Container.Bind<SearchViewModel>().ToConstant(new SearchViewModel(null, null, null, null));
             }
         }
 
