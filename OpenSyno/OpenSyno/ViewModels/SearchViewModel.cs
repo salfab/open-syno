@@ -26,7 +26,7 @@ namespace OpenSyno.ViewModels
 
         private readonly IPageSwitchingService _pageSwitchingService;
         private readonly ISearchService _searchService;
-        private bool _isAppLoading = true;
+        private bool _isAppLoading = false;
         private bool _isBusy;
         private string _searchPattern;
 

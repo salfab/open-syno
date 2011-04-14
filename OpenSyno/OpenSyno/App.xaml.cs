@@ -86,15 +86,25 @@ namespace OpenSyno
 
             IoC.Container.Bind<ISearchAllResultsViewModelFactory>().To(typeof(SearchAllResultsViewModelFactory)).InSingletonScope();
             IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
+            IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
+            IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
+
+            
            
             // Retrieve the type PlaybackService from a config file, so we can change it.
             IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();
 
+            ActivateEagerTypes();
+
         }
 
+        private void ActivateEagerTypes()
+        {
+            IoC.Container.Get<SearchResultsViewModelFactory>();
+            IoC.Container.Get<ArtistPanoramaViewModelFactory>();
+            IoC.Container.Get<PlayQueueViewModel>();
+        }
 
-
-     
 
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
