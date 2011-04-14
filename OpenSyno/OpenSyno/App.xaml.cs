@@ -84,7 +84,7 @@ namespace OpenSyno
             IoC.Container.Bind<ISearchService>().To(typeof(SearchService)).InSingletonScope();
             IoC.Container.Bind<ISignInService>().To(typeof(SignInService)).InSingletonScope();
 
-            IoC.Container.Bind<ISearchAllResultsViewModelFactory>().To(typeof(SearchAllResultsViewModelFactory)).InSingletonScope();
+            IoC.Container.Bind<ISearchAllResultsViewModelFactory>().To<SearchAllResultsViewModelFactory>().InSingletonScope();
             IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
@@ -102,6 +102,7 @@ namespace OpenSyno
         {
             IoC.Container.Get<SearchResultsViewModelFactory>();
             IoC.Container.Get<ArtistPanoramaViewModelFactory>();
+            IoC.Container.Get<ISearchAllResultsViewModelFactory>();
             IoC.Container.Get<PlayQueueViewModel>();
         }
 

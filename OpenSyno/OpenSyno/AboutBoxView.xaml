@@ -44,13 +44,11 @@
                     </TextBox.InputScope>
                 </TextBox>-->
                 <TextBlock Name="Description" TextWrapping="Wrap"
-                    Text="Open Syno is an unofficial WP7 client for Synology's Audio Station. It provides the proud owners of a Synology NAS to listen to their music library on the go without having to store any file on their hard drive. Therefore, Open Syno is very bandwidth greedy, and it is not recommended to use it with a 3G connection unless the user has an unlimited dataplan." FontSize="19" FontFamily="Segoe WP" />
+                    Text="Open Syno is an unofficial WP7 client for Synology's Audio Station. It provides the happy owners of a Synology NAS with a way to listen to their music library on the go without having to store any file on their phone. Therefore, Open Syno is very bandwidth greedy, and it is not recommended to use it with a 3G connection unless the user has an unlimited dataplan." FontSize="19" FontFamily="Segoe WP" />
                 <TextBlock Margin="0,15,0,0" Name="OpenSource" TextWrapping="Wrap"
-                    Text="Note that Open Syno is free and always will be. furthermore, we are working on cleaning-up the source-code to open-source it !" FontSize="19" FontFamily="Segoe WP" />
+                    Text="Open Syno is free and open source and always will be." FontSize="19" FontFamily="Segoe WP" />
                 <TextBlock Margin="0,15,0,0" Name="PoCDisclaimer" TextWrapping="Wrap"
-                    Text="The current version of Open Syno is a proof-of-concept in a very early stage. There is still a lot of work to do to reach a fully functionnal release, but we wanted you to be able to test this app asap so you can post your precious feedback on our website." FontSize="19" FontFamily="Segoe WP" />
-                <TextBlock Name="contact" TextWrapping="Wrap"
-                    Text="Don't forget to visit us on " FontSize="19" FontFamily="Segoe WP" />
+                    Text="The current version of Open Syno is a proof-of-concept at a very early stage. There is still a lot of work left to reach a fully functionnal release, but we wanted you to be able to give this app a shot asap so you can post your precious feedback on our website." FontSize="19" FontFamily="Segoe WP" />                
                 <HyperlinkButton Margin="0,15,0,0" FontSize="19" Content="http://opensyno.seesharp.ch" Behaviors:ButtonClickToCommandBehavior.Command="{Binding OpenWebsiteCommand}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="http://opensyno.seesharp.ch"/>
                 <TextBlock Margin="0,15,0,0" TextWrapping="Wrap"
                            Text="Last but not least, a big thank you to Liliboude for her fantastic splashscreen. you can find more of her goodness on her website : " FontSize="19" />

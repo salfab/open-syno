@@ -9,7 +9,7 @@
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
-    mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480"
+    mc:Ignorable="d" d:DesignHeight="696" d:DesignWidth="480"
     shell:SystemTray.IsVisible="True">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
@@ -27,20 +27,37 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <ListBox ItemsSource="{Binding SearchResults}" DisplayMemberPath="ItemInfo.Title" />
+            <ListBox ItemsSource="{Binding SearchResults}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <CheckBox>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding ItemInfo.Title}" />
+                                    <TextBlock Foreground="{StaticResource PhoneSubtleBrush}" Grid.Row="1" Text="{Binding ItemInfo.Artist}" />
+                                </StackPanel>
+                            </CheckBox>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
     </Grid>
  
     <!--Sample code showing usage of ApplicationBar-->
-    <!--<phone:PhoneApplicationPage.ApplicationBar>
+    <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
-            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="Button 1"/>
-            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="Button 2"/>
-            <shell:ApplicationBar.MenuItems>
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="play queue"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="play last"/>
+            <!--<shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
                 <shell:ApplicationBarMenuItem Text="MenuItem 2"/>
-            </shell:ApplicationBar.MenuItems>
+            </shell:ApplicationBar.MenuItems>-->
         </shell:ApplicationBar>
-    </phone:PhoneApplicationPage.ApplicationBar>-->
+    </phone:PhoneApplicationPage.ApplicationBar>
 
 </phone:PhoneApplicationPage>
