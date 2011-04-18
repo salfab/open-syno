@@ -5,48 +5,37 @@
     xmlns:local="clr-namespace:OpenSyno" xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance" xmlns:Helpers="clr-namespace:OpenSyno.Helpers">
 
     <Behaviors:ArtistPanoramaItemKindToStyleConverter x:Key="ArtistPanoramaItemKindToStyleConverter" />
-    
+
     <Style TargetType="ContentControl" x:Key="AlbumsItemStyle">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate>                    
+                <ControlTemplate>
                     <Grid>
                         <Grid.Resources>
                             <!--Dirty hack to workaround the ElementName not being cross-DataTemplate on WP7 !-->
-                            <ContentControl x:Key="ViewModelProxy" Content="{Binding}" />                            
+                            <ContentControl x:Key="ViewModelProxy" Content="{Binding}" />
                         </Grid.Resources>
                         <Grid.RowDefinitions>
-                            <RowDefinition />                                            
+                            <RowDefinition />
                             <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>	
+                        </Grid.RowDefinitions>
                         <!--Use a value converter to template-select according to the Type. either Tracks ,Either Albums : Not both :)-->
-                        <ListBox Grid.Row="0" ItemsSource="{Binding Albums, Mode=TwoWay}">
-                            <ListBox.Resources>
-                            </ListBox.Resources>
-                                <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding Source={StaticResource ViewModelProxy}, Path=Content.ShowAlbumDetailCommand, Converter={StaticResource BindingDebuggerConverter}}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="{Binding}" >                                        
-                                        <TextBlock Text="{Binding Album.Title}" />
-                                    </Button>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                        <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding ShowPlayQueueCommand}" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" BorderThickness="0" >
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <Image Source="appbar.basecircle.rest.png" Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Right"  />
-                                <Image Source="appbar.folder.rest.png" HorizontalAlignment="Right" VerticalAlignment="Top" Stretch="None" />
-                                <TextBlock Grid.Column="1" Text="playqueue" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5,0,0,0" />
-                            </Grid>
-                        </Button>
-                    </Grid>						
+                        <ScrollViewer>
+                            <ItemsControl Grid.Row="0" ItemsSource="{Binding Albums, Mode=TwoWay}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button HorizontalContentAlignment="Left" HorizontalAlignment="Stretch" Behaviors:ButtonClickToCommandBehavior.Command="{Binding Source={StaticResource ViewModelProxy}, Path=Content.ShowAlbumDetailCommand, Converter={StaticResource BindingDebuggerConverter}}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="{Binding}" Style="{StaticResource StillButton}" BorderThickness="0" Padding="10,2" >
+                                            <TextBlock Text="{Binding Album.Title}" FontSize="23" FontFamily="Segoe WP" />
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
 
                 </ControlTemplate>
             </Setter.Value>
-        </Setter>        
+        </Setter>
     </Style>
 
 
@@ -55,13 +44,13 @@
             <Setter.Value>
                 <ControlTemplate>
                     <ScrollViewer>
-                        <StackPanel>                            
+                        <StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>             		
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>     
+                                </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition />
                                     <RowDefinition />
@@ -71,17 +60,17 @@
                                 </Button>
                                 <Button Grid.Column="0" Grid.Row="1" Content="play" HorizontalAlignment="Left" />
                                 <Button Grid.Column="1" Grid.Row="1" Content="play next" />
-                                <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayListOperationCommand}" Grid.Column="2" Grid.Row="1" Content="play last" />							
-                            </Grid>						
+                                <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayListOperationCommand}" Grid.Column="2" Grid.Row="1" Content="play last" />
+                            </Grid>
                             <!--Use a value converter to template-select according to the Type. either Tracks ,Either ALbums : Not both :)-->
 
-                                <ItemsControl ItemsSource="{Binding Tracks, Mode=TwoWay}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding TrackInfo.Title}" />                 	
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                            <ItemsControl ItemsSource="{Binding Tracks, Mode=TwoWay}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding TrackInfo.Title}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
                 </ControlTemplate>
@@ -89,7 +78,7 @@
         </Setter>
     </Style>
 
-    <DataTemplate x:Key="PanoramaItemTemplate">    	
+    <DataTemplate x:Key="PanoramaItemTemplate">
         <ContentControl x:Name="PanoramaPagePresenter"
                         Behaviors:ArtistPanoramaItemKindToStyleConverter.PanoramaItemKind="{Binding PanoramaItemKind, Mode=TwoWay}"
                         Behaviors:ArtistPanoramaItemKindToStyleConverter.TracksStyle="{StaticResource TracksItemStyle}"

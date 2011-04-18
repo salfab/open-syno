@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -298,6 +299,9 @@ namespace Synology.AudioStationApi
             int limit = 10000;
             string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(artist.ItemID), limit);
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+
+            Debug.WriteLine(DateTime.Now + " GetAlbumsForArtist : " + artist.Title );
 
             request.BeginGetRequestStream(ar =>
             {

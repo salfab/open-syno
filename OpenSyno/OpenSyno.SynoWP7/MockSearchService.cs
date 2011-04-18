@@ -13,7 +13,7 @@
         }
         public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>, string> callback)
         {
-            var items = new List<SynoItem>();
+            var items = new List<SynoTrack>();
             items.Add(new SynoTrack
                 {
                     Artist = "Tom Waits",
@@ -55,7 +55,7 @@
                     ItemPid = "musiclib_music_aa"
                 });
 
-            results.Add(new SynoItem
+            results.Add(new SynoTrack
                 {
                     Title = "65daysofstatic",
                     ItemPid = "musiclib_music_aa"

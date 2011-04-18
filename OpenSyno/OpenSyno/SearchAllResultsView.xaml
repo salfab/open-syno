@@ -35,10 +35,10 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <CheckBox>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}">
                                 <StackPanel>
-                                    <TextBlock Text="{Binding ItemInfo.Title}" />
-                                    <TextBlock Foreground="{StaticResource PhoneSubtleBrush}" Grid.Row="1" Text="{Binding ItemInfo.Artist}" />
+                                    <TextBlock Text="{Binding TrackInfo.Title}" />
+                                    <TextBlock Foreground="{StaticResource PhoneSubtleBrush}" Grid.Row="1" Text="{Binding TrackInfo.Artist}" />
                                 </StackPanel>
                             </CheckBox>
                         </Grid>
@@ -51,8 +51,8 @@
     <!--Sample code showing usage of ApplicationBar-->
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
-            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="play queue"/>
-            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="play last"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="play queue" Click="ApplicationBarShowPlayQueue"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="play last" Click="ApplicationBarPlayLast"/>
             <!--<shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
                 <shell:ApplicationBarMenuItem Text="MenuItem 2"/>

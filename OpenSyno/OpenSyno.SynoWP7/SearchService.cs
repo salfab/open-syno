@@ -19,7 +19,7 @@
         {
             if (_audioStationSession.IsSignedIn)
             {
-                _audioStationSession.SearchAllMusic(pattern, (o) =>  callback(o, pattern), OnOperationReturnedWithError);
+                _audioStationSession.SearchAllMusic(pattern, o =>  callback(o, pattern), OnOperationReturnedWithError);
                 return true;
             }
 

@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
+using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Events;
 using Synology.AudioStationApi;
 
@@ -67,10 +69,15 @@ namespace OpenSyno.ViewModels
                 artistItem.PropertyChanged += UpdateBusyness;
             }
 
+            ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
 
-            eventAggregator.GetEvent<CompositePresentationEvent<SelectedArtistChangedAggregatedEvent>>().Subscribe(OnSelectedArtistChanged, true);
             LoadArtistInfo(artist);
 
+        }
+
+        private void OnShowPlayQueue()
+        {
+            _pageSwitchingService.NavigateToPlayQueue();
         }
 
         public int CurrentArtistItemIndex
@@ -130,10 +137,6 @@ namespace OpenSyno.ViewModels
             }
         }
 
-        private void OnSelectedArtistChanged(SelectedArtistChangedAggregatedEvent ea)
-        {
-            LoadArtistInfo(ea.Artist);
-        }
 
         private void LoadArtistInfo(SynoItem artist)
         {
@@ -153,6 +156,8 @@ namespace OpenSyno.ViewModels
                 OnPropertyChanged(ArtistNamePropertyName);
             }
         }
+
+        public ICommand ShowPlayQueueCommand { get; set; }
 
         private void GetAlbumsForArtist(SynoItem artist)
         {

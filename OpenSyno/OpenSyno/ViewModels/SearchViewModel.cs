@@ -119,9 +119,10 @@ namespace OpenSyno.ViewModels
 
         private void SearchAllCompleted(IEnumerable<SynoTrack> results, string keyword)
         {
+            if (results == null) throw new ArgumentNullException("results");
             IsBusy = false;
             _pageSwitchingService.NavigateToSearchAllResults(keyword);
-            _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Publish(new SearchResultsRetrievedAggregatedEvent(results.Cast<SynoItem>()));
+            _eventAggregator.GetEvent<CompositePresentationEvent<TrackSearchResultsRetrievedAggregatedEvent>>().Publish(new TrackSearchResultsRetrievedAggregatedEvent(results));
         }
 
         private void SearchCompleted(IEnumerable<SynoItem> results)
@@ -129,13 +130,16 @@ namespace OpenSyno.ViewModels
             IsBusy = false;
             _pageSwitchingService.NavigateToSearchResults();
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Publish(new SearchResultsRetrievedAggregatedEvent(results));
-        }
+        }    
+    }
 
-        private void GetAllArtistsCompleted(IEnumerable<SynoItem> results)
+    public class TrackSearchResultsRetrievedAggregatedEvent 
+    {
+        public IEnumerable<SynoTrack> Results { get; set; }
+
+        public TrackSearchResultsRetrievedAggregatedEvent(IEnumerable<SynoTrack> results)
         {
-            _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Publish(new SearchResultsRetrievedAggregatedEvent(results));
-            _pageSwitchingService.NavigateToSearchResults();
-
+            Results = results;
         }
     }
 }

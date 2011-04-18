@@ -88,7 +88,7 @@ namespace OpenSyno
             IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
-
+            IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
             
            
             // Retrieve the type PlaybackService from a config file, so we can change it.

@@ -25,5 +25,11 @@ namespace OpenSyno
             var factory = IoC.Container.Get<ArtistPanoramaViewModelFactory>();
             DataContext = factory.Create(new PageSwitchingService(NavigationService));
         }
+
+        private void ShowPlayQueue(object sender, EventArgs e)
+        {
+            var viewModel = (ArtistPanoramaViewModel)DataContext;
+            viewModel.ShowPlayQueueCommand.Execute(null);
+        }
     }
 }

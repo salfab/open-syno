@@ -43,12 +43,19 @@ namespace OpenSyno.Services
             _mediaElement = (MediaElement)App.Current.Resources["MediaElement"];
 
             // for now, a predicate that allows a partially loaded track will only work on the emulator, and I have no clue why.
-            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate ||  bytesLoaded == track.Size; 
+            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate ||  bytesLoaded == track.Size;
+
+            _mediaElement.MediaFailed += MediaFailed;
 
             _mediaElement.SetBinding(MediaElement.PositionProperty, new Binding { Source = this, Mode = BindingMode.TwoWay, Path = new PropertyPath(PositionPropertyName)  });
             _mediaElement.CurrentStateChanged += OnCurrentStateChanged;
             _mediaElement.MediaOpened += MediaOpened;
             _mediaElement.MediaEnded += PlayingMediaEnded;
+        }
+
+        private void MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            throw e.ErrorException;
         }
 
         private TimeSpan _position;
