@@ -1,4 +1,6 @@
-﻿using Ninject;
+﻿using System.Windows.Input;
+using Microsoft.Practices.Prism.Commands;
+using Ninject;
 
 namespace OpenSyno.ViewModels
 {
@@ -29,12 +31,19 @@ namespace OpenSyno.ViewModels
             // register for search results updates
             _eventAggregator = IoC.Container.Get<IEventAggregator>();
             _pageSwitchingService = pageSwitchingService;
+            _unfilteredSearchResults = lastSearchResults;
 
             // to catch up in case a search result has already been issued.
             SearchResults = from result in lastSearchResults select new SearchResultItemViewModel(result, _eventAggregator, _pageSwitchingService);
-
+            FilterResultsCommand = new DelegateCommand<string>(OnFilterResults);
             // everytime the searchResults changes, we'll react to that change.
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Subscribe(SearchResultsUpdated, true);
+        }
+
+        private void OnFilterResults(string filterExpression)
+        {
+
+            SearchResults = _unfilteredSearchResults.Where(o => o.Title.ToLowerInvariant().Contains(filterExpression.ToLowerInvariant())).Select(o => new SearchResultItemViewModel(o, _eventAggregator, _pageSwitchingService));
         }
 
         private void SearchResultsUpdated(SearchResultsRetrievedAggregatedEvent payload)
@@ -45,6 +54,7 @@ namespace OpenSyno.ViewModels
         private IEnumerable<SearchResultItemViewModel> _searchResults;
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
+        private readonly IEnumerable<SynoItem> _unfilteredSearchResults;
         private const string ArtistsPropertyName = "Artists";
         private const string SearchResultsPropertyName = "SearchResults";
 
@@ -56,6 +66,21 @@ namespace OpenSyno.ViewModels
                 _searchResults = value;
                 OnPropertyChanged(SearchResultsPropertyName);
                 OnPropertyChanged(ArtistsPropertyName);
+            }
+        }
+
+        public ICommand FilterResultsCommand { get; set; }
+
+        private string _filterExpression;
+        private const string FilterExpressionPropertyName = "FilterExpression";
+
+        public string FilterExpression
+        {
+            get { return _filterExpression; }
+            set
+            {
+                _filterExpression = value;
+                OnPropertyChanged(FilterExpressionPropertyName);
             }
         }
 

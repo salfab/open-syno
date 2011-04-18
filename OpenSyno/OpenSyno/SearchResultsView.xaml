@@ -19,7 +19,7 @@
         <controls:Pivot Title="{StaticResource AppName}">
             <!--Pivot item one-->
             <controls:PivotItem Header="artists">
-                <Controls:LongListSelector IsFlatList="False" DisplayAllGroups="True" ItemsSource="{Binding Artists, Mode=TwoWay}" ItemTemplate="{StaticResource ArtistLongListSelectorItemTemplate}" GroupItemTemplate="{StaticResource SquareGroupTitleTemplate}" GroupHeaderTemplate="{StaticResource SquareGroupTitleTemplate}">                    
+                <Controls:LongListSelector IsFlatList="False" DisplayAllGroups="True" ItemsSource="{Binding Artists, Mode=TwoWay}" ItemTemplate="{StaticResource ArtistLongListSelectorItemTemplate}" GroupItemTemplate="{StaticResource SquareGroupTitleTemplate}" GroupHeaderTemplate="{StaticResource SquareGroupTitleTemplate}" ListHeaderTemplate="{StaticResource ArtistsListHeader}" ListHeader="{Binding}">                    
                     <Controls:LongListSelector.GroupItemsPanel>
                         <ItemsPanelTemplate>
                             <Controls:WrapPanel/>

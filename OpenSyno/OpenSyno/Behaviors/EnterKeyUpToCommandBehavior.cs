@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using OpenSyno.Helpers;
 
 namespace OpenSyno.Behaviors
 {
@@ -27,31 +28,33 @@ namespace OpenSyno.Behaviors
         public static readonly DependencyProperty CommandProperty =
             DependencyProperty.RegisterAttached("Command", typeof(ICommand), typeof(EnterKeyUpToCommandBehavior), new PropertyMetadata(null, CommandPropertyChangedCallback));
 
-        private static TextBox _attachedElement;
 
         private static void CommandPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (_attachedElement == null)
-            {
-                // It's a choice we made not to be able to change the attached element once it's set
-                _attachedElement = d as TextBox;                
-            }
-            if (_attachedElement != null)
+            TextBox attachedElement;         
+            attachedElement = d as TextBox;                
+        
+            if (attachedElement != null)
             {
                 if (e.OldValue == null)
                 {
                     // Only register the internal event once.
-                    _attachedElement.KeyUp += FilterEnterKeysAndForwardToCommand;                    
+                    attachedElement.KeyUp += FilterEnterKeysAndForwardToCommand;                    
                 }
             }
         }
 
         private static void FilterEnterKeysAndForwardToCommand(object sender, KeyEventArgs e)
         {
+            var attachedElement = sender as TextBox;
             if (e.Key == Key.Enter)
             {
+                AppBarBindingsHelper.UpdateBinding(attachedElement);
+
                 // If ony the enter key was pressed
-                GetCommand(_attachedElement).Execute(GetCommandParameter(_attachedElement));                
+                var command = GetCommand(attachedElement);
+                var commandParameter = GetCommandParameter(attachedElement);
+                command.Execute(commandParameter);
             }
         }
 
