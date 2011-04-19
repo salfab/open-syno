@@ -79,6 +79,7 @@
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
             <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="sign-in" Click="ApplicationBarSignInButtonClicked"/>            
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="logs" Click="ApplicationBarLogsButtonClicked"/>            
             <!--<shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
                 <shell:ApplicationBarMenuItem Text="MenuItem 2"/>

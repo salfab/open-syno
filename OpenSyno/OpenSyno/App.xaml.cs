@@ -15,6 +15,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Practices.Prism.Events;
 using Ninject;
+using OpenSyno.Helpers;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;
 using Synology.AudioStationApi;
@@ -89,7 +90,8 @@ namespace OpenSyno
             IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
-            
+
+            IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
            
             // Retrieve the type PlaybackService from a config file, so we can change it.
             IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();

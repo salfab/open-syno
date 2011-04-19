@@ -1,4 +1,6 @@
 ﻿using Microsoft.Phone.Shell;
+using Ninject;
+using OpenSyno.Helpers;
 
 namespace OpenSyno.Services
 {
@@ -24,6 +26,8 @@ namespace OpenSyno.Services
         /// </summary>
         /// <remarks>The MP3 Media Stream Source is buggy with Variable bitrates, so the duration is not computed correctly. Instead, we want to use the duration exposed by Synology. In order to do this, we need to keep a reference on the last played SynoTrack.</remarks>
         private SynoTrack _lastStartedTrack;
+
+        private ILogService _logService;
 
         /// <summary>
         /// Gets or sets what strategy should be used to define the next track to play.
@@ -95,6 +99,7 @@ namespace OpenSyno.Services
 
         protected void OnTrackStarted(TrackStartedEventArgs trackStartedEventArgs)
         {
+            _logService.Trace("PlaybackService.OnTrackStarted : " + trackStartedEventArgs.Track.Title);
             _lastStartedTrack = trackStartedEventArgs.Track;
             if (TrackStarted != null)
             {
@@ -120,7 +125,10 @@ namespace OpenSyno.Services
         /// <param name="audioRenderingService">The audio rendering service.</param>
         public PlaybackService(AudioRenderingService audioRenderingService)
         {
+            _logService = IoC.Container.Get<ILogService>();
+
             _status = PlaybackStatus.Stopped;
+
 
             if (audioRenderingService == null)
             {

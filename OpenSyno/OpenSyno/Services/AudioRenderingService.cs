@@ -1,5 +1,7 @@
 ﻿using System.Windows.Data;
 using Media;
+using Ninject;
+using OpenSyno.Helpers;
 
 namespace OpenSyno.Services
 {
@@ -34,16 +36,20 @@ namespace OpenSyno.Services
 
         public AudioRenderingService(IAudioStationSession audioStationSession)
         {
+            // todo : inject ?
+            _logService = IoC.Container.Get<ILogService>();
+
+            _logService.Trace("AudioRenderingService .ctor");
             if (audioStationSession == null)
             {
                 throw new ArgumentNullException("audioStationSession");
             }
             _audioStationSession = audioStationSession;
 
-            _mediaElement = (MediaElement)App.Current.Resources["MediaElement"];
+            _mediaElement = (MediaElement)Application.Current.Resources["MediaElement"];
 
-            // for now, a predicate that allows a partially loaded track will only work on the emulator, and I have no clue why.
-            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate ||  bytesLoaded == track.Size;
+            // HACK : 500kb is absolutely arbitrary and is supposed to cover for the mp3 header and the ID3 tags. a more subtle approach would be to retrieve the actual size of the header for our heuristic to be more accurate.
+            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate + 500000 ||  bytesLoaded == track.Size;
 
             _mediaElement.MediaFailed += MediaFailed;
 
@@ -55,6 +61,7 @@ namespace OpenSyno.Services
 
         private void MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
+            _logService.Trace(string.Format("AudioRenderingService.MediaFailed : {0} : {1}", e.ErrorException.GetType().FullName, e.ErrorException.Message));
             throw e.ErrorException;
         }
 
@@ -172,7 +179,8 @@ namespace OpenSyno.Services
 
         public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
         bool _isPlayable;
-        
+        private readonly ILogService _logService;
+
         public event EventHandler<PlayBackStartedEventArgs> PlaybackStarted;
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
@@ -191,6 +199,7 @@ namespace OpenSyno.Services
             _isPlayable = this.BufferPlayableHeuristic(bufferingProgressUpdatedEventArgs.SynoTrack, bufferingProgressUpdatedEventArgs.FileSize - bufferingProgressUpdatedEventArgs.BytesLeft);
             if (_isPlayable)
             {
+                _logService.Trace("AudioRenderingService.OnBufferingProgressUpdated : Media is playable");
                 OnBufferReachedPlayableState(bufferingProgressUpdatedEventArgs.BufferingStream, bufferingProgressUpdatedEventArgs.SynoTrack);
             }
 
@@ -199,12 +208,15 @@ namespace OpenSyno.Services
 
         private void OnCurrentStateChanged(object sender, RoutedEventArgs e)
         {
-            //var state = ((MediaElement)sender).CurrentState;
+            var state = ((MediaElement)sender).CurrentState;
+            _logService.Trace("AudioRenderingService.OnCurrentStateChanged : " + state);
         }
 
 
         private void PlayingMediaEnded(object sender, RoutedEventArgs e)
         {
+            _logService.Trace("AudioRenderingService.PlayingMediaEnded : " + _currentTrack.Title);
+
             if (MediaEnded != null)
             {
                 MediaEnded(this, new MediaEndedEventArgs { Track = _currentTrack });
@@ -215,6 +227,7 @@ namespace OpenSyno.Services
 
         private void MediaOpened(object sender, RoutedEventArgs e)
         {
+            _logService.Trace("AudioRenderingService.MediaOpened : " + _currentTrack.Title);
             // TODO : Start timer to update position every second.
         }
 
@@ -267,7 +280,9 @@ namespace OpenSyno.Services
         }
 
         public void Bufferize(Action<Stream> bufferizedCallback, Action<double> bufferizeProgressChangedCallback , SynoTrack track)
-        {            
+        {
+            _logService.Trace("AudioRenderingService.Bufferize : " + track.Title);
+
             if (bufferizedCallback == null)
             {
                 throw new ArgumentNullException("bufferizedCallback");
@@ -289,7 +304,9 @@ namespace OpenSyno.Services
         }
 
         private void OnFileStreamOpened(WebResponse response, SynoTrack synoTrack)
-        {          
+        {
+            _logService.Trace("AudioRenderingService.OnFileStreamOpened : " + synoTrack.Title);
+
             var trackStream = response.GetResponseStream();
 
             // The trackstream is not readable.
@@ -308,6 +325,7 @@ namespace OpenSyno.Services
 
         private void OnBufferReachedPlayableState(Stream stream, SynoTrack synoTrack)
         {
+            _logService.Trace("AudioRenderingService.OnBufferReachedPlayableState : " + synoTrack.Title);
             // Hack : for now we just avoid it to crash : it seems that not continuing the download is not enough since an pother thread might still be running
             // and continuing once too much and make everything crash : 
             // here, by fixing this that way, we'll have some side effects : the download will continue and the download progress bar will show alternatively both statuses... 
@@ -316,17 +334,24 @@ namespace OpenSyno.Services
             {
                 Delegate mediaRenderingStarter = new Action<Stream>(streamToPlay =>
                                                                           {
-                                                                             
-                                                                                _mediaElement.Stop();
-                                                                                Mp3MediaStreamSource mss = new Mp3MediaStreamSource(streamToPlay);
-                                                                                _mediaElement.SetSource(mss);
 
-                                                                                _mediaElement.Position = TimeSpan.FromSeconds(0);
-                                                                                _mediaElement.Volume = 20;
-                                                                                _mediaElement.Play();
-                                                                                PlayBackStartedEventArgs eventArgs = new PlayBackStartedEventArgs();
-                                                                                eventArgs.Track = synoTrack;
-                                                                                OnPlaybackStarted(eventArgs);
+                                                                              _logService.Trace("AudioRenderingService.OnBufferReachedPlayableState : starting mediaRenderingStarter delegate");
+                                                                              _mediaElement.Stop();
+                                                                              Mp3MediaStreamSource mss = new Mp3MediaStreamSource(streamToPlay);
+
+                                                                              _logService.Trace("AudioRenderingService.OnBufferReachedPlayableState : setting mediaelement's source");
+                                                                              _mediaElement.SetSource(mss);
+                                                                              _logService.Trace("AudioRenderingService.OnBufferReachedPlayableState : mediaelement's source set");
+
+                                                                              _mediaElement.Position = TimeSpan.FromSeconds(0);
+                                                                              _mediaElement.Volume = 20;
+
+                                                                              _logService.Trace("AudioRenderingService.OnBufferReachedPlayableState : starting mediaelement playback.");
+                                                                              _mediaElement.Play();
+                                                                              _logService.Trace("AudioRenderingService.OnBufferReachedPlayableState : mediaelement playback started.");
+                                                                              PlayBackStartedEventArgs eventArgs = new PlayBackStartedEventArgs();
+                                                                              eventArgs.Track = synoTrack;
+                                                                              OnPlaybackStarted(eventArgs);
                                                                           });
                 Deployment.Current.Dispatcher.BeginInvoke(mediaRenderingStarter, new object[] {stream});
             }

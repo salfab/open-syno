@@ -42,7 +42,6 @@ namespace OpenSyno.ViewModels
 
         private void OnFilterResults(string filterExpression)
         {
-
             SearchResults = _unfilteredSearchResults.Where(o => o.Title.ToLowerInvariant().Contains(filterExpression.ToLowerInvariant())).Select(o => new SearchResultItemViewModel(o, _eventAggregator, _pageSwitchingService));
         }
 

@@ -44,5 +44,13 @@ namespace OpenSyno
             var viewModel = (LoginViewModel)DataContext;
             viewModel.SignInCommand.Execute(null);
         }
+
+        private void ApplicationBarLogsButtonClicked(object sender, EventArgs e)
+        {
+            ILogService logService = IoC.Container.Get<ILogService>();
+            var result = MessageBox.Show(logService.GetLogFile(), "Click Cancel to clear logs", MessageBoxButton.OKCancel);
+            if (result == MessageBoxResult.Cancel)
+                logService.ClearLog();
+        }
     }
 }

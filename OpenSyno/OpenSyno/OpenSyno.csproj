@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\TypeTypeConverter.cs" />
+    <Compile Include="Services\LogService.cs" />
     <Compile Include="Helpers\ViewModelResolver.cs" />
     <Compile Include="IBusyable.cs" />
     <Compile Include="PerformanceProgressBar\RelativeAnimatingContentControl.cs" />
