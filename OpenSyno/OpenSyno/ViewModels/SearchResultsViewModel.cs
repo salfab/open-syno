@@ -22,19 +22,14 @@ namespace OpenSyno.ViewModels
         /// Initializes a new instance of the <see cref="SearchResultsViewModel"/> class.
         /// </summary>
         /// <param name="pageSwitchingService">The page switching service.</param>
-        /// <param name="lastSearchResults">The last search results.</param>
-        public SearchResultsViewModel(IPageSwitchingService pageSwitchingService, IEnumerable<SynoItem> lastSearchResults)
+        public SearchResultsViewModel(IPageSwitchingService pageSwitchingService)
         {
             if (pageSwitchingService == null) throw new ArgumentNullException("pageSwitchingService");
-            if (lastSearchResults == null) throw new ArgumentNullException("lastSearchResults");
 
             // register for search results updates
             _eventAggregator = IoC.Container.Get<IEventAggregator>();
             _pageSwitchingService = pageSwitchingService;
-            _unfilteredSearchResults = lastSearchResults;
 
-            // to catch up in case a search result has already been issued.
-            SearchResults = from result in lastSearchResults select new SearchResultItemViewModel(result, _eventAggregator, _pageSwitchingService);
             FilterResultsCommand = new DelegateCommand<string>(OnFilterResults);
             // everytime the searchResults changes, we'll react to that change.
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Subscribe(SearchResultsUpdated, true);
@@ -47,13 +42,15 @@ namespace OpenSyno.ViewModels
 
         private void SearchResultsUpdated(SearchResultsRetrievedAggregatedEvent payload)
         {
-            SearchResults = from result in payload.Results select new SearchResultItemViewModel(result, _eventAggregator, _pageSwitchingService);
+            _unfilteredSearchResults = payload.Results;
+            SearchResults = from result in payload.Results select new SearchResultItemViewModel(result, _eventAggregator, _pageSwitchingService);;
+
         }
 
         private IEnumerable<SearchResultItemViewModel> _searchResults;
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
-        private readonly IEnumerable<SynoItem> _unfilteredSearchResults;
+        private IEnumerable<SynoItem> _unfilteredSearchResults;
         private const string ArtistsPropertyName = "Artists";
         private const string SearchResultsPropertyName = "SearchResults";
 

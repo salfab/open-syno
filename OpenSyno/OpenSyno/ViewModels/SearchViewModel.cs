@@ -30,7 +30,7 @@ namespace OpenSyno.ViewModels
         private bool _isBusy;
         private string _searchPattern;
 
-        public SearchViewModel(ISearchService searchService, [Named(ViewNames.SearchView)] IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator, ISignInService signInService)
+        public SearchViewModel(ISearchService searchService, IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator, ISignInService signInService)
         {
             _searchService = searchService;
             _pageSwitchingService = pageSwitchingService;
@@ -43,13 +43,22 @@ namespace OpenSyno.ViewModels
             // just in case the event has previously been fired : we set its default value to the current value.
             IsAppLoading = _signInService.IsSigningIn;
 
-            _eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Subscribe(o => IsAppLoading = false, true);
+            _eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Subscribe(OnSynoTokenReceived, false);
 
             StartSearchCommand = new DelegateCommand<string>(OnStartSearch);
             StartSearchAllCommand = new DelegateCommand<string>(OnStartSearchAll);
             ShowAboutBoxCommand = new DelegateCommand(OnShowAboutBox);
         }
 
+        /// <summary>
+        /// Called when the syno token is received.
+        /// </summary>
+        /// <param name="payload">The payload.</param>
+        /// <remarks>This is the handler for the <see cref="SynoTokenReceivedAggregatedEvent"/> aggregated event.</remarks>
+        public void OnSynoTokenReceived(SynoTokenReceivedAggregatedEvent payload)
+        {
+            IsAppLoading = false;
+        }
 
 
         public ICommand StartSearchAllCommand { get; set; }

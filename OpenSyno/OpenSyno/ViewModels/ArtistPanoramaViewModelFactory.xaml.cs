@@ -11,17 +11,19 @@ namespace OpenSyno
 
         private readonly IEventAggregator _eventAggregator;
         private SynoItem _defaultArtist;
+        private IPageSwitchingService _pageSwitchingService;
 
-        public ArtistPanoramaViewModelFactory(ISearchService searchService, IEventAggregator eventAggregator)
+        public ArtistPanoramaViewModelFactory(ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
         {
             _searchService = searchService;
+            _pageSwitchingService = pageSwitchingService;
             _eventAggregator = eventAggregator;
             eventAggregator.GetEvent<CompositePresentationEvent<SelectedArtistChangedAggregatedEvent>>().Subscribe(o => _defaultArtist = o.Artist, true);
         }
 
-        public ArtistPanoramaViewModel Create(PageSwitchingService pageSwitchingService)
+        public ArtistPanoramaViewModel Create()
         {
-            return new ArtistPanoramaViewModel(_searchService, _eventAggregator, pageSwitchingService, _defaultArtist);
+            return new ArtistPanoramaViewModel(_searchService, _eventAggregator, _pageSwitchingService, _defaultArtist);
         }
     }
 }

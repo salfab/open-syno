@@ -14,6 +14,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Events;
 using Ninject;
+using Ninject.Parameters;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;
 using Synology.AudioStationApi;
@@ -33,7 +34,8 @@ namespace OpenSyno
             if (DataContext == null)
             {
                 string keyword = NavigationContext.QueryString["keyword"];
-                DataContext = IoC.Container.Get<ISearchAllResultsViewModelFactory>().Create(keyword, new PageSwitchingService(NavigationService));                
+                // move this in the xaml with behavior : this one might actually need a special implementation to take query strings in account.
+                DataContext = IoC.Container.Get<ISearchAllResultsViewModelFactory>().Create(keyword);
             }
         }
 
@@ -52,17 +54,19 @@ namespace OpenSyno
 
     public interface ISearchAllResultsViewModelFactory
     {
-        ISearchAllResultsViewModel Create(string keyword, IPageSwitchingService pageSwitchingService);
+        ISearchAllResultsViewModel Create(string keyword);
     }
 
     public class SearchAllResultsViewModelFactory : ISearchAllResultsViewModelFactory
     {
         private readonly IEventAggregator _eventAggregator;
+        private readonly IPageSwitchingService _pageSwitchingService;
         private IEnumerable<SynoTrack> _lastResults;
 
-        public SearchAllResultsViewModelFactory(IEventAggregator eventAggregator)
+        public SearchAllResultsViewModelFactory(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
         {            
             _eventAggregator = eventAggregator;
+            _pageSwitchingService = pageSwitchingService;
 
             eventAggregator.GetEvent<CompositePresentationEvent<TrackSearchResultsRetrievedAggregatedEvent>>().Subscribe(payload =>
                                                                                                                         {
@@ -73,9 +77,9 @@ namespace OpenSyno
 
         #region Implementation of ISearchAllResultsViewModelFactory
 
-        public ISearchAllResultsViewModel Create(string keyword, IPageSwitchingService pageSwitchingService)
+        public ISearchAllResultsViewModel Create(string keyword)
         {
-            return new SearchAllResultsViewModel(_eventAggregator, pageSwitchingService, keyword, _lastResults);
+            return new SearchAllResultsViewModel(_eventAggregator, _pageSwitchingService, keyword, _lastResults);
         }
 
         #endregion

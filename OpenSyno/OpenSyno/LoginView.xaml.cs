@@ -30,10 +30,8 @@ namespace OpenSyno
 
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
-            // FIXME : Use and instanciate a LoginViewModelFactory at application startup and use it to create the LoginViewModelFactory.
-            var eventAggregator = IoC.Container.Get<IEventAggregator>();
-            // FIXME : Use a factory.Create, and instanciate AudioStationSession and event aggregators at application startup
-            DataContext = new LoginViewModel(new PageSwitchingService(NavigationService), eventAggregator, IoC.Container.Get<IAudioStationSession>(), IoC.Container.Get<IOpenSynoSettings>());
+            // FIXME : Use a ViewModelResolver (Humble object)
+            DataContext = IoC.Container.Get<LoginViewModel>();
         }
 
         private void ApplicationBarSignInButtonClicked(object sender, EventArgs e)

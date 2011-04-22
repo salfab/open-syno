@@ -32,7 +32,7 @@
 
         public ISearchResultsViewModel Create(PageSwitchingService pageSwitchingService)
         {
-            return new SearchResultsViewModel(pageSwitchingService, _lastSearchResults);
+            return new SearchResultsViewModel(pageSwitchingService);
         }
     }
 }

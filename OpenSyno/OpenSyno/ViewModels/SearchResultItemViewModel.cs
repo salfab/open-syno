@@ -35,6 +35,8 @@
             {
                 Artist = ItemInfo
             };
+
+            // HACK : Since we can't pass the payload to the view by injection, we assume that the event is being subscribed by the view model behind the viewmodel, and that this will occur in a timely fashion for the navigation to show only the information related to the payload.
             _eventAggregator.GetEvent<CompositePresentationEvent<SelectedArtistChangedAggregatedEvent>>().Publish(payload);
             _pageSwitchingService.NavigateToArtistPanorama();
         }

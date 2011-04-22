@@ -16,14 +16,20 @@ namespace OpenSyno
         /// </summary>
         public ArtistPanoramaView()
         {
-            this.Loaded += new System.Windows.RoutedEventHandler(OnArtistPanoramaViewLoaded);
+            this.Loaded += OnArtistPanoramaViewLoaded;
             InitializeComponent();
         }
 
         private void OnArtistPanoramaViewLoaded(object sender, RoutedEventArgs e)
         {
-            var factory = IoC.Container.Get<ArtistPanoramaViewModelFactory>();
-            DataContext = factory.Create(new PageSwitchingService(NavigationService));
+            // the page is an humble object, and the navigatorService, its sole dependency.
+            var navigator = IoC.Container.Get<INavigatorService>();
+            navigator.ActivateNavigationService(NavigationService, true);
+
+            if (DataContext == null)
+            {
+                DataContext = IoC.Container.Get<ArtistPanoramaViewModelFactory>().Create();
+            }
         }
 
         private void ShowPlayQueue(object sender, EventArgs e)

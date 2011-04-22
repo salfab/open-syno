@@ -24,11 +24,15 @@ namespace OpenSyno
 
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
+            // the page is an humble object, and the navigatorService, its sole dependency.
+            var navigator = IoC.Container.Get<INavigatorService>();
+            navigator.ActivateNavigationService(NavigationService, true);
+
             // we use a factory so we can inject a PageSwitchingService in the view model.
             var searchResultsViewModelFactory = IoC.Container.Get<SearchResultsViewModelFactory>();
 
             // TODO : think about either block the UI while it's loading or not reloading the view model if it exists ( and therefore keep the same artists list as it was last time we loaded it.)
-            DataContext = searchResultsViewModelFactory.Create(new PageSwitchingService(NavigationService));
+            DataContext = IoC.Container.Get<SearchResultsViewModel>();
         }
     }
 }

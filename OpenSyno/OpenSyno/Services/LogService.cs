@@ -50,6 +50,7 @@ namespace OpenSyno.Helpers
         {
             string log;
             MessageBox.Show("Logging will resume at next application startup.","Logs disabled",MessageBoxButton.OK);
+            IsEnabled = false;
             _logFile.Close();
             _logFile.Dispose();
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())

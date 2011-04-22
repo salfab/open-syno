@@ -20,7 +20,7 @@ namespace OpenSyno.ViewModels
         private readonly ISearchService _searchService;
         private readonly IEventAggregator _eventAggregator;
 
-        private readonly PageSwitchingService _pageSwitchingService;
+        private readonly IPageSwitchingService _pageSwitchingService;
 
         public ObservableCollection<ArtistPanoramaItem> ArtistItems { get; set; }
 
@@ -32,7 +32,7 @@ namespace OpenSyno.ViewModels
 
         public ArtistPanoramaItemKind PanoramaItemKind { get; set; }
 
-        public ArtistPanoramaViewModel(ISearchService searchService, IEventAggregator eventAggregator, PageSwitchingService pageSwitchingService, SynoItem artist)
+        public ArtistPanoramaViewModel(ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, SynoItem artist)
         {
             if (searchService == null)
             {

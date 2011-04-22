@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Windows.Navigation;
+using Microsoft.Practices.Prism.Events;
 
 namespace OpenSyno.Services
 {
     public class PageSwitchingService : IPageSwitchingService
     {
-        private readonly NavigationService _navigationService;
+        private readonly IEventAggregator _eventAggregator;
         private const string SearchUri = "/SearchView.xaml";
 
         private const string SearchAllResultsUri = "/SearchAllResultsView.xaml?keyword={0}";
@@ -17,44 +17,49 @@ namespace OpenSyno.Services
         private const string ArtistPanoramaUri = "/ArtistPanoramaView.xaml";
         private const string SearchResultsUri = "/SearchResultsView.xaml";
 
-        public PageSwitchingService(NavigationService navigationService)
+        public PageSwitchingService(IEventAggregator eventAggregator)
         {
-            _navigationService = navigationService;
+            _eventAggregator = eventAggregator;
         }
 
         public void NavigateToSearchResults()
         {
-            _navigationService.Navigate(new Uri(SearchResultsUri, UriKind.RelativeOrAbsolute));                        
+             NavigateToUri(new Uri(SearchResultsUri, UriKind.RelativeOrAbsolute));                        
         }
 
         public void NavigateToArtistPanorama()
         {
-            _navigationService.Navigate((new Uri(ArtistPanoramaUri, UriKind.RelativeOrAbsolute)));
+             NavigateToUri(new Uri(ArtistPanoramaUri, UriKind.RelativeOrAbsolute));
         }
 
         public void NavigateToPreviousPage()
         {
-            _navigationService.GoBack();
+            //navigationService.GoBack();
         }
 
         public void NavigateToAboutBox()
         {
-            _navigationService.Navigate(new Uri(AboutBoxUri, UriKind.RelativeOrAbsolute));                        
+            NavigateToUri(new Uri(AboutBoxUri, UriKind.RelativeOrAbsolute));
         }
 
         public void NavigateToSearchAllResults(string keyword)
         {
-            _navigationService.Navigate(new Uri(string.Format(SearchAllResultsUri, keyword), UriKind.RelativeOrAbsolute));
+             NavigateToUri(new Uri(string.Format(SearchAllResultsUri, keyword), UriKind.RelativeOrAbsolute));
         }
 
         public void NavigateToSearch()
         {
-            _navigationService.Navigate(new Uri(SearchUri, UriKind.RelativeOrAbsolute));
+            NavigateToUri(new Uri(SearchUri, UriKind.RelativeOrAbsolute));
         }
 
         public void NavigateToPlayQueue()
         {
-            _navigationService.Navigate(new Uri(PlayQueueResultsUri, UriKind.RelativeOrAbsolute));                        
+            NavigateToUri(new Uri(PlayQueueResultsUri, UriKind.RelativeOrAbsolute));                        
+        }
+
+        private void NavigateToUri(Uri uri)
+        {
+            _eventAggregator.GetEvent<CompositePresentationEvent<PageSwitchedAggregatedEvent>>().Publish(new PageSwitchedAggregatedEvent { Uri = uri});                               
         }
     }
 }

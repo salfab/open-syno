@@ -85,12 +85,14 @@ namespace OpenSyno
             IoC.Container.Bind<ISearchService>().To(typeof(SearchService)).InSingletonScope();
             IoC.Container.Bind<ISignInService>().To(typeof(SignInService)).InSingletonScope();
 
+            IoC.Container.Bind<IPageSwitchingService>().To<PageSwitchingService>().InSingletonScope();
+            IoC.Container.Bind<INavigatorService>().To<NavigatorService>().InSingletonScope();
             IoC.Container.Bind<ISearchAllResultsViewModelFactory>().To<SearchAllResultsViewModelFactory>().InSingletonScope();
             IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
-
+            IoC.Container.Bind<SearchResultsViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
            
             // Retrieve the type PlaybackService from a config file, so we can change it.
@@ -102,6 +104,7 @@ namespace OpenSyno
 
         private void ActivateEagerTypes()
         {
+            IoC.Container.Get<SearchResultsViewModel>();
             IoC.Container.Get<SearchResultsViewModelFactory>();
             IoC.Container.Get<ArtistPanoramaViewModelFactory>();
             IoC.Container.Get<ISearchAllResultsViewModelFactory>();
@@ -221,7 +224,7 @@ namespace OpenSyno
         #endregion
     }
 
-    internal class SynoTokenReceivedAggregatedEvent
+    public class SynoTokenReceivedAggregatedEvent
     {
         public string Token { get; set; }
     }
