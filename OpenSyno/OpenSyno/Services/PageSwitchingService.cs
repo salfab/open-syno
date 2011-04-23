@@ -34,7 +34,8 @@ namespace OpenSyno.Services
 
         public void NavigateToPreviousPage()
         {
-            //navigationService.GoBack();
+            _eventAggregator.GetEvent<CompositePresentationEvent<PageSwitchedAggregatedEvent>>().Publish(new PageSwitchedAggregatedEvent { UseNavigationServiceOperation = true, NavigationServiceOperation =  PageSwitchedAggregatedEvent.NavigationServiceOperations.GoBack});                               
+
         }
 
         public void NavigateToAboutBox()
@@ -59,7 +60,7 @@ namespace OpenSyno.Services
 
         private void NavigateToUri(Uri uri)
         {
-            _eventAggregator.GetEvent<CompositePresentationEvent<PageSwitchedAggregatedEvent>>().Publish(new PageSwitchedAggregatedEvent { Uri = uri});                               
+            _eventAggregator.GetEvent<CompositePresentationEvent<PageSwitchedAggregatedEvent>>().Publish(new PageSwitchedAggregatedEvent { Uri = uri, UseNavigationServiceOperation = false});                               
         }
     }
 }

@@ -312,6 +312,7 @@ namespace OpenSyno.Services
             // The trackstream is not readable.
             _isPlayable = false;
 
+            _logService.Trace("AudioRenderingService.OnFileStreamOpened : Instanciating ReadWriteMemoryStream of size " + response.ContentLength);
             Stream targetStream = new ReadWriteMemoryStream((int)response.ContentLength);
 
             DownloadToTemporaryFile(trackStream, response.ContentLength, targetStream, synoTrack, string.Empty, BufferedProgressUpdated);

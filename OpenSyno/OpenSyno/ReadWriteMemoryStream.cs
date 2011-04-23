@@ -23,6 +23,7 @@ namespace OpenSyno.Services
         private readonly object _lockObject = new object();
 
         private ILogService _logService;
+        private DateTime _lastFailedRead;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadWriteMemoryStream"/> class.
@@ -50,11 +51,34 @@ namespace OpenSyno.Services
                 if (read == 0)
                 {
                     var message = string.Format("The stream could not be read : 0 bytes received. Length : {0} Position : {1}", this.Length, this.Position);
+                    if (_lastFailedRead == DateTime.MaxValue)
+                    {
+                        _lastFailedRead = DateTime.Now;                        
+                    }
+                    else
+                    {
+                        if (_lastFailedRead.AddMilliseconds(ReadTimeout) > DateTime.Now)
+                        {
+                            _logService.Trace("ReadWriteMemoryStream.Read : Timeout reached : " + ReadTimeout);
+                            throw new EndOfStreamException(message, new TimeoutException(ReadTimeout.ToString())); 
+                        }
+                    }
                     _logService.Trace("ReadWriteMemoryStream.Read : " + message);
-                    throw new EndOfStreamException(message);
+                }
+                else
+                {
+                    _lastFailedRead = DateTime.MaxValue;
                 }
             }                       
             return read;
+        }
+
+        public override bool CanTimeout
+        {
+            get
+            {
+                return true;
+            }
         }
 
         /// <summary>

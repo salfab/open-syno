@@ -20,8 +20,8 @@ namespace OpenSyno.Helpers
 
         public IsolatedStorageLogService()
         {
-            // by default, logging is disabled.
-            IsEnabled = false;
+            // by default, logging is enabled.
+            IsEnabled = true;
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
                 _logFile = userStore.OpenFile("logfile.log", FileMode.Append, FileAccess.Write, FileShare.Read );                

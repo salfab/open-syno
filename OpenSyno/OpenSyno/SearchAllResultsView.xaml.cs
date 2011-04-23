@@ -31,6 +31,10 @@ namespace OpenSyno
 
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
+            // the page is an humble object, and the navigatorService, its sole dependency.
+            var navigator = IoC.Container.Get<INavigatorService>();
+            navigator.ActivateNavigationService(NavigationService, true);
+
             if (DataContext == null)
             {
                 string keyword = NavigationContext.QueryString["keyword"];

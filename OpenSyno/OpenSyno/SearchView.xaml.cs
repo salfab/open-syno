@@ -94,7 +94,28 @@ namespace OpenSyno
 
             callback = ae =>
                            {
-                               navigationService.Navigate(ae.Uri);
+                               if (!ae.UseNavigationServiceOperation)
+                               {                                   
+                                   navigationService.Navigate(ae.Uri);                                  
+                               }
+                               else
+                               {
+                                   switch (ae.NavigationServiceOperation)
+                                   {
+                                       case PageSwitchedAggregatedEvent.NavigationServiceOperations.GoBack:
+                                           navigationService.GoBack();
+                                           break;
+                                       case PageSwitchedAggregatedEvent.NavigationServiceOperations.GoForward:
+                                           navigationService.GoForward();
+                                           break;
+                                       case PageSwitchedAggregatedEvent.NavigationServiceOperations.StopLoading:
+                                           navigationService.StopLoading();
+                                           break;
+                                       default:
+                                           throw new ArgumentOutOfRangeException();
+                                   }
+                               }
+
                                if (deactivateAfterNavigation)
                                {
                                    // callback will not be modified, therefore : no need to make a copy to avoid accessing a modified closure.
@@ -112,5 +133,14 @@ namespace OpenSyno
     public class PageSwitchedAggregatedEvent
     {
         public Uri Uri { get; set; }
+        public bool UseNavigationServiceOperation { get; set; }
+        public NavigationServiceOperations NavigationServiceOperation { get; set; }
+
+        public enum NavigationServiceOperations
+        {
+            GoBack,
+            GoForward,
+            StopLoading
+        }
     }
 }
