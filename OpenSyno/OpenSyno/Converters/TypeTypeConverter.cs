@@ -73,5 +73,4 @@ namespace OpenSyno.Converters
             return ((Type)value).AssemblyQualifiedName;
         }
     }
-
 }

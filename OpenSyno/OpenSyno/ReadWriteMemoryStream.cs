@@ -31,6 +31,7 @@ namespace OpenSyno.Services
         /// <param name="size">The size.</param>
         public ReadWriteMemoryStream(int size) : base(size)
         {
+            _readTimeout = 2000;
             _logService = IoC.Container.Get<ILogService>();
         }
 
@@ -57,7 +58,7 @@ namespace OpenSyno.Services
                     }
                     else
                     {
-                        if (_lastFailedRead.AddMilliseconds(ReadTimeout) > DateTime.Now)
+                        if (_lastFailedRead.AddMilliseconds(ReadTimeout) < DateTime.Now)
                         {
                             _logService.Trace("ReadWriteMemoryStream.Read : Timeout reached : " + ReadTimeout);
                             throw new EndOfStreamException(message, new TimeoutException(ReadTimeout.ToString())); 
@@ -79,6 +80,13 @@ namespace OpenSyno.Services
             {
                 return true;
             }
+        }
+
+        private int _readTimeout;
+        public override int ReadTimeout
+        {
+            get { return _readTimeout; }
+            set { _readTimeout = value; }
         }
 
         /// <summary>

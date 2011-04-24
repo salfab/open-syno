@@ -79,6 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviors\RadioButtonCheckedToCommandBehavior.cs" />
     <Compile Include="Converters\TypeTypeConverter.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Helpers\ViewModelResolver.cs" />
@@ -182,12 +183,29 @@
     <Content Include="Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="appbar.transport.ff.rest.png" />
+    <Resource Include="appbar.transport.rew.rest.png" />
     <Resource Include="Untitled.png" />
     <Resource Include="11-18-04.jpg" />
     <Resource Include="appbar.basecircle.rest.png" />
     <Resource Include="appbar.folder.rest.png" />
     <Resource Include="PanoramaBackground.png" />
     <Resource Include="SampleData\11-18-36.jpg" />
+    <Content Include="icons\appbar.feature.settings.rest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="icons\appbar.folder.rest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="icons\appbar.next.rest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="icons\appbar.questionmark.rest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="icons\appbar.transport.play.rest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>

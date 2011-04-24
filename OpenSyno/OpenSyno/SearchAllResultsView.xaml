@@ -51,8 +51,8 @@
     <!--Sample code showing usage of ApplicationBar-->
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
-            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="play queue" Click="ApplicationBarShowPlayQueue"/>
-            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="play last" Click="ApplicationBarPlayLast"/>
+            <shell:ApplicationBarIconButton IconUri="/icons/appbar.transport.play.rest.png" Text="play last" Click="ApplicationBarPlayLast"/>
+            <shell:ApplicationBarIconButton IconUri="/icons/appbar.folder.rest.png" Text="play queue" Click="ApplicationBarShowPlayQueue"/>
             <!--<shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
                 <shell:ApplicationBarMenuItem Text="MenuItem 2"/>

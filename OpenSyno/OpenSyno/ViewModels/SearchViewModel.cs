@@ -16,8 +16,6 @@ namespace OpenSyno.ViewModels
 
     public class SearchViewModel : ViewModelBase
     {
-
-
         private const string SearchPatternPropertyName = "SearchPattern";
         private const string IsBusyPropertyName = "IsBusy";
         private const string IsAppLoadingPropertyName = "IsAppLoading";
@@ -29,6 +27,7 @@ namespace OpenSyno.ViewModels
         private bool _isAppLoading = false;
         private bool _isBusy;
         private string _searchPattern;
+        private SearchContext _searchContext;
 
         public SearchViewModel(ISearchService searchService, IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator, ISignInService signInService)
         {
@@ -48,8 +47,36 @@ namespace OpenSyno.ViewModels
             StartSearchCommand = new DelegateCommand<string>(OnStartSearch);
             StartSearchAllCommand = new DelegateCommand<string>(OnStartSearchAll);
             ShowAboutBoxCommand = new DelegateCommand(OnShowAboutBox);
+            SearchContextChangedCommand = new DelegateCommand<string>(OnSearchContextChanged);
+            DispatchSearchCommand = new DelegateCommand<string>(OnDispatchSearch);
         }
 
+        private void OnSearchContextChanged(string searchContextName)
+        {
+            _searchContext = (SearchContext) Enum.Parse(typeof (SearchContext), searchContextName, false);            
+        }
+
+        private void OnDispatchSearch(string keyword)
+        {
+            switch (_searchContext)
+            {
+                case SearchContext.Artist:
+                    OnStartSearch(keyword);
+                    break;
+                case SearchContext.Track:
+                    break;
+                case SearchContext.Album:
+                    break;
+                case SearchContext.AllMusic:
+                    OnStartSearchAll(keyword);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public ICommand DispatchSearchCommand { get; set; }
+        public ICommand SearchContextChangedCommand { get; set; }
         /// <summary>
         /// Called when the syno token is received.
         /// </summary>
@@ -65,18 +92,18 @@ namespace OpenSyno.ViewModels
 
         public ICommand StartSearchCommand { get; set; }
 
-        //protected string SearchPattern
-        //{
-        //    get
-        //    {
-        //        return _searchPattern;
-        //    }
-        //    set
-        //    {
-        //        _searchPattern = value;
-        //        OnPropertyChanged(SearchPatternPropertyName);
-        //    }
-        //}
+        public string SearchPattern
+        {
+            get
+            {
+                return _searchPattern;
+            }
+            set
+            {
+                _searchPattern = value;
+                OnPropertyChanged(SearchPatternPropertyName);
+            }
+        }
 
         public bool IsBusy
         {
@@ -150,5 +177,13 @@ namespace OpenSyno.ViewModels
         {
             Results = results;
         }
+    }
+
+    public enum SearchContext
+    {
+        Artist, 
+        Track, 
+        Album, 
+        AllMusic
     }
 }
