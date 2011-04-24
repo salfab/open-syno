@@ -276,7 +276,7 @@
                     AppendItems(e.Items);
                     if (_playbackService.Status == PlaybackStatus.Stopped)
                     {
-                        var trackToPlay = SelectedTrack != null ? SelectedTrack : PlayQueueItems.First();
+                        var trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
                         OnPlay(trackToPlay);
                     }
                     break;

@@ -46,7 +46,7 @@
                 <RadioButton Content="album"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Album" />
                 <RadioButton Content="all music" Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="AllMusic" />
                 <TextBlock Text="Search" Margin="12,0" />
-                <TextBox Name="SearchKeyword" Text="{Binding SearchPattern}" Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding DispatchSearchCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding ElementName=SearchKeyword, Path=Text}" />
+                <TextBox Name="SearchKeyword" Text="{Binding SearchPattern, Mode=TwoWay}" Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding DispatchSearchCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding ElementName=SearchKeyword, Path=Text}" />
                 <Button Content="Clear" Behaviors:ButtonClickToCommandBehavior.Command="{Binding ClearKeywordCommand}" />
             </StackPanel>            
         </Grid>

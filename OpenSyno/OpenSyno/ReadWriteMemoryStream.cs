@@ -31,7 +31,7 @@ namespace OpenSyno.Services
         /// <param name="size">The size.</param>
         public ReadWriteMemoryStream(int size) : base(size)
         {
-            _readTimeout = 2000;
+            _readTimeout = 10000;
             _logService = IoC.Container.Get<ILogService>();
         }
 

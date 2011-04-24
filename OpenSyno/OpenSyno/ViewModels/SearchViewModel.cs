@@ -49,6 +49,12 @@ namespace OpenSyno.ViewModels
             ShowAboutBoxCommand = new DelegateCommand(OnShowAboutBox);
             SearchContextChangedCommand = new DelegateCommand<string>(OnSearchContextChanged);
             DispatchSearchCommand = new DelegateCommand<string>(OnDispatchSearch);
+            ClearKeywordCommand = new DelegateCommand(OnClearKeyword);
+        }
+
+        private void OnClearKeyword()
+        {
+            this.SearchPattern = string.Empty;
         }
 
         private void OnSearchContextChanged(string searchContextName)
@@ -74,6 +80,8 @@ namespace OpenSyno.ViewModels
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public ICommand ClearKeywordCommand { get; set; }
 
         public ICommand DispatchSearchCommand { get; set; }
         public ICommand SearchContextChangedCommand { get; set; }
