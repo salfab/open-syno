@@ -120,7 +120,7 @@ namespace OpenSyno.Services
                 throw new ArgumentNullException("targetStream");
             }
 
-            int bufferSize = 10240;
+            int bufferSize = 4096;
             var buffer = new byte[bufferSize];
 
 
@@ -128,17 +128,14 @@ namespace OpenSyno.Services
             while (bytesLeft > 0)
             {
                 var readCount = stream.Read(buffer, 0, buffer.Length);
-
+                if (readCount < bufferSize && readCount < bytesLeft)
+                {
+                    // throttle the download
+                    Thread.Sleep(3000);
+                }
                 _logService.ConditionalTrace("RWMS_STARVING", "AudioRenderingService.DownloadTrackCallback : readCount = " + readCount);
 
                 bytesLeft = bytesLeft - readCount;
-
-                // that probably means the stream has been closed by the media element before it had a chance to be transfered completely, so we have abort the download
-                // to avoid trying to read from a closed stream.
-                if (!targetStream.CanRead)
-                {
-                    return;
-                }
 
                 // Note : this targetstream is protected against synchronous concurrent reading/writing, since it is a ReadWriteMemoryStream.
                 targetStream.Write(buffer, 0, readCount);
@@ -288,6 +285,7 @@ namespace OpenSyno.Services
 
         private void OnFileStreamOpened(WebResponse response, SynoTrack synoTrack)
         {
+            Thread.CurrentThread.Name = "Downloader";
             _logService.Trace("AudioRenderingService.OnFileStreamOpened : " + synoTrack.Title);
 
             var trackStream = response.GetResponseStream();

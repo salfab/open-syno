@@ -127,18 +127,35 @@ namespace OpenSyno.Services
                     {
                         _logService.Trace("ReadWriteMemoryStream.Write : Writing while starving");                        
                     }
-                    var oldPosition = base.Position;
-                    base.Position = base.Length;
-                    base.Write(buffer, offset, count);
-                    base.Position = oldPosition;
+                    if (this.CanWrite)
+                    {
+                        var oldPosition = base.Position;
+                        base.Position = base.Length;
+                        base.Write(buffer, offset, count);                    
+                        base.Position = oldPosition;
+                    }
                 }
-            }           
+            }
             catch (Exception e)
             {
                 _logService.Trace(string.Format("ReadWriteMemoryStream.Write : {0} - {1}", e.GetType().FullName, e.Message));
                 throw;
             }
            
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
+
+        public override void Close()
+        {
+            lock (_lockObject)
+            {
+                Debug.WriteLine("Closing stream : " + this.GetHashCode());
+                base.Close();
+            }
         }
     }
 }
