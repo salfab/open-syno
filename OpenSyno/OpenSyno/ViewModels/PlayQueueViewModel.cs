@@ -84,8 +84,16 @@
 
         private void OnPlayNext()
         {
-            TrackViewModel nextTrack = new TrackViewModel(_playbackService.GetNextTrack(ActiveTrack.TrackInfo));
-            OnPlay(nextTrack);
+            var nextSynoTrack = _playbackService.GetNextTrack(ActiveTrack.TrackInfo);
+            if (nextSynoTrack != null)
+            {
+                var nextTrack = new TrackViewModel(nextSynoTrack);
+                OnPlay(nextTrack);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("There is no next track to play : all tracks have been played.");                
+            }
         }
 
         private double _currentPlaybackPercentComplete;
@@ -266,9 +274,18 @@
         /// <param name="e">The e.</param>
         private void OnPlayListOperation(PlayListOperationAggregatedEvent e)
         {
+            TrackViewModel trackToPlay;
             switch (e.Operation)
             {
                 case PlayListOperation.ClearAndPlay:
+                    PlayQueueItems.Clear();
+                    AppendItems(e.Items);
+                    if (_playbackService.Status != PlaybackStatus.Stopped)
+                    {
+                        // stop the playback
+                    }
+                    trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
+                    OnPlay(trackToPlay);
                     break;
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
@@ -276,7 +293,7 @@
                     AppendItems(e.Items);
                     if (_playbackService.Status == PlaybackStatus.Stopped)
                     {
-                        var trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
+                        trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
                         OnPlay(trackToPlay);
                     }
                     break;

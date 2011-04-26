@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Ninject;
 using OpenSyno.Helpers;
 
@@ -31,7 +33,7 @@ namespace OpenSyno.Services
         /// <param name="size">The size.</param>
         public ReadWriteMemoryStream(int size) : base(size)
         {
-            _readTimeout = 10000;
+            _readTimeout = 5000;
             _logService = IoC.Container.Get<ILogService>();
         }
 
@@ -45,32 +47,47 @@ namespace OpenSyno.Services
         public override int Read(byte[] buffer, int offset, int count)
         {
             int read;
-           
+
             lock (_lockObject)
             {
-                read = base.Read(buffer, offset, count);
-                if (read == 0)
+              
+                try
                 {
-                    var message = string.Format("The stream could not be read : 0 bytes received. Length : {0} Position : {1}", this.Length, this.Position);
-                    if (_lastFailedRead == DateTime.MaxValue)
-                    {
-                        _lastFailedRead = DateTime.Now;                        
-                    }
-                    else
-                    {
-                        if (_lastFailedRead.AddMilliseconds(ReadTimeout) < DateTime.Now)
-                        {
-                            _logService.Trace("ReadWriteMemoryStream.Read : Timeout reached : " + ReadTimeout);
-                            throw new EndOfStreamException(message, new TimeoutException(ReadTimeout.ToString())); 
-                        }
-                    }
-                    _logService.Trace("ReadWriteMemoryStream.Read : " + message);
+                    read = base.Read(buffer, offset, count);
+                }
+                catch (Exception e)
+                {
+                    _logService.Trace(string.Format("ReadWriteMemoryStream.Read : Read error : {0} - {1}", e.GetType().FullName, e.Message));
+                    throw;
+                }
+            }
+            if (read == 0)
+            {
+                Debug.WriteLine("starving");
+                _isStarving = true;
+                _logService.ActivateConditionalTracing("RWMS_STARVING");
+                var message = string.Format("The stream could not be read : 0 bytes received. Length : {0} Position : {1}", this.Length, this.Position);
+
+
+                if (_lastFailedRead == DateTime.MaxValue)
+                {
+                    _lastFailedRead = DateTime.Now;                        
                 }
                 else
                 {
-                    _lastFailedRead = DateTime.MaxValue;
+                    if (_lastFailedRead.AddMilliseconds(ReadTimeout) < DateTime.Now)
+                    {
+                        _logService.Trace("ReadWriteMemoryStream.Read : Timeout reached : " + ReadTimeout);
+                        throw new EndOfStreamException(message, new TimeoutException(ReadTimeout.ToString())); 
+                    }
                 }
-            }                       
+                _logService.Trace("ReadWriteMemoryStream.Read : " + message);
+            }
+            else
+            {
+                _lastFailedRead = DateTime.MaxValue;
+            }
+            
             return read;
         }
 
@@ -83,6 +100,8 @@ namespace OpenSyno.Services
         }
 
         private int _readTimeout;
+        private bool _isStarving;
+
         public override int ReadTimeout
         {
             get { return _readTimeout; }
@@ -95,16 +114,25 @@ namespace OpenSyno.Services
         /// <param name="buffer">The buffer to write data from. </param><param name="offset">The byte offset in <paramref name="buffer"/> at which to begin writing from. </param><param name="count">The maximum number of bytes to write. </param><exception cref="T:System.ArgumentNullException"><paramref name="buffer"/> is null. </exception><exception cref="T:System.NotSupportedException">The stream does not support writing. For additional information see <see cref="P:System.IO.Stream.CanWrite"/>.-or- The current position is closer than <paramref name="count"/> bytes to the end of the stream, and the capacity cannot be modified. </exception><exception cref="T:System.ArgumentException"><paramref name="offset"/> subtracted from the buffer length is less than <paramref name="count"/>. </exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> are negative. </exception><exception cref="T:System.IO.IOException">An I/O error occurs. </exception><exception cref="T:System.ObjectDisposedException">The current stream instance is closed. </exception>
         public override void Write(byte[] buffer, int offset, int count)
         {
+
+            if (_isStarving)
+            {
+                _logService.Trace("ReadWriteMemoryStream.Write : Writing while starving BEFORE LOCK");
+            }
             try
             {
                 lock (_lockObject)
                 {
+                    if (_isStarving)
+                    {
+                        _logService.Trace("ReadWriteMemoryStream.Write : Writing while starving");                        
+                    }
                     var oldPosition = base.Position;
                     base.Position = base.Length;
                     base.Write(buffer, offset, count);
                     base.Position = oldPosition;
                 }
-            }
+            }           
             catch (Exception e)
             {
                 _logService.Trace(string.Format("ReadWriteMemoryStream.Write : {0} - {1}", e.GetType().FullName, e.Message));

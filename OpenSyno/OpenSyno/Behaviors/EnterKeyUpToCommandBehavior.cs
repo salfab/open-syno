@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using Ninject;
 using OpenSyno.Helpers;
 
 namespace OpenSyno.Behaviors
@@ -55,9 +56,48 @@ namespace OpenSyno.Behaviors
                 var command = GetCommand(attachedElement);
                 var commandParameter = GetCommandParameter(attachedElement);
                 command.Execute(commandParameter);
+
+                if (GetHideKeyboardAfterEnter(attachedElement))
+                {
+                    GetControlToFocusAfterEnter(attachedElement).Focus();                    
+                }
             }
         }
 
+
+
+        public static Control GetControlToFocusAfterEnter(DependencyObject obj)
+        {
+            return (Control)obj.GetValue(ControlToFocusAfterEnterProperty);
+        }
+
+        public static void SetControlToFocusAfterEnter(DependencyObject obj, Control value)
+        {
+            obj.SetValue(ControlToFocusAfterEnterProperty, value);
+        }
+
+        // Using a DependencyProperty as the backing store for ControlToFocusAfterEnter.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ControlToFocusAfterEnterProperty =
+            DependencyProperty.RegisterAttached("ControlToFocusAfterEnter", typeof(Control), typeof(EnterKeyUpToCommandBehavior), new PropertyMetadata(null));
+
+        
+
+
+        public static bool GetHideKeyboardAfterEnter(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(HideKeyboardAfterEnterProperty);
+        }
+
+        public static void SetHideKeyboardAfterEnter(DependencyObject obj, bool value)
+        {
+            obj.SetValue(HideKeyboardAfterEnterProperty, value);
+        }
+
+        // Using a DependencyProperty as the backing store for HideKeyboardAfterEnter.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HideKeyboardAfterEnterProperty =
+            DependencyProperty.RegisterAttached("HideKeyboardAfterEnter", typeof(bool), typeof(EnterKeyUpToCommandBehavior), new PropertyMetadata(true));
+
+        
 
 
         public static object GetCommandParameter(DependencyObject obj)

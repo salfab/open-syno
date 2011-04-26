@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Net;
@@ -17,6 +18,7 @@ namespace OpenSyno.Helpers
     {
         private IsolatedStorageFileStream _logFile;
         private StreamWriter _writer;
+        private Dictionary<string,bool> _conditionalTracingActivations = new Dictionary<string, bool>();
 
         public IsolatedStorageLogService()
         {
@@ -29,6 +31,39 @@ namespace OpenSyno.Helpers
             _writer = new StreamWriter(_logFile);
             _writer.AutoFlush = true;
         }
+
+        public void ActivateConditionalTracing(string key)
+        {
+            if (_conditionalTracingActivations.ContainsKey(key))
+            {
+                _conditionalTracingActivations[key] = true;            
+            }
+            else
+            {
+                _conditionalTracingActivations.Add(key, true);                
+            }
+        }
+
+        public void DeactivateConditionalTracing(string key)
+        {
+            if (_conditionalTracingActivations.ContainsKey(key))
+            {
+                _conditionalTracingActivations[key] = false;
+            }
+            else
+            {
+                _conditionalTracingActivations.Add(key, false);
+            }
+        }
+
+        public void ConditionalTrace(string message, string conditionKey)
+        {
+            if (_conditionalTracingActivations.ContainsKey(conditionKey) && _conditionalTracingActivations[conditionKey])
+            {
+                Trace(message);
+            }
+        }
+
         #region Implementation of ILogService
 
         public bool IsEnabled { get; set; }
@@ -86,5 +121,8 @@ namespace OpenSyno.Helpers
         void Error(string message);
         string GetLogFile();
         void ClearLog();
+        void ActivateConditionalTracing(string key);
+        void DeactivateConditionalTracing(string key);
+        void ConditionalTrace(string message, string conditionKey);
     }
 }

@@ -55,10 +55,14 @@ namespace Synology.AudioStationApi
         }
 
         private void OnFileDownloadResponseReceived(IAsyncResult ar)
-        {
+        {            
             var userState = (FileDownloadResponseReceivedUserState)ar.AsyncState;
-
             WebResponse response = userState.Request.EndGetResponse(ar);
+
+            if (response.ContentLength < 0)
+            {
+                Debugger.Break();
+            }
 
             userState.GetResponseCallback(response, userState.SynoTrack);
         }
@@ -301,7 +305,6 @@ namespace Synology.AudioStationApi
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 
 
-            Debug.WriteLine(DateTime.Now + " GetAlbumsForArtist : " + artist.Title );
 
             request.BeginGetRequestStream(ar =>
             {

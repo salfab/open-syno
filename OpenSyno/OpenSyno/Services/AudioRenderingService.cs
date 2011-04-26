@@ -1,4 +1,5 @@
-﻿using System.Windows.Data;
+﻿using System.Diagnostics;
+using System.Windows.Data;
 using Media;
 using Ninject;
 using OpenSyno.Helpers;
@@ -49,7 +50,7 @@ namespace OpenSyno.Services
             _mediaElement = (MediaElement)Application.Current.Resources["MediaElement"];
 
             // HACK : 500kb is absolutely arbitrary and is supposed to cover for the mp3 header and the ID3 tags. a more subtle approach would be to retrieve the actual size of the header for our heuristic to be more accurate.
-            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate + 500000 ||  bytesLoaded == track.Size;
+            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate ||  bytesLoaded == track.Size;
 
             _mediaElement.MediaFailed += MediaFailed;
 
@@ -122,64 +123,46 @@ namespace OpenSyno.Services
             int bufferSize = 10240;
             var buffer = new byte[bufferSize];
 
-            stream.BeginRead(buffer, 0, buffer.Length, DownloadTrackCallback, new DownloadFileState(stream, contentLength, targetStream, synoTrack, buffer, filePath, contentLength, bufferingProgressUpdate));          
-        }
 
-
-
-        public void DownloadTrackCallback(IAsyncResult ar)
-        {
-            var args = (DownloadFileState)ar.AsyncState;
-            var sourceStream = args.SourceStream;
-            var bytesLeft = args.BytesLeft;
-            var targetStream = args.TargetStream;
-            var buffer = args.Buffer;
-            var filePath = args.FilePath;
-            var readCount = sourceStream.EndRead(ar);
-            long fileSize = args.FileSize;
-            var synoTrack = args.SynoTrack;
-            Action<double> bufferingProgressUpdate = args.BufferingProgressUpdate;
-            bytesLeft = bytesLeft - readCount;
-
-            // that probably means the stream has been closed by the media element before it had a chance to be transfered completely, so we have abort the download
-            // to avoid trying to read from a closed stream.
-            if (!targetStream.CanRead)
+            long bytesLeft = contentLength;
+            while (bytesLeft > 0)
             {
-                return;
+                var readCount = stream.Read(buffer, 0, buffer.Length);
+
+                _logService.ConditionalTrace("RWMS_STARVING", "AudioRenderingService.DownloadTrackCallback : readCount = " + readCount);
+
+                bytesLeft = bytesLeft - readCount;
+
+                // that probably means the stream has been closed by the media element before it had a chance to be transfered completely, so we have abort the download
+                // to avoid trying to read from a closed stream.
+                if (!targetStream.CanRead)
+                {
+                    return;
+                }
+
+                // Note : this targetstream is protected against synchronous concurrent reading/writing, since it is a ReadWriteMemoryStream.
+                targetStream.Write(buffer, 0, readCount);
+
+                var bufferingProgressUpdatedEventArgs = new BufferingProgressUpdatedEventArgs
+                {
+                    BytesLeft = bytesLeft,
+                    FileSize = contentLength,
+                    FileName = filePath,
+                    BufferingStream = targetStream,
+                    SynoTrack = synoTrack
+                };
+                _downloadTrackCallbackCount++;
+
+                Deployment.Current.Dispatcher.BeginInvoke(() => OnBufferingProgressUpdated(bufferingProgressUpdatedEventArgs));
             }
-
-            // Note : this targetstream is protected against synchronous concurrent reading/writing, since it is a ReadWriteMemoryStream.
-            targetStream.Write(buffer, 0, readCount);
-
-            var bufferingProgressUpdatedEventArgs = new BufferingProgressUpdatedEventArgs { BytesLeft = bytesLeft, FileSize = fileSize, FileName = filePath, BufferingStream = targetStream, SynoTrack = synoTrack};
-            
-            Deployment.Current.Dispatcher.BeginInvoke(() => OnBufferingProgressUpdated(bufferingProgressUpdatedEventArgs));
-
-            if (bytesLeft > 0)
-            {               
-                // Not really fond of the idea of having a separate thread to do that, but it's fairly simple to implement... 
-                // C#5 will definitely come handy here !
-                // Plus, it doesn't force us to write it in an iterative way :
-                // recursive is fine because the callstack will not get too big, since it's always on an other thread,
-                // and the original one is then allowed to end properly.
-                ThreadPool.QueueUserWorkItem(o => sourceStream.BeginRead(
-                        buffer, 
-                        0,
-                        buffer.Length, 
-                        DownloadTrackCallback,
-                        new DownloadFileState(sourceStream, bytesLeft, targetStream, synoTrack, buffer, filePath, fileSize, bufferingProgressUpdate)));
-            }
-            else
-            {
-                sourceStream.Close();
-                sourceStream.Dispose();                
-            }
-
+            stream.Close();
+            stream.Dispose();
         }
 
         public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
         bool _isPlayable;
         private readonly ILogService _logService;
+        private int _downloadTrackCallbackCount;
 
         public event EventHandler<PlayBackStartedEventArgs> PlaybackStarted;
 
@@ -308,7 +291,7 @@ namespace OpenSyno.Services
             _logService.Trace("AudioRenderingService.OnFileStreamOpened : " + synoTrack.Title);
 
             var trackStream = response.GetResponseStream();
-
+            
             // The trackstream is not readable.
             _isPlayable = false;
 
