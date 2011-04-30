@@ -46,7 +46,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Margin="0,12,0,0" Text="{Binding CurrentTrackPosition, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
                         <Slider Value="{Binding CurrentPlaybackPercentComplete, Mode=TwoWay}" Maximum="1" LargeChange="0.1" SmallChange="0.01" Grid.Column="1" />
-                        <ProgressBar Grid.Column="1" Opacity="0.5" IsHitTestVisible="False" Value="{Binding BufferedBytesCount, Mode=TwoWay}" Maximum="{Binding CurrentFileSize}" Margin="0,-12,0,0" />
+                        <ProgressBar  Grid.Column="1" Opacity="0.5" IsHitTestVisible="False" Value="{Binding BufferedBytesCount, Mode=TwoWay}" Maximum="{Binding CurrentFileSize}" Margin="0,-12,0,0" />
                         <TextBlock HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Column="2" Text="{Binding ActiveTrack.TrackInfo.Duration, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
                     </Grid>
                     <Grid Grid.Row="4" Grid.ColumnSpan="2">

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Ninject;
 using OpenSyno.Helpers;
+using OpenSyno;
 
 namespace OpenSyno.Services
 {
@@ -33,7 +34,7 @@ namespace OpenSyno.Services
         /// <param name="size">The size.</param>
         public ReadWriteMemoryStream(int size) : base(size)
         {
-            _readTimeout = 5000;
+            _readTimeout = 30000;
             _logService = IoC.Container.Get<ILogService>();
         }
 
@@ -46,49 +47,74 @@ namespace OpenSyno.Services
         /// <param name="buffer">When this method returns, contains the specified byte array with the values between <paramref name="offset"/> and (<paramref name="offset"/> + <paramref name="count"/> - 1) replaced by the characters read from the current stream. </param><param name="offset">The byte offset in <paramref name="buffer"/> at which to begin reading. </param><param name="count">The maximum number of bytes to read. </param><exception cref="T:System.ArgumentNullException"><paramref name="buffer"/> is null. </exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative. </exception><exception cref="T:System.ArgumentException"><paramref name="offset"/> subtracted from the buffer length is less than <paramref name="count"/>. </exception><exception cref="T:System.ObjectDisposedException">The current stream instance is closed. </exception>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            int read;
+            int read = 0;
 
-            lock (_lockObject)
-            {
-              
+
                 try
                 {
-                    read = base.Read(buffer, offset, count);
+
+                    _lastFailedRead = DateTime.MaxValue;
+
+                    do
+                    {
+                        lock (_lockObject)
+                        {
+                            read = base.Read(buffer, offset, count);
+                            if (read == 0)
+                            {
+                                _logService.Trace("RWMS.Read : stream reading is starved : last failed @ " +
+                                                  _lastFailedRead);
+                            }
+
+                        }
+                        if (read == 0 && _lastFailedRead == DateTime.MaxValue)
+                        {
+                            _lastFailedRead = DateTime.Now;
+                        }
+                    } while (read == 0 && this.Position < this.Length && (_lastFailedRead == DateTime.MaxValue ||_lastFailedRead.AddMilliseconds(ReadTimeout) > DateTime.Now));
+
+                    if (read == 0 && this.Position < this.Length)
+                    {
+                        _logService.Trace("Connection lost, data could not be read. Position : " + Position + "Length : " + Length );
+                    }
                 }
+                
                 catch (Exception e)
                 {
                     _logService.Trace(string.Format("ReadWriteMemoryStream.Read : Read error : {0} - {1}", e.GetType().FullName, e.Message));
                     throw;
                 }
-            }
-            if (read == 0)
-            {
-                Debug.WriteLine("starving");
-                _isStarving = true;
-                _logService.ActivateConditionalTracing("RWMS_STARVING");
-                var message = string.Format("The stream could not be read : 0 bytes received. Length : {0} Position : {1}", this.Length, this.Position);
-
-
-                if (_lastFailedRead == DateTime.MaxValue)
-                {
-                    _lastFailedRead = DateTime.Now;                        
-                }
-                else
-                {
-                    if (_lastFailedRead.AddMilliseconds(ReadTimeout) < DateTime.Now)
-                    {
-                        _logService.Trace("ReadWriteMemoryStream.Read : Timeout reached : " + ReadTimeout);
-                        throw new EndOfStreamException(message, new TimeoutException(ReadTimeout.ToString())); 
-                    }
-                }
-                _logService.Trace("ReadWriteMemoryStream.Read : " + message);
-            }
-            else
-            {
-                _lastFailedRead = DateTime.MaxValue;
-            }
-            
+                       
+            _lastFailedRead = DateTime.MaxValue;            
             return read;
+        }
+
+        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            AsyncCallback internalBeginReadCallback = ar =>
+                                                          {                                                          
+                                                              var read = this.EndRead(ar);
+                                                              ThreadPool.QueueUserWorkItem(o =>
+                                                              {
+                                                                  while (read == 0 && this.Position < this.Length && (_lastFailedRead == DateTime.MaxValue || _lastFailedRead.AddMilliseconds(ReadTimeout) < DateTime.Now))
+                                                                  {
+                                                                      read = base.Read(buffer, offset, count);
+                                                                      if (read == 0 && _lastFailedRead == DateTime.MaxValue)
+                                                                      {
+                                                                          _lastFailedRead = DateTime.Now;
+                                                                      }
+
+                                                                  }
+                                                                  if (read == 0)
+                                                                  {
+                                                                      _logService.Trace("Connection lost, data could not be read.");
+                                                                  }
+
+                                                                  callback(ar);
+                                                              });
+
+                                                          };
+            return base.BeginRead(buffer, offset, count, internalBeginReadCallback, state);
         }
 
         public override bool CanTimeout

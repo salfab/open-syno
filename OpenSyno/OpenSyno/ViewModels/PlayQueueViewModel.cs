@@ -59,10 +59,15 @@
             eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             _playbackService = playbackService;
             _playbackService.BufferingProgressUpdated += (o, e) =>
-                {                    
-                    this.BufferedBytesCount = e.FileSize - e.BytesLeft;
-                    this.CurrentFileSize = e.FileSize;
-                    Debug.WriteLine("Download progress : " + (double)(e.FileSize - e.BytesLeft) / (double)e.FileSize * (double)100.0);
+                {
+                    // throttle refresh through binding.
+                    if (_lastBufferProgressUpdate.AddMilliseconds(500) < DateTime.Now || e.BytesLeft == 0)
+                    {
+                        _lastBufferProgressUpdate = DateTime.Now;
+                        this.BufferedBytesCount = e.FileSize - e.BytesLeft;
+                        this.CurrentFileSize = e.FileSize;
+                        Debug.WriteLine("Download progress : " + (double)(e.FileSize - e.BytesLeft) / (double)e.FileSize * (double)100.0);
+                    }
                 };
 
             _playbackService.TrackCurrentPositionChanged += (o, e) =>
@@ -177,6 +182,7 @@
         private TrackViewModel _selectedTrack;
 
         private string SelectedTrackPropertyName = "SelectedTrack";
+        private DateTime _lastBufferProgressUpdate;
 
         private const string CurrentPlaybackPercentCompletePropertyName = "CurrentPlaybackPercentComplete";
 

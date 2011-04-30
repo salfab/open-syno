@@ -84,7 +84,6 @@ namespace OpenSyno.Services
             PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             // var index = PlayqueueItems.IndexOf(trackToPlay);
             _audioRenderingService.Bufferize(BufferizedCallback, BufferingProgressChanged, trackToPlay);
-            _audioRenderingService.PlaybackStarted += (sender, eventArgs) => OnTrackStarted(new TrackStartedEventArgs { Track = eventArgs.Track });
             //var client = new WebClient();
             //client.OpenReadCompleted += (o, ea) =>
             //    _audioRenderingService.Play(ea.Result);
@@ -139,6 +138,8 @@ namespace OpenSyno.Services
             _audioRenderingService.BufferingProgressUpdated += (o, e) => OnBufferingProgressUpdated(e);
             _audioRenderingService.MediaPositionChanged += MediaPositionChanged;
             _audioRenderingService.MediaEnded += MediaEnded;
+            _audioRenderingService.PlaybackStarted += (sender, eventArgs) => OnTrackStarted(new TrackStartedEventArgs { Track = eventArgs.Track });
+
 
             PlayqueueItems = new List<SynoTrack>();
         }

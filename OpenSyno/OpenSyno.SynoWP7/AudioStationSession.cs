@@ -57,7 +57,16 @@ namespace Synology.AudioStationApi
         private void OnFileDownloadResponseReceived(IAsyncResult ar)
         {            
             var userState = (FileDownloadResponseReceivedUserState)ar.AsyncState;
-            WebResponse response = userState.Request.EndGetResponse(ar);
+            WebResponse response;
+            try
+            {
+                response = userState.Request.EndGetResponse(ar);
+            }
+            catch (ArgumentNullException argumentNullException)
+            {
+                // TODO : Call the Error callback;
+                throw;
+            }
 
             if (response.ContentLength < 0)
             {
@@ -173,7 +182,7 @@ namespace Synology.AudioStationApi
             HttpWebRequest request = BuildRequest(url);
 
             // TODO : Find a way to retrieve the whole list by chunks of smaller size to have something to show earlier... or stream the JSON and parse it on the fly if it is possible
-            int limit = 10000;
+            int limit = 5000;
             string postString = string.Format(@"sort=title&dir=ASC&action=browse&target=musiclib_music_aa&server=musiclib_music_aa&category=&keyword={0}&start=0&limit={1}", pattern, limit);
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 

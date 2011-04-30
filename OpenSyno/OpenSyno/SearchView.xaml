@@ -42,17 +42,32 @@
                 </TextBox>-->
                 
                 <!--Search contexts-->
-                <RadioButton Content="artist"    Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Artist" />
-                <RadioButton Content="track"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Track" />
-                <RadioButton Content="album"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Album" />
-                <RadioButton Content="all music" Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="AllMusic" />
-                <TextBlock Text="Search" Margin="12,0" />
-                <TextBox Name="SearchKeyword" Text="{Binding SearchPattern, Mode=TwoWay}" Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding DispatchSearchCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding ElementName=SearchKeyword, Path=Text}" Behaviors:EnterKeyUpToCommandBehavior.ControlToFocusAfterEnter="{Binding ElementName=SearchViewRoot}" />
-                <Button Content="Clear" Behaviors:ButtonClickToCommandBehavior.Command="{Binding ClearKeywordCommand}"  />
+
+                <Grid Margin="0,0,0,12">
+                	<Grid.RowDefinitions>
+                		<RowDefinition/>
+                		<RowDefinition/>
+                	</Grid.RowDefinitions>
+                	<Grid.ColumnDefinitions>
+                		<ColumnDefinition/>
+                		<ColumnDefinition/>
+                	</Grid.ColumnDefinitions>
+<!--Search contexts-->
+
+            		<RadioButton Content="artist"    Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Artist" Style="{StaticResource RadioButtonTilesTemplate}" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsChecked="True" Margin="0,0,2,2" />
+            		<RadioButton Grid.Column="1" Content="track"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Track" Style="{StaticResource RadioButtonTilesTemplate}" VerticalAlignment="Bottom" Margin="2,0,0,2" />
+            		<RadioButton Grid.Row="1" Content="album"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Album" Style="{StaticResource RadioButtonTilesTemplate}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,2,2,0" />
+            		<RadioButton Grid.Row="1" Grid.Column="1" Content="all music" Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="AllMusic" Style="{StaticResource RadioButtonTilesTemplate}" VerticalAlignment="Top" Margin="2,2,0,0" />
+
+            	</Grid>
+
+            	<TextBlock Text="Search" Margin="12,0" />
+            	<TextBox x:Name="SearchKeyword" Text="{Binding SearchPattern, Mode=TwoWay}" Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding DispatchSearchCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding Text, ElementName=SearchKeyword}" Behaviors:EnterKeyUpToCommandBehavior.ControlToFocusAfterEnter="{Binding ElementName=SearchViewRoot}" />
+            	<Button Content="Clear" Behaviors:ButtonClickToCommandBehavior.Command="{Binding ClearKeywordCommand}"  />
             </StackPanel>            
         </Grid>
         <!--Behaviors:OverrideVisibilityBehavior.IsVisible="{Binding IsAppLoading, Converter={StaticResource BooleanToVisibilityConverter}}"-->
-        <Image Visibility="{Binding IsAppLoading, Converter={StaticResource BooleanToVisibilityConverter}}" Source="/SplashScreenImage.jpg" Stretch="Fill" Margin="0,-32,0,0"/>
+        <!-- <Image Visibility="{Binding IsAppLoading, Converter={StaticResource BooleanToVisibilityConverter}}" Source="/SplashScreenImage.jpg" Stretch="Fill" Margin="0,-32,0,0"/> -->
     </Grid>
  
     <!--Sample code showing usage of ApplicationBar-->

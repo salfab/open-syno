@@ -50,7 +50,7 @@ namespace OpenSyno.Services
             _mediaElement = (MediaElement)Application.Current.Resources["MediaElement"];
 
             // HACK : 500kb is absolutely arbitrary and is supposed to cover for the mp3 header and the ID3 tags. a more subtle approach would be to retrieve the actual size of the header for our heuristic to be more accurate.
-            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate ||  bytesLoaded == track.Size;
+            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= 1||  bytesLoaded == track.Size;
 
             _mediaElement.MediaFailed += MediaFailed;
 
@@ -120,6 +120,7 @@ namespace OpenSyno.Services
                 throw new ArgumentNullException("targetStream");
             }
 
+            // 4096 works better on the device
             int bufferSize = 4096;
             var buffer = new byte[bufferSize];
 
@@ -130,6 +131,7 @@ namespace OpenSyno.Services
                 var readCount = stream.Read(buffer, 0, buffer.Length);
                 if (readCount < bufferSize && readCount < bytesLeft)
                 {
+                    _logService.Trace(string.Format("Network stream starving : {0} bytes read; Throttling download.",readCount));
                     // throttle the download
                     Thread.Sleep(3000);
                 }
@@ -316,7 +318,6 @@ namespace OpenSyno.Services
             {
                 Delegate mediaRenderingStarter = new Action<Stream>(streamToPlay =>
                                                                           {
-
                                                                               _logService.Trace("AudioRenderingService.OnBufferReachedPlayableState : starting mediaRenderingStarter delegate");
                                                                               _mediaElement.Stop();
                                                                               Mp3MediaStreamSource mss = new Mp3MediaStreamSource(streamToPlay);
