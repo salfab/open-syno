@@ -43,7 +43,7 @@
                 
                 <!--Search contexts-->
 
-                <Grid Margin="0,0,0,12">
+                <Grid Margin="12,0,0,12" HorizontalAlignment="Left">
                 	<Grid.RowDefinitions>
                 		<RowDefinition/>
                 		<RowDefinition/>

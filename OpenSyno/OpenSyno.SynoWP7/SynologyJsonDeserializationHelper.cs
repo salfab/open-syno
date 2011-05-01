@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -40,6 +40,9 @@ namespace OpenSyno.SynoWP7
 
         private static string BuildAbsoluteAlbumArtUrl(string urlBase, string relativeAlbumArtUrl)
         {
+            // In the iPhone app : 
+           // http://host/audio/iPhone/enumerate.cgi?action=get_cover&music_id=54289&sid=*******
+
             // in DSM 3.0
             // http://host/audio/[albumArtURL]
 
