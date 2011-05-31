@@ -52,7 +52,7 @@
                 <HyperlinkButton Margin="0,15,0,0" FontSize="19" Content="http://opensyno.seesharp.ch" Behaviors:ButtonClickToCommandBehavior.Command="{Binding OpenWebsiteCommand}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="http://opensyno.seesharp.ch"/>
                 <TextBlock Margin="0,15,0,0" TextWrapping="Wrap"
                            Text="Last but not least, a big thank you to Liliboude for her fantastic splashscreen. you can find more of her goodness on her website : " FontSize="19" />
-                <HyperlinkButton Margin="0,15,0,0" FontSize="19" Content="http://elisabethboude.blogspot.com" Behaviors:ButtonClickToCommandBehavior.Command="{Binding OpenWebsiteCommand}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="http://liliboude.over-blog.com"/>
+                <HyperlinkButton Margin="0,15,0,0" FontSize="19" Content="http://elisabethboude.blogspot.com" Behaviors:ButtonClickToCommandBehavior.Command="{Binding OpenWebsiteCommand}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="http://elisabethboude.blogspot.com"/>
             </StackPanel>
         </Grid>
     </Grid>
