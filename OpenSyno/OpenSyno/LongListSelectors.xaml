@@ -16,15 +16,15 @@
             <TextBlock Text="{Binding Title}" FontSize="40" Foreground="{StaticResource PhoneForegroundBrush}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
         </Border>
     </DataTemplate>
-    <!--<DataTemplate x:Key="ArtistsListHeader">
+    <DataTemplate x:Key="ArtistsListHeader">
         <Grid>
-            <Grid.RowDefinitions>
+            <!--<Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock TextWrapping="Wrap" Text="Filter" d:LayoutOverrides="Width" Margin="12,0,0,0"/>
-            <TextBox Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding FilterResultsCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding FilterExpression}" Text="{Binding FilterExpression, Mode=TwoWay}" TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="1"/>
+            <TextBox Behaviors:EnterKeyUpToCommandBehavior.Command="{Binding FilterResultsCommand}" Behaviors:EnterKeyUpToCommandBehavior.CommandParameter="{Binding FilterExpression}" Text="{Binding FilterExpression, Mode=TwoWay}" TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="1"/>-->
         </Grid>
-    </DataTemplate>-->
+    </DataTemplate>
     <!-- Resource dictionary entries should be defined here. -->
 </ResourceDictionary>
