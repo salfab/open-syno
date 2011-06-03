@@ -57,6 +57,10 @@ namespace OpenSyno.Services
         event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
 
         SynoTrack GetNextTrack(SynoTrack currentTrack);
+
+        void PausePlayback();
+
+        void ResumePlayback();
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);

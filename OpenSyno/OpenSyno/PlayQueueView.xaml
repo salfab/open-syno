@@ -54,6 +54,8 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                             <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayPreviousCommand}" >
                         	<Image Source="appbar.transport.rew.rest.png" Stretch="None"/>
@@ -62,7 +64,9 @@
                         <Button Behaviors:ButtonClickToCommandBehavior.CommandParameter="{Binding SelectedTrack}" Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayCommand}"  Grid.Column="1">
                         	<Image Stretch="None" Source="/icons/appbar.transport.play.rest.png"/>
                         </Button>
-                        <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayNextCommand}" Grid.Column="2">
+                        <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PausePlaybackCommand}" Grid.Column="2" Content="Pause"/>
+                        <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding ResumePlaybackCommand}" Grid.Column="3" Content="Resume"/>
+                        <Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayNextCommand}" Grid.Column="4">
                         	<Image Source="appbar.transport.ff.rest.png" Stretch="None"/>
                         </Button>                        
                     </Grid>

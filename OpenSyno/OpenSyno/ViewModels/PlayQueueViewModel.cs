@@ -78,7 +78,19 @@
 
             PlayCommand = new DelegateCommand<TrackViewModel>(OnPlay, track => track != null);
             PlayNextCommand = new DelegateCommand(OnPlayNext);
+            PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
+            ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious, () => false);
+        }
+
+        private void OnResumePlayback()
+        {
+            _playbackService.ResumePlayback();
+        }
+
+        private void OnPausePlayback()
+        {
+            _playbackService.PausePlayback();
         }
 
         private void OnPlayPrevious()
@@ -222,6 +234,10 @@
         public ICommand PlayPreviousCommand { get; set; }
 
         public ICommand PlayNextCommand { get; set; }
+
+        public ICommand PausePlaybackCommand { get; set; }
+        
+        public ICommand ResumePlaybackCommand { get; set; }
 
         public ICommand PlayCommand { get; set; }
 

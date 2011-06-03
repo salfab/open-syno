@@ -160,6 +160,16 @@ namespace OpenSyno.Services
             return null;
         }
 
+        public void PausePlayback()
+        {
+            _audioRenderingService.Pause();
+        }
+
+        public void ResumePlayback()
+        {
+            _audioRenderingService.Resume();
+        }
+
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
         {
             if (BufferingProgressUpdated != null)
