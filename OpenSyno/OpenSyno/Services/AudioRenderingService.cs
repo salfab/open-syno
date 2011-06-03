@@ -366,6 +366,16 @@ namespace OpenSyno.Services
             _mediaElement.MediaOpened -= MediaOpened;
             _mediaElement.MediaEnded -= PlayingMediaEnded;
         }
+
+        public void Pause()
+        {
+            _mediaElement.Pause();
+        }
+
+        public void Resume()
+        {
+            _mediaElement.Play();
+        }
     }
 
     public class PlayBackStartedEventArgs : EventArgs

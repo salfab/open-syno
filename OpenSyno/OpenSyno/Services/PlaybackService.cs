@@ -16,7 +16,7 @@ namespace OpenSyno.Services
         /// <summary>
         /// The service responsible for downloading and rendering the audio files.
         /// </summary>
-        private readonly AudioRenderingService _audioRenderingService;
+        private readonly IAudioRenderingService _audioRenderingService;
 
         private PlaybackStatus _status;
 
