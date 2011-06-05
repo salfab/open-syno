@@ -14,13 +14,16 @@
         private IEnumerable<SynoItem> _lastSearchResults;
         private IEventAggregator _eventAggregator;
 
-        public SearchResultsViewModelFactory(IEventAggregator eventAggregator)
+        private ISearchResultItemViewModelFactory _searchResultItemViewModelFactory;
+
+        public SearchResultsViewModelFactory(IEventAggregator eventAggregator, ISearchResultItemViewModelFactory searchResultItemViewModelFactory)
         {
             if (eventAggregator == null)
             {
                 throw new ArgumentNullException("eventAggregator");
             }
             _eventAggregator = eventAggregator;
+            _searchResultItemViewModelFactory = searchResultItemViewModelFactory;
             _lastSearchResults = new List<SynoItem>();
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Subscribe(SearchResultsUpdated, true);
         }
@@ -32,7 +35,7 @@
 
         public ISearchResultsViewModel Create(PageSwitchingService pageSwitchingService)
         {
-            return new SearchResultsViewModel(pageSwitchingService);
+            return new SearchResultsViewModel(pageSwitchingService, _searchResultItemViewModelFactory);
         }
     }
 }

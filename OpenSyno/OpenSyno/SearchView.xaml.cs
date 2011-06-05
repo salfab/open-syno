@@ -75,17 +75,22 @@ namespace OpenSyno
     public interface INavigatorService
     {
         void ActivateNavigationService(NavigationService navigationService, bool deactivateAfterNavigation);
+
+        IUrlParameterToObjectsPlateHeater UrlParameterToObjectsPlateHeater { get; }
     }
 
     public class NavigatorService : INavigatorService
     {
         private readonly IEventAggregator _eventAggregator;
 
+        private readonly IUrlParameterToObjectsPlateHeater _urlParameterToObjectsPlateHeater;
+
         #region Implementation of INavigatorService
 
-        public NavigatorService(IEventAggregator eventAggregator)
+        public NavigatorService(IEventAggregator eventAggregator, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater)
         {
             _eventAggregator = eventAggregator;
+            _urlParameterToObjectsPlateHeater = urlParameterToObjectsPlateHeater;
         }
 
         public void ActivateNavigationService(NavigationService navigationService, bool deactivateAfterNavigation)
@@ -125,6 +130,14 @@ namespace OpenSyno
                            };
 
             _eventAggregator.GetEvent<CompositePresentationEvent<PageSwitchedAggregatedEvent>>().Subscribe(callback, true);
+        }
+
+        public IUrlParameterToObjectsPlateHeater UrlParameterToObjectsPlateHeater
+        {
+            get
+            {
+                return _urlParameterToObjectsPlateHeater;
+            }            
         }
 
         #endregion

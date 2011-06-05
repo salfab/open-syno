@@ -9,6 +9,8 @@ namespace OpenSyno
 
     using OpenSyno.ViewModels;
 
+    using Synology.AudioStationApi;
+
     public partial class ArtistPanoramaView : PhoneApplicationPage
     {
         /// <summary>
@@ -28,7 +30,9 @@ namespace OpenSyno
 
             if (DataContext == null)
             {
-                DataContext = IoC.Container.Get<ArtistPanoramaViewModelFactory>().Create();
+                var artistTicket = NavigationContext.QueryString["artistTicket"];
+                SynoItem artist = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(artistTicket);
+                DataContext = IoC.Container.Get<ArtistPanoramaViewModelFactory>().Create(artist);
             }
         }
 

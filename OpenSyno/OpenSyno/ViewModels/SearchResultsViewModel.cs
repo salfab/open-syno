@@ -22,13 +22,14 @@ namespace OpenSyno.ViewModels
         /// Initializes a new instance of the <see cref="SearchResultsViewModel"/> class.
         /// </summary>
         /// <param name="pageSwitchingService">The page switching service.</param>
-        public SearchResultsViewModel(IPageSwitchingService pageSwitchingService)
+        public SearchResultsViewModel(IPageSwitchingService pageSwitchingService, ISearchResultItemViewModelFactory searchResultItemViewModelFactory)
         {
             if (pageSwitchingService == null) throw new ArgumentNullException("pageSwitchingService");
 
             // register for search results updates
             _eventAggregator = IoC.Container.Get<IEventAggregator>();
             _pageSwitchingService = pageSwitchingService;
+            _searchResultItemViewModelFactory = searchResultItemViewModelFactory;
 
             FilterResultsCommand = new DelegateCommand<string>(OnFilterResults);
             // everytime the searchResults changes, we'll react to that change.
@@ -37,14 +38,13 @@ namespace OpenSyno.ViewModels
 
         private void OnFilterResults(string filterExpression)
         {
-            SearchResults = _unfilteredSearchResults.Where(o => o.Title.ToLowerInvariant().Contains(filterExpression.ToLowerInvariant())).Select(o => new SearchResultItemViewModel(o, _eventAggregator, _pageSwitchingService));
+            SearchResults = _unfilteredSearchResults.Where(o => o.Title.ToLowerInvariant().Contains(filterExpression.ToLowerInvariant())).Select(o => _searchResultItemViewModelFactory.Create(o, this._eventAggregator, this._pageSwitchingService));
         }
 
         private void SearchResultsUpdated(SearchResultsRetrievedAggregatedEvent payload)
         {
             _unfilteredSearchResults = payload.Results;
-            SearchResults = from result in payload.Results select new SearchResultItemViewModel(result, _eventAggregator, _pageSwitchingService);;
-
+            SearchResults = from result in payload.Results select _searchResultItemViewModelFactory.Create(result, this._eventAggregator, this._pageSwitchingService);
         }
 
         private IEnumerable<SearchResultItemViewModel> _searchResults;
@@ -68,6 +68,9 @@ namespace OpenSyno.ViewModels
         public ICommand FilterResultsCommand { get; set; }
 
         private string _filterExpression;
+
+        private ISearchResultItemViewModelFactory _searchResultItemViewModelFactory;
+
         private const string FilterExpressionPropertyName = "FilterExpression";
 
         public string FilterExpression
@@ -134,5 +137,26 @@ namespace OpenSyno.ViewModels
                 }
             }
         }
+    }
+
+    public class SearchResultItemViewModelFactory : ISearchResultItemViewModelFactory
+    {
+        private IUrlParameterToObjectsPlateHeater _urlParameterToObjectsPlateHeater;
+
+        public SearchResultItemViewModelFactory(IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater)
+        {
+            this._urlParameterToObjectsPlateHeater = urlParameterToObjectsPlateHeater;
+        }
+
+        // Eventaggregator needs to be moved to .ctor
+        public SearchResultItemViewModel Create(SynoItem result, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
+        {
+            return new SearchResultItemViewModel(result, eventAggregator, pageSwitchingService, _urlParameterToObjectsPlateHeater);
+        }
+    }
+
+    public interface ISearchResultItemViewModelFactory
+    {
+        SearchResultItemViewModel Create(SynoItem result, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService);
     }
 }

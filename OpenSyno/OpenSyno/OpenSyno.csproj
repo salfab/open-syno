@@ -122,12 +122,12 @@
     <Compile Include="Services\MediaEndedEventArgs.cs" />
     <Compile Include="ReadWriteMemoryStream.cs" />
     <Compile Include="Services\IPanoramaItemSwitchingService.cs" />
+    <Compile Include="ViewModels\IUrlParameterToObjectsPlateHeater.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
     <Compile Include="ViewModels\SearchResultsViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
     <Compile Include="ViewModels\SearchResultItemViewModel.cs" />
-    <Compile Include="SelectedArtistChangedAggregatedEvent.cs" />
     <Compile Include="Services\AudioRenderingService.cs" />
     <Compile Include="Services\IAudioRenderingService.cs" />
     <Compile Include="Services\IPlaybackService.cs" />
@@ -161,6 +161,7 @@
     <Compile Include="Services\IPageSwitchingService.cs" />
     <Compile Include="Services\PageSwitchingService.cs" />
     <Compile Include="Services\SearchResultsRetrievedAggregatedEvent.cs" />
+    <Compile Include="ViewModels\UrlParameterToObjectsPlateHeater.xaml.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
   </ItemGroup>

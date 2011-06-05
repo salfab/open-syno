@@ -94,7 +94,9 @@ namespace OpenSyno
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
-           
+            IoC.Container.Bind<ISearchResultItemViewModelFactory>().To<SearchResultItemViewModelFactory>().InSingletonScope();
+            IoC.Container.Bind<IUrlParameterToObjectsPlateHeater>().To<UrlParameterToObjectsPlateHeater>().InSingletonScope();
+
             // Retrieve the type PlaybackService from a config file, so we can change it.
             IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();
 

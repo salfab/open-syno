@@ -7,7 +7,7 @@ namespace OpenSyno.Services
     public interface IPageSwitchingService
     {
         void NavigateToSearchResults();
-        void NavigateToArtistPanorama();
+        void NavigateToArtistPanorama(string artistId);
         void NavigateToPreviousPage();
 
         void NavigateToAboutBox();

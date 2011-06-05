@@ -14,7 +14,7 @@ namespace OpenSyno.Services
 
         private const string PlayQueueResultsUri = "/PlayQueueView.xaml";
 
-        private const string ArtistPanoramaUri = "/ArtistPanoramaView.xaml";
+        private const string ArtistPanoramaUri = "/ArtistPanoramaView.xaml?artistTicket={0}";
         private const string SearchResultsUri = "/SearchResultsView.xaml";
 
         public PageSwitchingService(IEventAggregator eventAggregator)
@@ -27,9 +27,9 @@ namespace OpenSyno.Services
              NavigateToUri(new Uri(SearchResultsUri, UriKind.RelativeOrAbsolute));                        
         }
 
-        public void NavigateToArtistPanorama()
+        public void NavigateToArtistPanorama(string artistId)
         {
-             NavigateToUri(new Uri(ArtistPanoramaUri, UriKind.RelativeOrAbsolute));
+             NavigateToUri(new Uri(string.Format(ArtistPanoramaUri, artistId), UriKind.RelativeOrAbsolute));
         }
 
         public void NavigateToPreviousPage()
