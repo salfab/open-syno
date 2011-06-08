@@ -51,6 +51,8 @@
             _synoSettings.Password = Password;
             _synoSettings.Host = Host;
             _synoSettings.Port = Port;
+            _audioStationSession.Host = Host;
+            _audioStationSession.Port = Port;
             _audioStationSession.LoginAsync(UserName, Password, OnLoginAsyncCompleted, OnLoginAsyncException);
         }
 

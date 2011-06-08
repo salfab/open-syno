@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Runtime.Serialization;
 
     public interface IAudioStationSession
     {
@@ -22,5 +23,14 @@
         void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError);
 
         bool IsSignedIn { get; }
+
+        [DataMember]
+        string Host { get; set; }
+
+        [DataMember]
+        int Port { get; set; }
+
+        [DataMember]
+        string Token { get; set; }
     }
 }
