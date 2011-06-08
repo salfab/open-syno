@@ -49,7 +49,7 @@
         }
 
 
-        public void LoginAsync(string login, string password, string host, int port, Action<string> callback, Action<Exception> callbackError)
+        public void LoginAsync(string login, string password, Action<string> callback, Action<Exception> callbackError)
         {
             callback("#FAKETOKEN!");
         }

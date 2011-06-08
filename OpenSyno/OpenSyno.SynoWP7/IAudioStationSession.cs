@@ -14,7 +14,7 @@
         /// <remarks>The caller is responsible for closing the stream after the call to DownloadFile returns</remarks>
         void GetFileStream(SynoTrack synoTrack, Action<WebResponse, SynoTrack> callback);
 
-        void LoginAsync(string login, string password, string host, int port, Action<string> callback, Action<Exception> callbackError);
+        void LoginAsync(string login, string password, Action<string> callback, Action<Exception> callbackError);
 
         void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError);
         void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError);

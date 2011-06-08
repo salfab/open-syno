@@ -42,8 +42,6 @@ namespace OpenSyno.Services
                 audioStation.LoginAsync(
                     _openSynoSettings.UserName,
                     _openSynoSettings.Password,
-                    _openSynoSettings.Host,
-                    _openSynoSettings.Port,
                     token =>
                     {
                         _openSynoSettings.Token = token;

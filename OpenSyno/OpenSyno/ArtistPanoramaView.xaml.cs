@@ -13,13 +13,24 @@ namespace OpenSyno
 
     public partial class ArtistPanoramaView : PhoneApplicationPage
     {
+        private bool _newPageInstance = false;
+        private const string ArtistPanoramaViewDataContext = "ArtistPanoramaViewDataContext";
+
+        private SynoItem _artist;
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtistPanoramaView"/> class.
         /// </summary>
         public ArtistPanoramaView()
         {
+            _newPageInstance = true;
             this.Loaded += OnArtistPanoramaViewLoaded;
             InitializeComponent();
+        }
+     
+        protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
+        {
+            State[ArtistPanoramaViewDataContext] = _artist;
+            base.OnNavigatedFrom(e);
         }
 
         private void OnArtistPanoramaViewLoaded(object sender, RoutedEventArgs e)
@@ -31,8 +42,16 @@ namespace OpenSyno
             if (DataContext == null)
             {
                 var artistTicket = NavigationContext.QueryString["artistTicket"];
-                SynoItem artist = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(artistTicket);
-                DataContext = IoC.Container.Get<ArtistPanoramaViewModelFactory>().Create(artist);
+
+                if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewDataContext))
+                {
+                    _artist = (SynoItem)this.State[ArtistPanoramaViewDataContext];
+                }
+                else
+                {
+                    _artist = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(artistTicket);                    
+                }
+                DataContext = IoC.Container.Get<ArtistPanoramaViewModelFactory>().Create(_artist);
             }
         }
 

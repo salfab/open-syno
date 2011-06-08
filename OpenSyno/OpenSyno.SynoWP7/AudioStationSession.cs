@@ -9,12 +9,19 @@ using OpenSyno.SynoWP7;
 
 namespace Synology.AudioStationApi
 {
+    using System.Runtime.Serialization;
+
+    [DataContract]
     public class AudioStationSession : IAudioStationSession
     {
-        private string _host;
-        private int _port;
-        private string _token;
+        [DataMember]
+        public string Host { get;  set; }
 
+        [DataMember]
+        public int Port { get;  set; }
+
+        [DataMember]
+        public string Token { get; set; }
 
         /// <summary>
         /// Gets the remote file network stream.
@@ -37,11 +44,11 @@ namespace Synology.AudioStationApi
             var client = new WebClient();
 
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
-            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", _host, _port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20"));
+            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", this.Host, this.Port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20"));
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.CookieContainer = new CookieContainer();
-            request.CookieContainer.SetCookies(new Uri(url), _token);
+            request.CookieContainer.SetCookies(new Uri(url), this.Token);
             //Set request headers.
             request.Accept = "application/x-ms-application, image/jpeg, application/xaml+xml, image/gif, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
             //request.Headers.Set(HttpRequestHeader.AcceptLanguage, "en-US");
@@ -76,24 +83,20 @@ namespace Synology.AudioStationApi
             userState.GetResponseCallback(response, userState.SynoTrack);
         }
 
-        public void LoginAsync(string login, string password, string host, int port, Action<string> callback, Action<Exception> callbackError)
+        public void LoginAsync(string login, string password, Action<string> callback, Action<Exception> callbackError)
         {
             if (login == null) throw new ArgumentNullException("login");
             if (password == null) throw new ArgumentNullException("password");
-            if (host == null) throw new ArgumentNullException("host");
-
-            _host = host;
-            _port = port;
 
             WebClient client = new WebClient();
 
             Uri uri =
                 new UriBuilder
                 {
-                    Host = _host,
+                    Host = this.Host,
                     Path = @"/webman/login.cgi",
                     Query = string.Format("username={0}&passwd={1}", login, password),
-                    Port = _port
+                    Port = this.Port
                 }.Uri;
             client.DownloadStringCompleted += (sender, e) =>
                                                   {
@@ -104,7 +107,7 @@ namespace Synology.AudioStationApi
                                                       else
                                                       {
                                                           string cookie = ((WebClient)(sender)).ResponseHeaders["Set-Cookie"].Split(';').Where(s => s.StartsWith("id=")).Single();
-                                                          _token = cookie;
+                                                          this.Token = cookie;
                                                           callback(cookie);
                                                       }
 
@@ -114,7 +117,7 @@ namespace Synology.AudioStationApi
 
         public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError)
         {
-            string urlBase = string.Format("http://{0}:{1}", _host, _port);
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
             var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
 
             HttpWebRequest request = BuildRequest(url);
@@ -176,7 +179,7 @@ namespace Synology.AudioStationApi
 
         public void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError)
         {
-            string urlBase = string.Format("http://{0}:{1}", _host, _port);
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
 
             HttpWebRequest request = BuildRequest(url);
@@ -284,7 +287,7 @@ namespace Synology.AudioStationApi
 
             request.UserAgent = "OpenSyno";
             request.CookieContainer = new CookieContainer();
-            request.CookieContainer.SetCookies(new Uri(url), _token);
+            request.CookieContainer.SetCookies(new Uri(url), this.Token);
 
             request.Method = "POST";
             return request;
@@ -292,7 +295,7 @@ namespace Synology.AudioStationApi
 
         public void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback, Action<Exception> callbackError)
         {
-            string urlBase = string.Format("http://{0}:{1}", _host, _port);
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
@@ -305,7 +308,7 @@ namespace Synology.AudioStationApi
 
             request.UserAgent = "OpenSyno";
             request.CookieContainer = new CookieContainer();
-            request.CookieContainer.SetCookies(new Uri(url), _token);
+            request.CookieContainer.SetCookies(new Uri(url), this.Token);
 
             request.Method = "POST";
 
@@ -369,7 +372,7 @@ namespace Synology.AudioStationApi
 
         public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError)
         {
-            string urlBase = string.Format("http://{0}:{1}", _host, _port);
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
 
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
 
@@ -383,7 +386,7 @@ namespace Synology.AudioStationApi
 
             request.UserAgent = "OpenSyno";
             request.CookieContainer = new CookieContainer();
-            request.CookieContainer.SetCookies(new Uri(url), _token);
+            request.CookieContainer.SetCookies(new Uri(url), this.Token);
 
             request.Method = "POST";
 
@@ -447,7 +450,7 @@ namespace Synology.AudioStationApi
         {
             get
             {
-                return _token != null;
+                return this.Token != null;
             }
         }
     }

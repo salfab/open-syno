@@ -78,7 +78,7 @@ namespace OpenSyno
 
             // Retrieve the type IAudioStationSession from a config file, so we can change it.
             // Also possible : RemoteFileMockAudioStationSession
-            IoC.Container.Bind<IAudioStationSession>().To(typeof(AudioStationSession)).InSingletonScope();
+            IoC.Container.Bind<IAudioStationSession>().ToConstant(new AudioStationSession { Host=_openSynoSettings.Host, Port = _openSynoSettings.Port}).InSingletonScope();
 
             // Retrieve the type SearchService from a config file, so we can change it.
             // also possible: MockSearchService;
@@ -126,13 +126,17 @@ namespace OpenSyno
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
             // TODO Ensure that application state is restored appropriately
-          
+            IAudioStationSession audioStationSession = (IAudioStationSession)PhoneApplicationService.Current.State["IAudioStationSession"];
+            IoC.Container.Unbind<IAudioStationSession>();
+            IoC.Container.Bind<IAudioStationSession>().ToConstant(audioStationSession);
         }
 
         // Code to execute when the application is deactivated (sent to background)
         // This code will not execute when the application is closing
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
+            var audioStationSssion = IoC.Container.Get<IAudioStationSession>();
+            PhoneApplicationService.Current.State["IAudioStationSession"] = audioStationSssion;
             // Ensure that required application state is persisted here.
         }
 
