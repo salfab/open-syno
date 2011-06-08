@@ -275,6 +275,9 @@
 
         private void OnPlay(TrackViewModel trackViewModel)
         {
+            // HACK : with silverlight 4 on the phone, there will be proper support for commanding and disabling buttons when canExecute is false
+            if (!PlayCommand.CanExecute(trackViewModel)) 
+                return;
             if (trackViewModel == null)
             {
                 throw new ArgumentNullException("trackViewModel", "The play command has been triggered without specifying a track to play.");
