@@ -21,6 +21,8 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno
 {
+    using System.Windows.Navigation;
+
     public partial class SearchAllResultsView : PhoneApplicationPage
     {
         private string SearchAllMusicResults = "AllMusicSearchResultsTicket";
