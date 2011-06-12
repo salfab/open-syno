@@ -10,6 +10,7 @@ using OpenSyno.SynoWP7;
 namespace Synology.AudioStationApi
 {
     using System.Runtime.Serialization;
+    using System.Windows.Threading;
 
     [DataContract]
     public class AudioStationSession : IAudioStationSession
@@ -102,7 +103,8 @@ namespace Synology.AudioStationApi
                                                   {
                                                       if (e.Error != null)
                                                       {
-                                                          MessageBox.Show(e.Error.Message);
+                                                          //FIXME : move this in a dedicated error provider service !!
+                                                          MessageBox.Show("An error occured when trying to log in. Please check your internet connection.");
                                                       }
                                                       else
                                                       {
@@ -203,7 +205,21 @@ namespace Synology.AudioStationApi
                         {
                             // Just make sure we retrieve the right web request : no access to modified closure.                        
                             var httpWebRequest = responseAr.AsyncState;
+                            if (!webRequest.HaveResponse)
+                            {
+                                // FIXME : Use an error handling service
+                                var action = new Action(() =>MessageBox.Show("Error connecting to search engine", "Connection error",MessageBoxButton.OK));   
 
+                                if (Deployment.Current.CheckAccess())
+                                {
+                                    action();
+                                }
+                                else
+                                {
+                                    Deployment.Current.Dispatcher.BeginInvoke(action);
+                                }
+                                return;
+                            }
                             var webResponse = webRequest.EndGetResponse(responseAr);
                             var responseStream = webResponse.GetResponseStream();
                             var reader = new StreamReader(responseStream);
@@ -220,6 +236,7 @@ namespace Synology.AudioStationApi
                             {
                                 if (count > limit)
                                 {
+                                    // FIXME : Use an error handling service
                                     MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                 }
                                 callback(artists);
@@ -230,6 +247,7 @@ namespace Synology.AudioStationApi
                                     {
                                         if (count > limit)
                                         {
+                                            // FIXME : Use an error handling service
                                             MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                         }
                                         callback(artists);
