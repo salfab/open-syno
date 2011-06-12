@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Windows;
     using System.Windows.Input;
 
     using Microsoft.Practices.Prism.Commands;
@@ -101,6 +102,12 @@
 
         private void OnPlayNext()
         {
+            // HACK : we should use a proper mechanism, so if there are no active track, the nominal routines would handle this scenario, we should not have to special-case like here !
+            if (ActiveTrack == null)
+            {
+                return;
+            }
+
             var nextSynoTrack = _playbackService.GetNextTrack(ActiveTrack.TrackInfo);
             if (nextSynoTrack != null)
             {
@@ -109,7 +116,9 @@
             }
             else
             {
-                throw new ArgumentOutOfRangeException("There is no next track to play : all tracks have been played.");                
+                // FIXME : We should use a notification service for this !
+                MessageBox.Show("There is no next track to play : all tracks have been played.", "No more tracks", MessageBoxButton.OK);
+                //throw new ArgumentOutOfRangeException("There is no next track to play : all tracks have been played.");                
             }
         }
 
@@ -331,11 +340,14 @@
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
                 case PlayListOperation.Append:
-                    AppendItems(e.Items);
-                    if (_playbackService.Status == PlaybackStatus.Stopped)
+                    if (e.Items.Count() > 0)
                     {
-                        trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
-                        OnPlay(trackToPlay);
+                        AppendItems(e.Items);
+                        if (_playbackService.Status == PlaybackStatus.Stopped)
+                        {
+                            trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
+                            OnPlay(trackToPlay);
+                        }
                     }
                     break;
                 default:
