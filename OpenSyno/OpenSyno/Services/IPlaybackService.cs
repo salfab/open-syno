@@ -61,6 +61,10 @@ namespace OpenSyno.Services
         void PausePlayback();
 
         void ResumePlayback();
+
+        double GetVolume();
+
+        void SetVolume(double volume);
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);

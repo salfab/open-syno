@@ -376,6 +376,16 @@ namespace OpenSyno.Services
         {
             _mediaElement.Play();
         }
+
+        public double GetVolume()
+        {
+            return _mediaElement.Volume;
+        }
+
+        public void SetVolume(double volume)
+        {
+            _mediaElement.Volume = volume;
+        }
     }
 
     public class PlayBackStartedEventArgs : EventArgs

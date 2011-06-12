@@ -170,6 +170,16 @@ namespace OpenSyno.Services
             _audioRenderingService.Resume();
         }
 
+        public double GetVolume()
+        {
+            return _audioRenderingService.GetVolume();
+        }
+
+        public void SetVolume(double volume)
+        {
+            _audioRenderingService.SetVolume(volume);
+        }
+
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
         {
             if (BufferingProgressUpdated != null)

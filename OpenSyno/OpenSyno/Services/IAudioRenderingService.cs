@@ -22,5 +22,9 @@
         void Pause();
 
         void Resume();
+
+        double GetVolume();
+
+        void SetVolume(double volume);
     }
 }

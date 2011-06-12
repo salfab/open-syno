@@ -146,6 +146,22 @@
 
         #region Properties
 
+        
+
+        public double Volume
+        {
+            get
+            {
+                // FIXME : Here, we'd like to have a dependency on th audio renderer... the design is not optimal.
+                return _playbackService.GetVolume();
+            }
+            set
+            {
+                // FIXME : Here, we'd like to have a dependency on th audio renderer... the design is not optimal.
+                _playbackService.SetVolume(value);
+            }
+        }
+
         public TrackViewModel ActiveTrack
         {
             get { return _activeTrack; }
