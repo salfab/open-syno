@@ -2,7 +2,7 @@
 {
     public interface IUrlParameterToObjectsPlateHeater
     {
-        object GetObjectForTicket(string artistTicket);
+        object GetObjectForTicket(string urlParameterTicket);
 
         /// <summary>
         /// Registers the object.

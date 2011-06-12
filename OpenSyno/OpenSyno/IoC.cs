@@ -22,7 +22,7 @@ namespace OpenSyno
             if (DesignerProperties.IsInDesignTool)
             {
                 // FIXME : use default values instead of null, and thro exception on null params.
-                Container.Bind<SearchViewModel>().ToConstant(new SearchViewModel(null, null, null, null));
+                Container.Bind<SearchViewModel>().ToConstant(new SearchViewModel(null, null, null, null, null));
             }
         }
 

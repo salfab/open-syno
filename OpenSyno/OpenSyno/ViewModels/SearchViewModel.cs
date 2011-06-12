@@ -29,9 +29,12 @@ namespace OpenSyno.ViewModels
         private string _searchPattern;
         private SearchContext _searchContext;
 
-        public SearchViewModel(ISearchService searchService, IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator, ISignInService signInService)
+        private IUrlParameterToObjectsPlateHeater _ticketUrlParameterToObjectPlateHeater;
+
+        public SearchViewModel(ISearchService searchService, IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator, ISignInService signInService, IUrlParameterToObjectsPlateHeater ticketUrlParameterToObjectPlateHeater)
         {
             _searchService = searchService;
+            this._ticketUrlParameterToObjectPlateHeater = ticketUrlParameterToObjectPlateHeater;
             _pageSwitchingService = pageSwitchingService;
             _eventAggregator = eventAggregator;
             _signInService = signInService;
@@ -165,8 +168,8 @@ namespace OpenSyno.ViewModels
         {
             if (results == null) throw new ArgumentNullException("results");
             IsBusy = false;
+            _ticketUrlParameterToObjectPlateHeater.RegisterObject("AllMusicSearchResultsTicket", results);
             _pageSwitchingService.NavigateToSearchAllResults(keyword);
-            _eventAggregator.GetEvent<CompositePresentationEvent<TrackSearchResultsRetrievedAggregatedEvent>>().Publish(new TrackSearchResultsRetrievedAggregatedEvent(results));
         }
 
         private void SearchCompleted(IEnumerable<SynoItem> results)
@@ -177,15 +180,7 @@ namespace OpenSyno.ViewModels
         }    
     }
 
-    public class TrackSearchResultsRetrievedAggregatedEvent 
-    {
-        public IEnumerable<SynoTrack> Results { get; set; }
 
-        public TrackSearchResultsRetrievedAggregatedEvent(IEnumerable<SynoTrack> results)
-        {
-            Results = results;
-        }
-    }
 
     public enum SearchContext
     {

@@ -23,24 +23,21 @@ namespace OpenSyno
 {
     public partial class SearchAllResultsView : PhoneApplicationPage
     {
+        private string SearchAllMusicResults = "AllMusicSearchResultsTicket";
+        private bool _newPageInstance = false;
+        private IEnumerable<SynoTrack> _searchResults;
         public SearchAllResultsView()
         {
+            _newPageInstance = true;
             this.Loaded += PageLoaded;
             InitializeComponent();
         }
 
-        private void PageLoaded(object sender, RoutedEventArgs e)
-        {
-            // the page is an humble object, and the navigatorService, its sole dependency.
-            var navigator = IoC.Container.Get<INavigatorService>();
-            navigator.ActivateNavigationService(NavigationService, true);
 
-            if (DataContext == null)
-            {
-                string keyword = NavigationContext.QueryString["keyword"];
-                // move this in the xaml with behavior : this one might actually need a special implementation to take query strings in account.
-                DataContext = IoC.Container.Get<ISearchAllResultsViewModelFactory>().Create(keyword);
-            }
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            State[SearchAllMusicResults] = _searchResults.ToArray();
+            base.OnNavigatedFrom(e);
         }
 
         private void ApplicationBarPlayLast(object sender, EventArgs e)
@@ -54,36 +51,52 @@ namespace OpenSyno
             var viewModel = (SearchAllResultsViewModel)DataContext;
             viewModel.ShowPlayQueueCommand.Execute(null);
         }
+        private void PageLoaded(object sender, RoutedEventArgs e)
+        {
+            // the page is an humble object, and the navigatorService, its sole dependency.
+            var navigator = IoC.Container.Get<INavigatorService>();
+            navigator.ActivateNavigationService(NavigationService, true);
+
+            if (DataContext == null)
+            {
+                string keyword = NavigationContext.QueryString["keyword"];
+
+                if (_newPageInstance && State.ContainsKey(SearchAllMusicResults))
+                {
+                    _searchResults = (IEnumerable<SynoTrack>)this.State[this.SearchAllMusicResults];
+                }
+                else
+                {
+                    _searchResults = (IEnumerable<SynoTrack>)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(SearchAllMusicResults);
+                }
+
+                DataContext = IoC.Container.Get<ISearchAllResultsViewModelFactory>().Create(keyword, _searchResults);
+            }
+        }
     }
 
     public interface ISearchAllResultsViewModelFactory
     {
-        ISearchAllResultsViewModel Create(string keyword);
+        ISearchAllResultsViewModel Create(string keyword, IEnumerable<SynoTrack> searchResults);
     }
 
     public class SearchAllResultsViewModelFactory : ISearchAllResultsViewModelFactory
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
-        private IEnumerable<SynoTrack> _lastResults;
 
         public SearchAllResultsViewModelFactory(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
         {            
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
 
-            eventAggregator.GetEvent<CompositePresentationEvent<TrackSearchResultsRetrievedAggregatedEvent>>().Subscribe(payload =>
-                                                                                                                        {
-                                                                                                                            _lastResults = payload.Results;
-                                                                                                                        },
-             true);
         }
 
         #region Implementation of ISearchAllResultsViewModelFactory
 
-        public ISearchAllResultsViewModel Create(string keyword)
+        public ISearchAllResultsViewModel Create(string keyword, IEnumerable<SynoTrack> searchResults)
         {
-            return new SearchAllResultsViewModel(_eventAggregator, _pageSwitchingService, keyword, _lastResults);
+            return new SearchAllResultsViewModel(_eventAggregator, _pageSwitchingService, keyword, searchResults);
         }
 
         #endregion
@@ -118,6 +131,10 @@ namespace OpenSyno
             }
         }
 
+        public string Keyword { get; set; }
+        public ICommand PlayLastCommand { get; set; }
+        public ObservableCollection<TrackViewModel> SearchResults { get; set; }
+        public ICommand ShowPlayQueueCommand { get; set; }
         private void OnPlayLast()
         {
             var tracksToPlay = from track in SearchResults where track.IsSelected select track;
@@ -129,11 +146,6 @@ namespace OpenSyno
             _pageSwitchingService.NavigateToPlayQueue();
         }
 
-        public string Keyword { get; set; }
-        public ObservableCollection<TrackViewModel> SearchResults { get; set; }
-
-        public ICommand ShowPlayQueueCommand { get; set; }
-        public ICommand PlayLastCommand { get; set; }
     }
 }
 
