@@ -70,7 +70,7 @@
                         </TextBox.InputScope>
                     </TextBox>
                 </Grid>
-                <ProgressBar IsIndeterminate="True" />
+                <!--<ProgressBar IsIndeterminate="True" />-->
             </StackPanel>
         </Grid>
     </Grid>
