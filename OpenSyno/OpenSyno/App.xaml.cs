@@ -34,7 +34,7 @@ namespace OpenSyno
         /// <summary>
         /// Constructor for the Application object.
         /// </summary>
-        public App(INotificationService notificationService)
+        public App()
         {
             // Global handler for uncaught exceptions. 
             UnhandledException += Application_UnhandledException;
@@ -62,7 +62,7 @@ namespace OpenSyno
 
             // Phone-specific initialization
             InitializePhoneApplication();
-            this._notificationService = notificationService;
+
         }
 
         private void InitializeSettings()
@@ -107,7 +107,9 @@ namespace OpenSyno
             IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
             IoC.Container.Bind<ISearchResultItemViewModelFactory>().To<SearchResultItemViewModelFactory>().InSingletonScope();
             IoC.Container.Bind<IUrlParameterToObjectsPlateHeater>().To<UrlParameterToObjectsPlateHeater>().InSingletonScope();
-            IoC.Container.Bind<INotificationService>().ToConstant(new NotificationService()).InSingletonScope();
+            
+            _notificationService = new NotificationService();
+            IoC.Container.Bind<INotificationService>().ToConstant(_notificationService).InSingletonScope();
 
             // Retrieve the type PlaybackService from a config file, so we can change it.
             IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();
@@ -217,7 +219,7 @@ namespace OpenSyno
 
         private IOpenSynoSettings _openSynoSettings;
 
-        private readonly INotificationService _notificationService;
+        private INotificationService _notificationService;
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()
