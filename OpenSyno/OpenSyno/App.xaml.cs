@@ -178,37 +178,48 @@ namespace OpenSyno
             {
                 throw ex;
             }
+            catch (SynoLoginException exception)
+            {
+                _notificationService.Error(exception.Message, "Login error");
+                e.Handled = true;
+            }
             catch (SynoSearchException exception)
             {
                 _notificationService.Error(exception.Message, "Search error");
+                e.Handled = true;
             }
-
-            while (ex != null)
+            finally
             {
-                Exception exception = ex;
 
-                if (!Deployment.Current.Dispatcher.CheckAccess())
+                e.Handled = true;
+                while (ex != null && e.Handled == false)
                 {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                                                                  {
-                                                                      MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
-                                                                      MessageBox.Show(exception.StackTrace, exception.GetType().Name, MessageBoxButton.OK);
-                                                                  });
+                    Exception exception = ex;
+
+                    if (!Deployment.Current.Dispatcher.CheckAccess())
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(
+                            () =>
+                                {
+                                    MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
+                                    MessageBox.Show(exception.StackTrace, exception.GetType().Name, MessageBoxButton.OK);
+                                });
+                    }
+                    else
+                    {
+                        MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
+                        MessageBox.Show(exception.StackTrace, exception.GetType().Name, MessageBoxButton.OK);
+                    }
+
+                    ex = ex.InnerException;
                 }
-                else
+
+                Console.Error.WriteLine(e.ExceptionObject.GetType().Name);
+                if (System.Diagnostics.Debugger.IsAttached)
                 {
-                    MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
-                    MessageBox.Show(exception.StackTrace, exception.GetType().Name, MessageBoxButton.OK);
+                    // An unhandled exception has occurred; break into the debugger
+                    System.Diagnostics.Debugger.Break();
                 }
-
-                ex = ex.InnerException;
-            }
-
-            Console.Error.WriteLine(e.ExceptionObject.GetType().Name);
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                // An unhandled exception has occurred; break into the debugger
-                System.Diagnostics.Debugger.Break();
             }
         }
 
