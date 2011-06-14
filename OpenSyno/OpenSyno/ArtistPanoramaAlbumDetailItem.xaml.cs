@@ -28,6 +28,8 @@ namespace OpenSyno
         private ObservableCollection<TrackViewModel> _tracks;
         private IEventAggregator _eventAggregator;
 
+        private readonly INotificationService _notificationService;
+
         public ObservableCollection<TrackViewModel> Tracks
         {
             get
@@ -41,10 +43,11 @@ namespace OpenSyno
             }
         }
 
-        public ArtistPanoramaAlbumDetailItem(SynoItem album, ISearchService searchService, IEventAggregator eventAggregator) : base(ArtistPanoramaItemKind.AlbumDetail)
+        public ArtistPanoramaAlbumDetailItem(SynoItem album, ISearchService searchService, IEventAggregator eventAggregator, INotificationService notificationService) : base(ArtistPanoramaItemKind.AlbumDetail)
         {
             this._searchService = searchService;
             _eventAggregator = eventAggregator;
+            _notificationService = notificationService;
             AlbumItemInfo = album;
             Header = album.Title;
 
@@ -65,8 +68,7 @@ namespace OpenSyno
             IEnumerable<TrackViewModel> selectedItems = Tracks.Where(o => o.IsSelected);
             if (selectedItems.Count() < 1)
             {
-                // FIXME : Use a service to de-couple the viewmodel and the way a message is visually shown to the user. (i.e. use a service)
-                MessageBox.Show("Please, select at least one track to play.");
+                _notificationService.Warning("Please, select at least one track to play.", "No track selected");
             }
             else
             {

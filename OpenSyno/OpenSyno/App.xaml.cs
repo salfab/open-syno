@@ -34,7 +34,7 @@ namespace OpenSyno
         /// <summary>
         /// Constructor for the Application object.
         /// </summary>
-        public App()
+        public App(INotificationService notificationService)
         {
             // Global handler for uncaught exceptions. 
             UnhandledException += Application_UnhandledException;
@@ -62,6 +62,7 @@ namespace OpenSyno
 
             // Phone-specific initialization
             InitializePhoneApplication();
+            this._notificationService = notificationService;
         }
 
         private void InitializeSettings()
@@ -106,6 +107,7 @@ namespace OpenSyno
             IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
             IoC.Container.Bind<ISearchResultItemViewModelFactory>().To<SearchResultItemViewModelFactory>().InSingletonScope();
             IoC.Container.Bind<IUrlParameterToObjectsPlateHeater>().To<UrlParameterToObjectsPlateHeater>().InSingletonScope();
+            IoC.Container.Bind<INotificationService>().ToConstant(new NotificationService()).InSingletonScope();
 
             // Retrieve the type PlaybackService from a config file, so we can change it.
             IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();
@@ -170,6 +172,15 @@ namespace OpenSyno
         private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
             var ex = e.ExceptionObject;
+            try
+            {
+                throw ex;
+            }
+            catch (SynoSearchException exception)
+            {
+                _notificationService.Error(exception.Message, "Search error");
+            }
+
             while (ex != null)
             {
                 Exception exception = ex;
@@ -205,6 +216,8 @@ namespace OpenSyno
         private bool phoneApplicationInitialized = false;
 
         private IOpenSynoSettings _openSynoSettings;
+
+        private readonly INotificationService _notificationService;
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()

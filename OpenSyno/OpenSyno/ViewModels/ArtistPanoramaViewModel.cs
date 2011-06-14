@@ -32,7 +32,7 @@ namespace OpenSyno.ViewModels
 
         public ArtistPanoramaItemKind PanoramaItemKind { get; set; }
 
-        public ArtistPanoramaViewModel(ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, SynoItem artist)
+        public ArtistPanoramaViewModel(ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, SynoItem artist, INotificationService notificationService)
         {
             if (searchService == null)
             {
@@ -55,6 +55,7 @@ namespace OpenSyno.ViewModels
             }
 
             _searchService = searchService;
+            this._notificationService = notificationService;
 
             // TODO : Use IoC or Factory or whatever, but something to be able to inject our own implementation
             _panoramaItemSwitchingService = new PanoramaItemSwitchingService();
@@ -107,6 +108,8 @@ namespace OpenSyno.ViewModels
         private IPanoramaItemSwitchingService _panoramaItemSwitchingService;
 
         private int _currentArtistItemIndex;
+
+        private readonly INotificationService _notificationService;
 
         public bool IsBusy
         {
@@ -179,13 +182,15 @@ namespace OpenSyno.ViewModels
 
             foreach (var album in albums.Except(allmusic))
             {
-                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator);                
+                // Fixme : use a factory                
+                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator, _notificationService);                
                 ArtistItems.Add(albumDetail);
             }
 
             foreach (var album in allmusic)
             {
-                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator);
+                // Fixme : use a factory
+                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator, _notificationService);
                 ArtistItems.Add(albumDetail);
             }
             

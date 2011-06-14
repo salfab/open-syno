@@ -13,10 +13,12 @@ namespace OpenSyno
 
         private IPageSwitchingService _pageSwitchingService;
 
+        private readonly INotificationService _notificationService;
 
-        public ArtistPanoramaViewModelFactory(ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
+        public ArtistPanoramaViewModelFactory(ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, INotificationService notificationService)
         {
             _searchService = searchService;
+            this._notificationService = notificationService;
             _pageSwitchingService = pageSwitchingService;
             
             _eventAggregator = eventAggregator;            
@@ -24,7 +26,7 @@ namespace OpenSyno
 
         public ArtistPanoramaViewModel Create(SynoItem artist)
         {
-            return new ArtistPanoramaViewModel(_searchService, _eventAggregator, _pageSwitchingService, artist);
+            return new ArtistPanoramaViewModel(_searchService, _eventAggregator, _pageSwitchingService, artist, _notificationService);
         }
     }
 }

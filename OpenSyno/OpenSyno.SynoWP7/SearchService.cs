@@ -17,30 +17,27 @@
 
         public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>, string> callback)
         {
-            if (_audioStationSession.IsSignedIn)
-            {
-                _audioStationSession.SearchAllMusic(pattern, o =>  callback(o, pattern), OnOperationReturnedWithError);
-                return true;
-            }
+            CheckIsSignedIn();
+            this._audioStationSession.SearchAllMusic(pattern, o => callback(o, pattern), this.OnOperationReturnedWithError);
+            return true;
+        }
 
-            // FIXME : Use a service in order to separate visual feedback from viewmodels.
-            MessageBox.Show("You are not signed in. Please enter credentials in the settings.");
-            return false;
+        private void CheckIsSignedIn()
+        {
+            if (!this._audioStationSession.IsSignedIn)
+            {
+                throw new SynoLoginException("You are not signed in. Please enter credentials in the settings.", null);
+                // FIXME : Use a service in order to separate visual feedback from viewmodels.
+                MessageBox.Show("You are not signed in. Please enter credentials in the settings.");
+            }            
         }
 
         public bool SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback)
         {
-            if (_audioStationSession.IsSignedIn)
-            {
-                _audioStationSession.SearchArtist(pattern, callback, OnOperationReturnedWithError);
-                return true;
-            }
-            else
-            {
-                // FIXME : Use a service in order to separate visual feedback from viewmodels.
-                MessageBox.Show("You are not signed in. Please enter credentials in the settings.");
-                return false;
-            }
+            this.CheckIsSignedIn();
+            _audioStationSession.SearchArtist(pattern, callback, OnOperationReturnedWithError);
+            return true;
+           
         }
 
         public void GetAllArtists(Action<IEnumerable<SynoItem>> callback)

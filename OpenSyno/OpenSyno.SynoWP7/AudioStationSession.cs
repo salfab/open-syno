@@ -103,8 +103,8 @@ namespace Synology.AudioStationApi
                                                   {
                                                       if (e.Error != null)
                                                       {
-                                                          //FIXME : move this in a dedicated error provider service !!
-                                                          MessageBox.Show("An error occured when trying to log in. Please check your internet connection.");
+                                                          throw new SynoLoginException("An error occured when trying to log in. Please check your internet connection.", e.Error);
+                                                          // MessageBox.Show("An error occured when trying to log in. Please check your internet connection.");
                                                       }
                                                       else
                                                       {
@@ -207,6 +207,7 @@ namespace Synology.AudioStationApi
                             var httpWebRequest = responseAr.AsyncState;
                             if (!webRequest.HaveResponse)
                             {
+                                throw new SynoSearchException("Error connecting to search engine", null);
                                 // FIXME : Use an error handling service
                                 var action = new Action(() =>MessageBox.Show("Error connecting to search engine", "Connection error",MessageBoxButton.OK));   
 
@@ -470,6 +471,20 @@ namespace Synology.AudioStationApi
             {
                 return this.Token != null;
             }
+        }
+    }
+
+    public class SynoSearchException : Exception
+    {
+        public SynoSearchException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+    }
+
+    public class SynoLoginException : Exception
+    {
+        public SynoLoginException(string message, Exception innerException) : base(message, innerException)
+        {            
         }
     }
 }

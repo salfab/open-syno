@@ -82,6 +82,8 @@
   <ItemGroup>
     <Compile Include="Behaviors\RadioButtonCheckedToCommandBehavior.cs" />
     <Compile Include="Converters\TypeTypeConverter.cs" />
+    <Compile Include="INotificationService.xaml.cs" />
+    <Compile Include="NotificationService.xaml.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Helpers\ViewModelResolver.cs" />
     <Compile Include="IBusyable.cs" />
