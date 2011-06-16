@@ -26,9 +26,7 @@
         {
             if (!this._audioStationSession.IsSignedIn)
             {
-                throw new SynoLoginException("You are not signed in. Please enter credentials in the settings.", null);
-                // FIXME : Use a service in order to separate visual feedback from viewmodels.
-                MessageBox.Show("You are not signed in. Please enter credentials in the settings.");
+                throw new SynoLoginException("Open Syno is not signed in. Please make sure the info provided in the credentials page is correct.", null);
             }            
         }
 

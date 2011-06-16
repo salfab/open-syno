@@ -103,8 +103,7 @@ namespace Synology.AudioStationApi
                                                   {
                                                       if (e.Error != null)
                                                       {
-                                                          throw new SynoLoginException("An error occured when trying to log in. Please check your internet connection.", e.Error);
-                                                          // MessageBox.Show("An error occured when trying to log in. Please check your internet connection.");
+                                                          throw new SynoNetworkException("Open Syno could not complete the operation. Please check that your phone is not in flight mode.", e.Error);
                                                       }
                                                       else
                                                       {
@@ -484,6 +483,13 @@ namespace Synology.AudioStationApi
     public class SynoLoginException : Exception
     {
         public SynoLoginException(string message, Exception innerException) : base(message, innerException)
+        {            
+        }
+    }
+
+    public class SynoNetworkException : Exception
+    {
+        public SynoNetworkException(string message, Exception innerException) : base(message, innerException)
         {            
         }
     }

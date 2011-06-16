@@ -178,6 +178,11 @@ namespace OpenSyno
             {
                 throw ex;
             }
+            catch (SynoNetworkException exception)
+            {
+                _notificationService.Error(exception.Message, "Network error");
+                e.Handled = true;
+            }
             catch (SynoLoginException exception)
             {
                 _notificationService.Error(exception.Message, "Login error");
