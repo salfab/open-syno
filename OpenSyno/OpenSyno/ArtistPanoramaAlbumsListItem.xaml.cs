@@ -12,7 +12,7 @@ namespace OpenSyno
 
     using OpenSyno.Services;
 
-    public class ArtistPanoramaAlbumsListItem : ArtistPanoramaItem
+    public class ArtistPanoramaAlbumsListItemViewModel : ArtistPanoramaItemViewModel
     {
         private readonly IPageSwitchingService _pageSwitchingService;
 
@@ -35,7 +35,7 @@ namespace OpenSyno
 
         public ICommand ShowAlbumDetailCommand { get; set; }
 
-        public ArtistPanoramaAlbumsListItem(IEnumerable<SynoItem> albums, SynoItem artist, IPageSwitchingService pageSwitchingService, IPanoramaItemSwitchingService panoramaItemSwitchingService)
+        public ArtistPanoramaAlbumsListItemViewModel(IEnumerable<SynoItem> albums, SynoItem artist, IPageSwitchingService pageSwitchingService, IPanoramaItemSwitchingService panoramaItemSwitchingService)
             : base(ArtistPanoramaItemKind.AlbumsList)
         {
             if (albums == null)

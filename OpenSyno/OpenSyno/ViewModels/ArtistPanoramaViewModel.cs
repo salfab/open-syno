@@ -22,7 +22,7 @@ namespace OpenSyno.ViewModels
 
         private readonly IPageSwitchingService _pageSwitchingService;
 
-        public ObservableCollection<ArtistPanoramaItem> ArtistItems { get; set; }
+        public ObservableCollection<ArtistPanoramaItemViewModel> ArtistItems { get; set; }
 
         private string _artistName;
         private const string ArtistNamePropertyName = "ArtistName";
@@ -63,17 +63,16 @@ namespace OpenSyno.ViewModels
             _panoramaItemSwitchingService.ActiveItemChangeRequested += (s, e) => CurrentArtistItemIndex = e.NewItemIndex;
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
-            ArtistItems = new ObservableCollection<ArtistPanoramaItem>();
+            ArtistItems = new ObservableCollection<ArtistPanoramaItemViewModel>();
             ArtistItems.CollectionChanged += StartMonitoringElements;
-            foreach (ArtistPanoramaItem artistItem in ArtistItems)
+            foreach (ArtistPanoramaItemViewModel artistItem in ArtistItems)
             {
                 artistItem.PropertyChanged += UpdateBusyness;
             }
 
             ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
-
-            LoadArtistInfo(artist);
-
+            _artist = artist;
+            ArtistName = _artist.Title;
         }
 
         private void OnShowPlayQueue()
@@ -97,7 +96,7 @@ namespace OpenSyno.ViewModels
 
         private void UpdateBusyness(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == ArtistPanoramaItem.IsBusyPropertyName)
+            if (e.PropertyName == ArtistPanoramaItemViewModel.IsBusyPropertyName)
             {
                 IsBusy = ArtistItems.Any(o => o.IsBusy);
             }
@@ -110,6 +109,8 @@ namespace OpenSyno.ViewModels
         private int _currentArtistItemIndex;
 
         private readonly INotificationService _notificationService;
+
+        private SynoItem _artist;
 
         public bool IsBusy
         {
@@ -125,7 +126,7 @@ namespace OpenSyno.ViewModels
         {
             if (e.NewItems != null)
             {
-                foreach (ArtistPanoramaItem artistItem in e.NewItems)
+                foreach (ArtistPanoramaItemViewModel artistItem in e.NewItems)
                 {
                     artistItem.PropertyChanged += UpdateBusyness;
                 } 
@@ -133,7 +134,7 @@ namespace OpenSyno.ViewModels
 
             if (e.OldItems != null)
             {
-                foreach (ArtistPanoramaItem artistItem in e.OldItems)
+                foreach (ArtistPanoramaItemViewModel artistItem in e.OldItems)
                 {
                     artistItem.PropertyChanged -= UpdateBusyness;
                 }
@@ -141,11 +142,6 @@ namespace OpenSyno.ViewModels
         }
 
 
-        private void LoadArtistInfo(SynoItem artist)
-        {
-            ArtistName = artist.Title;
-            GetAlbumsForArtist(artist);
-        }
 
         public string ArtistName
         {
@@ -162,20 +158,14 @@ namespace OpenSyno.ViewModels
 
         public ICommand ShowPlayQueueCommand { get; set; }
 
-        private void GetAlbumsForArtist(SynoItem artist)
+        public void BuildArtistItems(IEnumerable<SynoItem> albums)
         {
-            _searchService.GetAlbumsForArtist(artist, GetAlbumsForArtistCompleted);
-        }
-
-        private void GetAlbumsForArtistCompleted(IEnumerable<SynoItem> albums, long total, SynoItem artist)
-        {
-            // make sure the old items are cleared.
-            ArtistItems.Clear();
+            this.ArtistItems.Clear();            
 
             // add the page for the list of albums.
-            var albumsListPanel = new ArtistPanoramaAlbumsListItem(albums, artist, _pageSwitchingService, _panoramaItemSwitchingService);
-
-            ArtistItems.Add(albumsListPanel);
+            var albumsListPanelViewModel = new ArtistPanoramaAlbumsListItemViewModel(albums, _artist, this._pageSwitchingService, this._panoramaItemSwitchingService);
+            
+            this.ArtistItems.Add(albumsListPanelViewModel);
 
             // the "all albums" items
             var allmusic = albums.Where(o => o.ItemID.StartsWith("musiclib_music_artist"));
@@ -183,17 +173,17 @@ namespace OpenSyno.ViewModels
             foreach (var album in albums.Except(allmusic))
             {
                 // Fixme : use a factory                
-                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator, _notificationService);                
-                ArtistItems.Add(albumDetail);
+                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, this._searchService, this._eventAggregator, this._notificationService);                
+                this.ArtistItems.Add(albumDetail);
             }
 
             foreach (var album in allmusic)
             {
                 // Fixme : use a factory
-                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, _searchService, _eventAggregator, _notificationService);
-                ArtistItems.Add(albumDetail);
+                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, this._searchService, this._eventAggregator, this._notificationService);
+                this.ArtistItems.Add(albumDetail);
             }
-            
+
         }
     }
 }

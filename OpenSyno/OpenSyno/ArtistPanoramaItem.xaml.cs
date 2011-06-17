@@ -4,7 +4,7 @@ namespace OpenSyno
 {
     using OpenSyno.Converters;
 
-    public class ArtistPanoramaItem : ViewModelBase, IBusyable
+    public class ArtistPanoramaItemViewModel : ViewModelBase, IBusyable
     {
         private bool _isBusy;
         public bool IsBusy
@@ -36,7 +36,7 @@ namespace OpenSyno
             }
         }
 
-        protected ArtistPanoramaItem(ArtistPanoramaItemKind panoramaItemKind)
+        protected ArtistPanoramaItemViewModel(ArtistPanoramaItemKind panoramaItemKind)
         {
             PanoramaItemKind = panoramaItemKind;
         }

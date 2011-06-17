@@ -46,19 +46,24 @@
             results.Add(new SynoItem
                 {
                     Title = "Tom Waits",
-                    ItemPid = "musiclib_music_aa"
+                    ItemPid = "musiclib_music_aa",
+                    ItemID = "1"
+
                 });
 
             results.Add(new SynoItem
                 {
                     Title = "Mike Patton",
-                    ItemPid = "musiclib_music_aa"
+                    ItemPid = "musiclib_music_aa",
+                    ItemID = "2"
+
                 });
 
             results.Add(new SynoTrack
                 {
                     Title = "65daysofstatic",
-                    ItemPid = "musiclib_music_aa"
+                    ItemPid = "musiclib_music_aa",
+                    ItemID = "3"
                 });
 
             callback(results);
@@ -99,7 +104,7 @@
                     Icon = "icon_container.png",
                     IsContainer = true,
                     IsTrack = false,
-                    ItemID = "",
+                    ItemID = "musiclib_music_artist",
                     ItemPid = "musiclib_music_aa/852502",
                     Sequence = 0,
                     Support = false,

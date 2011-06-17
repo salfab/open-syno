@@ -13,7 +13,7 @@ namespace OpenSyno
 
     using OpenSyno.ViewModels;
 
-    public class ArtistPanoramaAlbumDetailItem : ArtistPanoramaItem
+    public class ArtistPanoramaAlbumDetailItem : ArtistPanoramaItemViewModel
     {
         private const string TracksPropertyName = "Tracks";
 

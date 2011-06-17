@@ -5,6 +5,9 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno
 {
+    using System;
+    using System.Collections.Generic;
+
     public class ArtistPanoramaViewModelFactory
     {
         private readonly ISearchService _searchService;
@@ -26,7 +29,15 @@ namespace OpenSyno
 
         public ArtistPanoramaViewModel Create(SynoItem artist)
         {
-            return new ArtistPanoramaViewModel(_searchService, _eventAggregator, _pageSwitchingService, artist, _notificationService);
+            var artistPanoramaViewModel = new ArtistPanoramaViewModel(this._searchService, this._eventAggregator, this._pageSwitchingService, artist, this._notificationService);
+            return artistPanoramaViewModel;
         }
+
+        //public ArtistPanoramaViewModel Create(SynoItem artist, IEnumerable<SynoItem> artistItems)
+        //{
+        //    ArtistPanoramaViewModel artistPanoramaViewModel = new ArtistPanoramaViewModel(this._searchService, this._eventAggregator, this._pageSwitchingService, artist, this._notificationService);
+        //    artistPanoramaViewModel.BuildArtistItems(artistItems);
+        //    return artistPanoramaViewModel;
+        //}
     }
 }
