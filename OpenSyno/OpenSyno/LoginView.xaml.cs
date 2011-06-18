@@ -49,7 +49,7 @@ namespace OpenSyno
             ILogService logService = IoC.Container.Get<ILogService>();
 
             // TODO : Move this to a notification service
-            MessageBox.Show("Logging will resume next time the application is started.", "Logs disabled", MessageBoxButton.OK);
+            MessageBox.Show("Logging is not enabled. There are no log files available", "Logs disabled", MessageBoxButton.OK);
             if (logService.IsEnabled)
             {
                 // TODO : Move this to a notification service
