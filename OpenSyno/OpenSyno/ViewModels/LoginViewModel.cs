@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO.IsolatedStorage;
+    using System.Windows;
     using System.Windows.Input;
 
     using Microsoft.Practices.Prism.Commands;
@@ -53,7 +54,18 @@
             _synoSettings.Port = Port;
             _audioStationSession.Host = Host;
             _audioStationSession.Port = Port;
-            _audioStationSession.LoginAsync(UserName, Password, OnLoginAsyncCompleted, OnLoginAsyncException);
+            try
+            {
+                _audioStationSession.LoginAsync(UserName, Password, OnLoginAsyncCompleted, OnLoginAsyncException);
+            }
+            catch (ArgumentNullException exception)
+            {                
+                // FIXME : Use noification service instead
+                MessageBox.Show(
+                    "The connection settings don't look valid, please make sure they are entered correctly.",
+                    "Credentials not valid",
+                    MessageBoxButton.OK);
+            }
         }
 
         private void OnLoginAsyncException(Exception exception)
