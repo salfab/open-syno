@@ -22,6 +22,10 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno
 {
+    using System.Text;
+
+    using Microsoft.Phone.Tasks;
+
     public partial class App : Application
     {
      
@@ -194,32 +198,47 @@ namespace OpenSyno
                 e.Handled = true;
             }
             finally
-            {
-
-                e.Handled = true;
-                while (ex != null && e.Handled == false)
+            {                
+                var helpDebug = MessageBox.Show(
+                    "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us anonymous information. Would you like to do so ?",
+                    "Ooops !",
+                    MessageBoxButton.OKCancel);
+                if (helpDebug == MessageBoxResult.OK)
                 {
-                    Exception exception = ex;
 
-                    if (!Deployment.Current.Dispatcher.CheckAccess())
+                    var mailContent = new StringBuilder();
+                    while (ex != null && e.Handled == false)
                     {
-                        Deployment.Current.Dispatcher.BeginInvoke(
-                            () =>
-                                {
-                                    MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
-                                    MessageBox.Show(exception.StackTrace, exception.GetType().Name, MessageBoxButton.OK);
-                                });
-                    }
-                    else
-                    {
-                        MessageBox.Show(exception.Message, exception.GetType().Name, MessageBoxButton.OK);
-                        MessageBox.Show(exception.StackTrace, exception.GetType().Name, MessageBoxButton.OK);
+                        Exception exception = ex;
+
+                        var buildExceptionOutput = new Action(() =>
+                        {
+                            mailContent.AppendFormat("Exception name : {0}\r\n", exception.GetType().Name);
+                            mailContent.AppendFormat("Exception Message : {0}\r\n", exception.Message);
+                            mailContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", exception.StackTrace);
+                        });
+
+                        if (!Deployment.Current.Dispatcher.CheckAccess())
+                        {
+                            Deployment.Current.Dispatcher.BeginInvoke(buildExceptionOutput);
+                        }
+                        else
+                        {
+                            buildExceptionOutput();
+                        }
+
+                        mailContent.AppendLine("Inner exception : \r\n");
+                        ex = ex.InnerException;
                     }
 
-                    ex = ex.InnerException;
+                    EmailComposeTask emailComposeTask = new EmailComposeTask();
+                    emailComposeTask.To = "opensyno@seesharp.ch";
+                    emailComposeTask.Body = mailContent.ToString();
+                    emailComposeTask.Subject = "Open syno Unhandled exception - " + e.ExceptionObject.GetType().Name;
+                    emailComposeTask.Show(); 
                 }
+                                
 
-                Console.Error.WriteLine(e.ExceptionObject.GetType().Name);
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
                     // An unhandled exception has occurred; break into the debugger

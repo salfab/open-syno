@@ -45,10 +45,19 @@ namespace OpenSyno
 
         private void ApplicationBarLogsButtonClicked(object sender, EventArgs e)
         {
+            // TODO : Move this to a proper command !
             ILogService logService = IoC.Container.Get<ILogService>();
-            var result = MessageBox.Show(logService.GetLogFile(), "Click Cancel to clear logs", MessageBoxButton.OKCancel);
-            if (result == MessageBoxResult.Cancel)
-                logService.ClearLog();
+
+            // TODO : Move this to a notification service
+            MessageBox.Show("Logging will resume next time the application is started.", "Logs disabled", MessageBoxButton.OK);
+            if (logService.IsEnabled)
+            {
+                // TODO : Move this to a notification service
+                var result = MessageBox.Show(logService.GetLogFile(), "Click Cancel to clear logs", MessageBoxButton.OKCancel);
+                if (result == MessageBoxResult.Cancel)
+                    logService.ClearLog();
+            }
+
         }
     }
 }

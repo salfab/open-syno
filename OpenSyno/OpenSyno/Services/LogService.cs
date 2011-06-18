@@ -83,20 +83,21 @@ namespace OpenSyno.Helpers
 
         public string GetLogFile()
         {
-            string log;
-            MessageBox.Show("Logging will resume at next application startup.","Logs disabled",MessageBoxButton.OK);
-            IsEnabled = false;
-            _logFile.Close();
-            _logFile.Dispose();
-            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+            string log = string.Empty;
+            if (IsEnabled)
             {
-                using (var logFile = userStore.OpenFile("logfile.log", FileMode.Open, FileAccess.Read))
+                IsEnabled = false;
+                _logFile.Close();
+                _logFile.Dispose();
+                using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    var reader = new StreamReader(logFile);
-                    log = reader.ReadToEnd();    
-                }                
+                    using (var logFile = userStore.OpenFile("logfile.log", FileMode.Open, FileAccess.Read))
+                    {
+                        var reader = new StreamReader(logFile);
+                        log = reader.ReadToEnd();
+                    }
+                }
             }
-
             return log;            
         }
 
