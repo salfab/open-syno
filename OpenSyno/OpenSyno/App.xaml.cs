@@ -198,46 +198,52 @@ namespace OpenSyno
                 e.Handled = true;
             }
             finally
-            {                
-                var helpDebug = MessageBox.Show(
-                    "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us anonymous information. Would you like to do so ?",
-                    "Ooops !",
-                    MessageBoxButton.OKCancel);
-                if (helpDebug == MessageBoxResult.OK)
+            {
+                if (e.Handled == false)
                 {
 
-                    var mailContent = new StringBuilder();
-                    while (ex != null && e.Handled == false)
+
+                    var helpDebug =
+                        MessageBox.Show(
+                            "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us anonymous information. Would you like to do so ?",
+                            "Ooops !",
+                            MessageBoxButton.OKCancel);
+                    if (helpDebug == MessageBoxResult.OK)
                     {
-                        Exception exception = ex;
-
-                        var buildExceptionOutput = new Action(() =>
+                        var mailContent = new StringBuilder();
+                        while (ex != null)
                         {
-                            mailContent.AppendFormat("Exception name : {0}\r\n", exception.GetType().Name);
-                            mailContent.AppendFormat("Exception Message : {0}\r\n", exception.Message);
-                            mailContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", exception.StackTrace);
-                        });
+                            Exception exception = ex;
 
-                        if (!Deployment.Current.Dispatcher.CheckAccess())
-                        {
-                            Deployment.Current.Dispatcher.BeginInvoke(buildExceptionOutput);
+                            var buildExceptionOutput = new Action(
+                                () =>
+                                    {
+                                        mailContent.AppendFormat("Exception name : {0}\r\n", exception.GetType().Name);
+                                        mailContent.AppendFormat("Exception Message : {0}\r\n", exception.Message);
+                                        mailContent.AppendFormat(
+                                            "Exception StackTrace : {0}\r\n\r\n", exception.StackTrace);
+                                    });
+
+                            if (!Deployment.Current.Dispatcher.CheckAccess())
+                            {
+                                Deployment.Current.Dispatcher.BeginInvoke(buildExceptionOutput);
+                            }
+                            else
+                            {
+                                buildExceptionOutput();
+                            }
+
+                            mailContent.AppendLine("Inner exception : \r\n");
+                            ex = ex.InnerException;
                         }
-                        else
-                        {
-                            buildExceptionOutput();
-                        }
 
-                        mailContent.AppendLine("Inner exception : \r\n");
-                        ex = ex.InnerException;
+                        EmailComposeTask emailComposeTask = new EmailComposeTask();
+                        emailComposeTask.To = "opensyno@seesharp.ch";
+                        emailComposeTask.Body = mailContent.ToString();
+                        emailComposeTask.Subject = "Open syno Unhandled exception - " + e.ExceptionObject.GetType().Name;
+                        emailComposeTask.Show();
                     }
-
-                    EmailComposeTask emailComposeTask = new EmailComposeTask();
-                    emailComposeTask.To = "opensyno@seesharp.ch";
-                    emailComposeTask.Body = mailContent.ToString();
-                    emailComposeTask.Subject = "Open syno Unhandled exception - " + e.ExceptionObject.GetType().Name;
-                    emailComposeTask.Show(); 
                 }
-                                
 
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
