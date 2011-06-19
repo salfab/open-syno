@@ -76,6 +76,7 @@ namespace OpenSyno
 
             string synoSettings = "SynoSettings";
             _openSynoSettings = IsolatedStorageSettings.ApplicationSettings.Contains(synoSettings) ? (OpenSynoSettings)IsolatedStorageSettings.ApplicationSettings[synoSettings] : new OpenSynoSettings();
+
             // FIXME : Try to get rid of thses registrations and use DI instead.
             IoC.Container.Bind<IOpenSynoSettings>().ToConstant(_openSynoSettings);
 
@@ -128,7 +129,6 @@ namespace OpenSyno
             IoC.Container.Get<SearchResultsViewModelFactory>();
             IoC.Container.Get<ArtistPanoramaViewModelFactory>();
             IoC.Container.Get<ISearchAllResultsViewModelFactory>();
-            IoC.Container.Get<PlayQueueViewModel>();
         }
 
 
