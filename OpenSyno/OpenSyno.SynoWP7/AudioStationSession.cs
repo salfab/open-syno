@@ -107,7 +107,13 @@ namespace Synology.AudioStationApi
                                                       }
                                                       else
                                                       {
-                                                          string cookie = ((WebClient)(sender)).ResponseHeaders["Set-Cookie"].Split(';').Where(s => s.StartsWith("id=")).Single();
+                                                          string rawCookie = ((WebClient)sender).ResponseHeaders["Set-Cookie"];
+                                                          if (rawCookie == null)
+                                                          {
+                                                              throw new SynoLoginException("The login and the password don't match, please check your credentials", null);
+                                                          }
+
+                                                          string cookie = rawCookie.Split(';').Where(s => s.StartsWith("id=")).Single();
                                                           this.Token = cookie;
                                                           callback(cookie);
                                                       }
