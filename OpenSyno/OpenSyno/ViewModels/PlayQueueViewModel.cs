@@ -54,6 +54,8 @@
             }
 
 
+            RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
+
             PlayQueueItems = new ObservableCollection<TrackViewModel>();
 
             eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
@@ -81,6 +83,17 @@
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious, () => false);
+        }
+
+        private void OnRemoveTracksFromQueue(IEnumerable<object> tracks)
+        {
+            for (int i = this.PlayQueueItems.Count - 1; i >= 0; i--)
+            {
+                if (this.PlayQueueItems[i].IsSelected)
+                {
+                    this.PlayQueueItems.RemoveAt(i);
+                }
+            }
         }
 
         private void OnResumePlayback()
@@ -307,7 +320,9 @@
                                                      // FIXME : Use a factory so we can mock the active track !
                                                      ActiveTrack = new TrackViewModel(ea.Track);
                                                  };
-        }      
+        }
+
+        public ICommand RemoveTracksFromQueueCommand { get; set; }
 
         /// <summary>
         /// Called when a play list operation is requested.
@@ -337,6 +352,7 @@
                         trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
                         OnPlay(trackToPlay);
                     }
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

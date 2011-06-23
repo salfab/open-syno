@@ -42,5 +42,16 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
+	<DataTemplate x:Key="CheckBoxVerticalBar">
+		<CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding TrackInfo.Title}" />
+		<!--<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+			<Border Width="6" Background="{StaticResource PhoneAccentBrush}" />
+            <TextBlock Grid.Column="1" Text="{Binding TrackInfo.Title}" />
+		</Grid>-->
+	</DataTemplate>
 	<!-- Resource dictionary entries should be defined here. -->
 </ResourceDictionary>
