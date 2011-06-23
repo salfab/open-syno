@@ -98,6 +98,7 @@ namespace OpenSyno
 
             // Retrieve the type SearchService from a config file, so we can change it.
             // also possible: MockSearchService;
+            // IoC.Container.Bind<ISearchService>().To(typeof(MockSearchService)).InSingletonScope();
             IoC.Container.Bind<ISearchService>().To(typeof(SearchService)).InSingletonScope();
             IoC.Container.Bind<ISignInService>().To(typeof(SignInService)).InSingletonScope();
 

@@ -41,7 +41,7 @@
         /// </summary>
         /// <param name="eventAggregator">The event aggregator.</param>
         /// <param name="playbackService">The playback service.</param>
-        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService)
+        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService)
         {
             if (eventAggregator == null)
             {
@@ -52,7 +52,10 @@
             {
                 throw new ArgumentNullException("playbackService");
             }
-
+            if (notificationService == null)
+            {
+                throw new ArgumentNullException("notificationService");
+            }
 
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
@@ -60,6 +63,7 @@
 
             eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             _playbackService = playbackService;
+            this._notificationService = notificationService;
             _playbackService.BufferingProgressUpdated += (o, e) =>
                 {
                     // throttle refresh through binding.
@@ -122,7 +126,7 @@
             }
             else
             {
-                throw new ArgumentOutOfRangeException("There is no next track to play : all tracks have been played.");                
+                _notificationService.Warning("There is no next track to play : all tracks have been played.", "No more tracks to play");                                
             }
         }
 
@@ -224,6 +228,8 @@
 
         private string SelectedTrackPropertyName = "SelectedTrack";
         private DateTime _lastBufferProgressUpdate;
+
+        private INotificationService _notificationService;
 
         private const string CurrentPlaybackPercentCompletePropertyName = "CurrentPlaybackPercentComplete";
 
