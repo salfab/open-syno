@@ -129,6 +129,7 @@ namespace OpenSyno
             IoC.Container.Get<SearchResultsViewModelFactory>();
             IoC.Container.Get<ArtistPanoramaViewModelFactory>();
             IoC.Container.Get<ISearchAllResultsViewModelFactory>();
+            IoC.Container.Get<PlayQueueViewModel>();
         }
 
 

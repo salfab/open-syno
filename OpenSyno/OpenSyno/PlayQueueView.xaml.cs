@@ -11,8 +11,6 @@ namespace OpenSyno
 
     public partial class PlayQueueView : PhoneApplicationPage
     {
-        private const string PlayQueueViewModelKey = "PlayQUeueViewModel";
-
         private bool _newInstance = false;
 
         private const string BufferedBytesCountKey = "BufferedBytesCountKey";

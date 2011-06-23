@@ -1,15 +1,19 @@
 ﻿namespace OpenSyno.ViewModels
 {
     using System;
+    using System.Runtime.Serialization;
 
     using Synology.AudioStationApi;
 
+    [DataContract]
     public class TrackViewModel : ViewModelBase
     {
         private bool _isSelected;
         private const string IsSelectedPropertyName = "IsSelected";
+        [DataMember]
         public SynoTrack TrackInfo { get; set; }
 
+        [DataMember]
         public bool IsSelected
         {
             get 

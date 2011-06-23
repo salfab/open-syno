@@ -2,6 +2,9 @@
 
 namespace OpenSyno.ViewModels
 {
+    using System.Runtime.Serialization;
+
+    [DataContract]
     public class ViewModelBase : INotifyPropertyChanged
     {
         virtual public void OnPropertyChanged(string propertyName)
