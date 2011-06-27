@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Diagnostics;
     using System.Linq;
     using System.Windows.Input;
@@ -41,7 +42,8 @@
         /// </summary>
         /// <param name="eventAggregator">The event aggregator.</param>
         /// <param name="playbackService">The playback service.</param>
-        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService)
+        /// <param name="openSynoSettings"></param>
+        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings)
         {
             if (eventAggregator == null)
             {
@@ -56,14 +58,19 @@
             {
                 throw new ArgumentNullException("notificationService");
             }
+            if (openSynoSettings == null)
+            {
+                throw new ArgumentNullException("openSynoSettings");
+            }
 
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
             PlayQueueItems = new ObservableCollection<TrackViewModel>();
-
+            PlayQueueItems.CollectionChanged += OnPlayQueueEdited;
             eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             _playbackService = playbackService;
             this._notificationService = notificationService;
+            _openSynoSettings = openSynoSettings;
             _playbackService.BufferingProgressUpdated += (o, e) =>
                 {
                     // throttle refresh through binding.
@@ -87,10 +94,37 @@
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious, () => false);
+            SavePlaylistCommand = new DelegateCommand(OnSavePlaylist);
+        }
+
+        private void OnPlayQueueEdited(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (TrackViewModel oldItem in e.OldItems)
+                {
+                    this._playbackService.PlayqueueItems.Remove(oldItem.TrackInfo);
+                }
+            }
+
+            if (e.NewItems != null)
+            {
+                foreach (TrackViewModel newItem in e.NewItems)
+                {
+                    this._playbackService.PlayqueueItems.Add(newItem.TrackInfo);
+                }
+            }
+        }
+
+        private void OnSavePlaylist()
+        {
+            Playlist playlist = null;
+            _openSynoSettings.Playlists.Add(playlist);
         }
 
         private void OnRemoveTracksFromQueue(IEnumerable<object> tracks)
         {
+            
             for (int i = this.PlayQueueItems.Count - 1; i >= 0; i--)
             {
                 if (this.PlayQueueItems[i].IsSelected)
@@ -231,6 +265,8 @@
 
         private INotificationService _notificationService;
 
+        private readonly IOpenSynoSettings _openSynoSettings;
+
         private const string CurrentPlaybackPercentCompletePropertyName = "CurrentPlaybackPercentComplete";
 
         private const string BufferBytesCountPropertyName = "BufferedBytesCount";
@@ -265,6 +301,8 @@
                 OnPropertyChanged(CurrentArtworkPropertyName);
             }
         }
+
+        public ICommand SavePlaylistCommand { get; set; }
 
         public ICommand PlayPreviousCommand { get; set; }
 

@@ -2,6 +2,8 @@
 
 namespace OpenSyno
 {
+    using System.Collections.Generic;
+
     public class OpenSynoSettings : IOpenSynoSettings
     {
         public string Token { get; set; }
@@ -13,5 +15,7 @@ namespace OpenSyno
         public string Host { get; set; }
         
         public int Port { get; set; }
+
+        public List<Playlist> Playlists { get; set; }
     }
 }
