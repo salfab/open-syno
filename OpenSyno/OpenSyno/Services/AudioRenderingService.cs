@@ -63,6 +63,11 @@ namespace OpenSyno.Services
         private void MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
             _logService.Trace(string.Format("AudioRenderingService.MediaFailed : {0} : {1}", e.ErrorException.GetType().FullName, e.ErrorException.Message));
+            if (e.ErrorException.Message == "AG_E_NETWORK_ERROR")
+            {
+                throw new SynoNetworkException("Open Syno could not complete the operation. Please check that your phone is not in flight mode.", e.ErrorException);
+            }
+
             throw e.ErrorException;
         }
 
