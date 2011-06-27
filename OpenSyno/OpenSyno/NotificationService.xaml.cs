@@ -14,5 +14,10 @@
         {
             MessageBox.Show(message, messageTitle, MessageBoxButton.OK);
         }
+
+        public MessageBoxResult WarningQuery(string warningMessage, string warningTitle, MessageBoxButton userResponseOptions)
+        {
+            return MessageBox.Show(warningMessage, warningTitle, userResponseOptions);
+        }
     }
 }

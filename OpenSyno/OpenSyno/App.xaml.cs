@@ -169,6 +169,10 @@ namespace OpenSyno
         // Code to execute if a navigation fails
         private void RootFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
+            //this.HandleException(e.Exception, e.Handled);
+
+          //  e.Handled = true;
+
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 // A navigation has failed; break into the debugger
@@ -179,29 +183,49 @@ namespace OpenSyno
         // Code to execute on Unhandled Exceptions
         private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
-            var ex = e.ExceptionObject;
+            ILogService logService = IoC.Container.Get<ILogService>();
+        
+            logService.Error(e.ExceptionObject.GetType().FullName);
+            logService.Error(e.ExceptionObject.Message);
+
+            e.Handled = HandleException(e.ExceptionObject, e.Handled);
+
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                // An unhandled exception has occurred; break into the debugger
+                System.Diagnostics.Debugger.Break();
+            }
+        }
+
+        private bool HandleException(Exception e, bool handled)
+        {
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+
             try
             {
-                throw ex;
+                throw e;
             }
             catch (SynoNetworkException exception)
             {
-                _notificationService.Error(exception.Message, "Network error");
-                e.Handled = true;
+                this._notificationService.Error(exception.Message, "Network error");
+                handled = true;
             }
             catch (SynoLoginException exception)
             {
-                _notificationService.Error(exception.Message, "Login error");
-                e.Handled = true;
+                this._notificationService.Error(exception.Message, "Login error");
+                handled = true;
             }
             catch (SynoSearchException exception)
             {
-                _notificationService.Error(exception.Message, "Search error");
-                e.Handled = true;
+                this._notificationService.Error(exception.Message, "Search error");
+                handled = true;
             }
             finally
             {
-                if (e.Handled == false)
+                if (handled == false)
                 {
 
 
@@ -210,22 +234,20 @@ namespace OpenSyno
                             "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us anonymous information. Would you like to do so ?",
                             "Ooops !",
                             MessageBoxButton.OKCancel);
+                    string exceptionName = e.GetType().Name;
                     if (helpDebug == MessageBoxResult.OK)
                     {
                         var mailContent = new StringBuilder();
-                        while (ex != null)
+                        while (e != null)
                         {
-                            Exception exception = ex;
-
                             var buildExceptionOutput = new Action(
                                 () =>
                                     {
-                                        mailContent.AppendFormat("Exception name : {0}\r\n", exception.GetType().Name);
-                                        mailContent.AppendFormat("Exception Message : {0}\r\n", exception.Message);
+                                        mailContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
+                                        mailContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
                                         mailContent.AppendFormat(
-                                            "Exception StackTrace : {0}\r\n\r\n", exception.StackTrace);
+                                            "Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
                                     });
-
                             if (!Deployment.Current.Dispatcher.CheckAccess())
                             {
                                 Deployment.Current.Dispatcher.BeginInvoke(buildExceptionOutput);
@@ -236,23 +258,21 @@ namespace OpenSyno
                             }
 
                             mailContent.AppendLine("Inner exception : \r\n");
-                            ex = ex.InnerException;
+                            e = e.InnerException;
                         }
+                        ILogService logService = IoC.Container.Get<ILogService>();
+                        logService.Error(mailContent.ToString());
 
                         EmailComposeTask emailComposeTask = new EmailComposeTask();
                         emailComposeTask.To = "opensyno@seesharp.ch";
                         emailComposeTask.Body = mailContent.ToString();
-                        emailComposeTask.Subject = "Open syno Unhandled exception - " + e.ExceptionObject.GetType().Name;
+                        emailComposeTask.Subject = "Open syno Unhandled exception - " + exceptionName;
                         emailComposeTask.Show();
                     }
-                }
-
-                if (System.Diagnostics.Debugger.IsAttached)
-                {
-                    // An unhandled exception has occurred; break into the debugger
-                    System.Diagnostics.Debugger.Break();
-                }
+                }                
             }
+
+            return handled;
         }
 
         #region Phone application initialization

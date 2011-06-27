@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-
-namespace OpenSyno.Helpers
+﻿namespace OpenSyno.Helpers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.IsolatedStorage;
+
     public class IsolatedStorageLogService : ILogService
     {
         private IsolatedStorageFileStream _logFile;
@@ -22,8 +13,8 @@ namespace OpenSyno.Helpers
 
         public IsolatedStorageLogService()
         {
-            // by default, logging is disabled.
-            IsEnabled = false;
+            // by default, logging is enabled.
+            IsEnabled = true;
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
                 _logFile = userStore.OpenFile("logfile.log", FileMode.Append, FileAccess.Write, FileShare.Read );                
@@ -78,7 +69,10 @@ namespace OpenSyno.Helpers
 
         public void Error(string message)
         {
-            throw new NotImplementedException();
+            if (IsEnabled)
+            {
+                _writer.WriteLine("ERROR : [{0}] - {1}", DateTime.Now, message);
+            }
         }
 
         public string GetLogFile()

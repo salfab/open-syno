@@ -20,6 +20,8 @@ namespace OpenSyno
     using System;
     using System.Windows.Navigation;
 
+    using Microsoft.Phone.Tasks;
+
     public partial class LoginView
     {
         public LoginView()
@@ -53,9 +55,17 @@ namespace OpenSyno
             if (logService.IsEnabled)
             {
                 // TODO : Move this to a notification service
-                var result = MessageBox.Show(logService.GetLogFile(), "Click Cancel to clear logs", MessageBoxButton.OKCancel);
-                if (result == MessageBoxResult.Cancel)
-                    logService.ClearLog();
+                string logFile = logService.GetLogFile();
+
+                EmailComposeTask emailComposeTask = new EmailComposeTask();
+                emailComposeTask.To = "opensyno@seesharp.ch";
+                emailComposeTask.Body = logFile;
+                emailComposeTask.Subject = "Log file";
+                emailComposeTask.Show();
+
+                //var result = MessageBox.Show(logFile, "Click Cancel to clear logs", MessageBoxButton.OKCancel);
+                //if (result == MessageBoxResult.Cancel)
+                logService.ClearLog();
             }
 
         }

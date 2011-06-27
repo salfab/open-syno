@@ -62,8 +62,7 @@ namespace OpenSyno.Services
                             read = base.Read(buffer, offset, count);
                             if (read == 0)
                             {
-                                _logService.Trace("RWMS.Read : stream reading is starved : last failed @ " +
-                                                  _lastFailedRead);
+                                // logService.Trace("RWMS.Read : stream reading is starved : last failed @ " + _lastFailedRead);
                             }
 
                         }
