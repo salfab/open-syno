@@ -59,11 +59,19 @@
                 _audioStationSession.LoginAsync(UserName, Password, OnLoginAsyncCompleted, OnLoginAsyncException);
             }
             catch (ArgumentNullException exception)
-            {                
+            {
                 // FIXME : Use noification service instead
                 MessageBox.Show(
                     "The connection settings don't look valid, please make sure they are entered correctly.",
                     "Credentials not valid",
+                    MessageBoxButton.OK);
+            }
+            catch (UriFormatException exception)
+            {
+                // FIXME : Use noification service instead
+                MessageBox.Show(
+                    "The format of the provided hostname is not in valid. Check that it is not prefixedit with http:// or https://",
+                    "The host name is not valid",
                     MessageBoxButton.OK);
             }
         }
