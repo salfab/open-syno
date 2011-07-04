@@ -37,13 +37,13 @@
                     </TextBox.InputScope>    
                 </TextBox>
                 <TextBlock Margin="12,0" Text="Password" />
-                <TextBox Text="{Binding Password, Mode=TwoWay}" >
-                    <TextBox.InputScope>
+                <PasswordBox Password="{Binding Password, Mode=TwoWay}" >
+                    <!--<TextBox.InputScope>
                         <InputScope>
                             <InputScopeName NameValue="Password" />
                         </InputScope>
-                    </TextBox.InputScope>
-                </TextBox>
+                    </TextBox.InputScope>-->
+                </PasswordBox>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
