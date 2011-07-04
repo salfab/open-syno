@@ -50,7 +50,7 @@ namespace OpenSyno.Services
             _mediaElement = (MediaElement)Application.Current.Resources["MediaElement"];
 
             // HACK : 500kb is absolutely arbitrary and is supposed to cover for the mp3 header and the ID3 tags. a more subtle approach would be to retrieve the actual size of the header for our heuristic to be more accurate.
-            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= 1||  bytesLoaded == track.Size;
+            BufferPlayableHeuristicPredicate = (track, bytesLoaded) =>  bytesLoaded >= track.Bitrate||  bytesLoaded == track.Size;
 
             _mediaElement.MediaFailed += MediaFailed;
 
