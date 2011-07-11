@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Windows.Data;
-using Media;
 using Ninject;
 using OpenSyno.Helpers;
 
@@ -14,6 +13,8 @@ namespace OpenSyno.Services
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
+
+    using Media;
 
     using Synology.AudioStationApi;
 
