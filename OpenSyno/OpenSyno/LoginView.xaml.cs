@@ -59,7 +59,17 @@ namespace OpenSyno
 
                 EmailComposeTask emailComposeTask = new EmailComposeTask();
                 emailComposeTask.To = "opensyno@seesharp.ch";
-                emailComposeTask.Body = logFile;
+
+                if (logFile.Length > 60000)
+                {
+                    const string truncateDisclaimer = "This logfile has been truncated : only the last 64kbytes are shown.\r\n";
+                    emailComposeTask.Body = truncateDisclaimer + logFile.Substring(logFile.Length - 60000 + truncateDisclaimer.Length);
+                }
+                else
+                {
+                    emailComposeTask.Body = logFile;
+                }
+
                 emailComposeTask.Subject = "Log file";
                 emailComposeTask.Show();
 
