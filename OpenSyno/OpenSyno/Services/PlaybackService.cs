@@ -206,6 +206,7 @@ namespace OpenSyno.Services
 
         private void MediaEnded(object sender, MediaEndedEventArgs e)
         {
+            _logService.Trace("PlaybackService.MediaEnded : " + e.Track.Title);
             _status = PlaybackStatus.Stopped;
             var currentTrackItem = PlayqueueItems.IndexOf(e.Track);
             
