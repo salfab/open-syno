@@ -106,5 +106,21 @@ namespace OpenSyno
             var viewModel = (ArtistPanoramaViewModel)DataContext;
             viewModel.ShowPlayQueueCommand.Execute(null);
         }
+
+        private void PlayLast(object sender, EventArgs e)
+        {
+            var viewModel = (ArtistPanoramaViewModel)DataContext;
+            ArtistPanoramaItemViewModel artistPanoramaItemViewModel = viewModel.ArtistItems[viewModel.CurrentArtistItemIndex];
+            if (artistPanoramaItemViewModel.PanoramaItemKind ==  ArtistPanoramaItemKind.AlbumDetail)
+            {
+                ((ArtistPanoramaAlbumDetailItem)artistPanoramaItemViewModel).PlayListOperationCommand.Execute(null);                
+            }
+            else
+            {
+                // This should not even be available
+                // FIXME : Remove this : the button should be grayed-out !
+                MessageBox.Show("Play command not available in this context. sorry, we'll hide it for the final version ;)", "Known \"bug\"", MessageBoxButton.OK);
+            }
+        }
     }
 }
