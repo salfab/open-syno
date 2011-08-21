@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Deployment xmlns="http://schemas.microsoft.com/windowsphone/2009/deployment" AppPlatformVersion="7.0">
+<Deployment xmlns="http://schemas.microsoft.com/windowsphone/2009/deployment" AppPlatformVersion="7.1">
   <App xmlns="" ProductID="{8ef11a6e-ff23-4241-82a9-6506e949a5d4}" Title="Open Syno" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="OpenSyno author" Description="Sample description" Publisher="OpenSyno">
     <IconPath IsRelative="true" IsResource="false">ApplicationIconHeadset62.png</IconPath>
     <Capabilities>
