@@ -84,25 +84,33 @@ namespace Synology.AudioStationApi
             userState.GetResponseCallback(response, userState.SynoTrack);
         }
 
-        public void LoginAsync(string login, string password, Action<string> callback, Action<Exception> callbackError)
+        public void LoginAsync(string login, string password, Action<string> callback, Action<Exception> callbackError, bool useSsl)
         {
             if (login == null) throw new ArgumentNullException("login");
             if (password == null) throw new ArgumentNullException("password");
 
             WebClient client = new WebClient();
 
-            Uri uri =
-                new UriBuilder
+            Uri uri = new UriBuilder
                 {
                     Host = this.Host,
                     Path = @"/webman/login.cgi",
                     Query = string.Format("username={0}&passwd={1}", login, password),
-                    Port = this.Port
+                    Port = this.Port,
+                    Scheme = useSsl ? "https" : "http"
                 }.Uri;
+
+            // uri = new Uri("https://ds509.hamilcar.ch:5001/webman/index.cgi");
+            // uri = new Uri("http://www.google.com/accounts/ServiceLogin?service=mail&passive=true&rm=false&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F%3Fui%3Dhtml%26zy%3Dl&bsv=llya694le36z&ss=1&scc=1&ltmpl=default&ltmplcache=2&from=login");
             client.DownloadStringCompleted += (sender, e) =>
                                                   {
                                                       if (e.Error != null)
                                                       {
+                                                          if (uri.Scheme == "https")
+                                                          {
+                                                              throw new SynoNetworkException("Open Syno could not connect to the server. Please make sure your server's SSL certificate has been issued by a trusted Certificate Authority. see http://bit.ly/qODji5  for further detail.", e.Error);
+                                                          }
+
                                                           throw new SynoNetworkException("Open Syno could not complete the operation. Please check that your phone is not in flight mode.", e.Error);
                                                       }
                                                       else
@@ -119,6 +127,7 @@ namespace Synology.AudioStationApi
                                                       }
 
                                                   };
+
             client.DownloadStringAsync(uri);
         }
 

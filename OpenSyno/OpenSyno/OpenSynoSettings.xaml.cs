@@ -17,5 +17,8 @@ namespace OpenSyno
         public int Port { get; set; }
 
         public List<Playlist> Playlists { get; set; }
+
+        public bool UseSsl { get; set; }
+      
     }
 }

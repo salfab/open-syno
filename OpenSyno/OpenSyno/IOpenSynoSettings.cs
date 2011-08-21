@@ -13,5 +13,7 @@
         int Port { get; set; }
 
         List<Playlist> Playlists { get; set; }
+
+        bool UseSsl { get; set; }
     }
 }
