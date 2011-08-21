@@ -15,6 +15,8 @@ using Synology.AudioStationApi;
 namespace OpenSyno
 {
     using System.Text;
+    using System.Threading;
+    using System.Windows.Threading;
 
     using Microsoft.Phone.Tasks;
 
@@ -219,6 +221,8 @@ namespace OpenSyno
             {
                 if (handled == false)
                 {
+                    System.Threading.ManualResetEvent mre = new ManualResetEvent(false);
+
                     Action errorFeedback = () =>
                                                       {
                                                           var helpDebug =
@@ -247,20 +251,22 @@ namespace OpenSyno
                                                               emailComposeTask.Body = mailContent.ToString();
                                                               emailComposeTask.Subject = "Open syno Unhandled exception - " + exceptionName;
                                                               emailComposeTask.Show();
+                                                              mre.Set();
                                                           }
                                                       };
 
                             if (!Deployment.Current.Dispatcher.CheckAccess())
                             {
-
-                                Deployment.Current.Dispatcher.BeginInvoke(errorFeedback);
+                                DispatcherOperation dop;
+                                dop = Deployment.Current.Dispatcher.BeginInvoke(errorFeedback);
+                                mre.WaitOne();
                             }
                             else
                             {
                                 errorFeedback();
                             }
+                    handled = true;
 
-                   
                 }                
             }
 
