@@ -6,7 +6,6 @@ namespace OpenSyno.Services
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Net;
 
     using Synology.AudioStationApi;
@@ -83,7 +82,8 @@ namespace OpenSyno.Services
         {            
             PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             // var index = PlayqueueItems.IndexOf(trackToPlay);
-            _audioRenderingService.Bufferize(BufferizedCallback, BufferingProgressChanged, trackToPlay);
+            _audioRenderingService.StreamTrack(trackToPlay);
+            //_audioRenderingService.Bufferize(BufferizedCallback, BufferingProgressChanged, trackToPlay);
             //var client = new WebClient();
             //client.OpenReadCompleted += (o, ea) =>
             //    _audioRenderingService.Play(ea.Result);
@@ -104,18 +104,6 @@ namespace OpenSyno.Services
             {
                 TrackStarted(this, trackStartedEventArgs);
             }
-        }
-
-
-        private void BufferizedCallback(Stream trackStream)
-        {
-            _audioRenderingService.Play(trackStream);
-            _status = PlaybackStatus.Playing;
-        }
-
-        private void BufferingProgressChanged(double progress)
-        {
-
         }
 
         /// <summary>
