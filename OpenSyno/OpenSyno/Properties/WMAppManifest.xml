@@ -17,6 +17,9 @@
     </Capabilities>
     <Tasks>
       <DefaultTask Name="_default" NavigationPage="SearchView.xaml" />
+      <ExtendedTask Name="BackgroundTask">
+        <BackgroundServiceAgent Specifier="AudioPlayerAgent" Name="OpenSyno.BackgroundPlaybackAgent" Source="OpenSyno.BackgroundPlaybackAgent" Type="OpenSyno.BackgroundPlaybackAgent.AudioPlayer" />
+      </ExtendedTask>
     </Tasks>
     <Tokens>
       <PrimaryToken TokenID="OpenSynoToken" TaskName="_default">

@@ -15,7 +15,7 @@ namespace OpenSyno.Services
         /// <summary>
         /// The service responsible for downloading and rendering the audio files.
         /// </summary>
-        private readonly IAudioRenderingService _audioRenderingService;
+        private readonly IAudioRenderingService _backgroundAudioRenderingService;
 
         private PlaybackStatus _status;
 
@@ -82,7 +82,7 @@ namespace OpenSyno.Services
         {            
             PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             // var index = PlayqueueItems.IndexOf(trackToPlay);
-            _audioRenderingService.StreamTrack(trackToPlay);
+            this._backgroundAudioRenderingService.StreamTrack(trackToPlay);
             //_audioRenderingService.Bufferize(BufferizedCallback, BufferingProgressChanged, trackToPlay);
             //var client = new WebClient();
             //client.OpenReadCompleted += (o, ea) =>
@@ -109,24 +109,24 @@ namespace OpenSyno.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="PlaybackService"/> class.
         /// </summary>
-        /// <param name="audioRenderingService">The audio rendering service.</param>
-        public PlaybackService(AudioRenderingService audioRenderingService)
+        /// <param name="backgroundAudioRenderingService">The audio rendering service.</param>
+        public PlaybackService(BackgroundAudioRenderingService backgroundAudioRenderingService)
         {
             _logService = IoC.Container.Get<ILogService>();
 
             _status = PlaybackStatus.Stopped;
 
 
-            if (audioRenderingService == null)
+            if (backgroundAudioRenderingService == null)
             {
-                throw new ArgumentNullException("audioRenderingService");
+                throw new ArgumentNullException("backgroundAudioRenderingService");
             }
 
-            _audioRenderingService = audioRenderingService;
-            _audioRenderingService.BufferingProgressUpdated += (o, e) => OnBufferingProgressUpdated(e);
-            _audioRenderingService.MediaPositionChanged += MediaPositionChanged;
-            _audioRenderingService.MediaEnded += MediaEnded;
-            _audioRenderingService.PlaybackStarted += (sender, eventArgs) => OnTrackStarted(new TrackStartedEventArgs { Track = eventArgs.Track });
+            this._backgroundAudioRenderingService = backgroundAudioRenderingService;
+            this._backgroundAudioRenderingService.BufferingProgressUpdated += (o, e) => OnBufferingProgressUpdated(e);
+            this._backgroundAudioRenderingService.MediaPositionChanged += MediaPositionChanged;
+            this._backgroundAudioRenderingService.MediaEnded += MediaEnded;
+            this._backgroundAudioRenderingService.PlaybackStarted += (sender, eventArgs) => OnTrackStarted(new TrackStartedEventArgs { Track = eventArgs.Track });
 
 
             PlayqueueItems = new List<SynoTrack>();
@@ -150,22 +150,22 @@ namespace OpenSyno.Services
 
         public void PausePlayback()
         {
-            _audioRenderingService.Pause();
+            this._backgroundAudioRenderingService.Pause();
         }
 
         public void ResumePlayback()
         {
-            _audioRenderingService.Resume();
+            this._backgroundAudioRenderingService.Resume();
         }
 
         public double GetVolume()
         {
-            return _audioRenderingService.GetVolume();
+            return this._backgroundAudioRenderingService.GetVolume();
         }
 
         public void SetVolume(double volume)
         {
-            _audioRenderingService.SetVolume(volume);
+            this._backgroundAudioRenderingService.SetVolume(volume);
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
