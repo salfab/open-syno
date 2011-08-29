@@ -24,7 +24,6 @@ namespace OpenSyno.BackgroundPlaybackAgent
             if (!_classInitialized)
             {
                 _classInitialized = true;
-                _playbackService = IoC.Container.Get<IPlaybackService>();
                 // Subscribe to the managed exception handler
                 Deployment.Current.Dispatcher.BeginInvoke(delegate
                 {
