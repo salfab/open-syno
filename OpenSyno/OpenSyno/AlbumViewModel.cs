@@ -2,13 +2,15 @@
 
 namespace OpenSyno
 {
+    using OpenSyno.Services;
+
     public class AlbumViewModel
     {
-        public AlbumViewModel(SynoItem album)
+        public AlbumViewModel(ISynoItem album)
         {
             this.Album = album;
         }
 
-        public SynoItem Album { get; set; }
+        public ISynoItem Album { get; set; }
     }
 }

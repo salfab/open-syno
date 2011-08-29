@@ -3,15 +3,13 @@
     using System;
     using System.Collections.Generic;
 
+    using OpenSyno.Services;
+
     using Synology.AudioStationApi;
 
     public class MockSearchService : ISearchService
     {
-        public MockSearchService()
-        {
-            
-        }
-        public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>, string> callback)
+        public bool SearchAllMusic(string pattern, Action<IEnumerable<ISynoTrack>, string> callback)
         {
             var items = new List<SynoTrack>();
             items.Add(new SynoTrack
@@ -35,13 +33,13 @@
                     Title = "Fawn",
                 });
 
-            callback((IEnumerable<SynoTrack>) items, "my keyword");
+            callback((IEnumerable<ISynoTrack>) items, "my keyword");
             return true;
         }
 
-        public bool SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback)
+        public bool SearchArtists(string pattern, Action<IEnumerable<ISynoItem>> callback)
         {
-            var results = new List<SynoItem>();
+            var results = new List<ISynoItem>();
 
             results.Add(new SynoItem
                 {
@@ -70,9 +68,9 @@
             return true;
         }
 
-        public void GetAllArtists(Action<IEnumerable<SynoItem>> callback)
+        public void GetAllArtists(Action<IEnumerable<ISynoItem>> callback)
         {
-            var results = new List<SynoItem>();
+            var results = new List<ISynoItem>();
             results.Add(new SynoItem
                 {
                     Title = "Tom Waits",
@@ -94,9 +92,9 @@
             callback(results);
         }
 
-        public void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback)
+        public void GetAlbumsForArtist(ISynoItem artist, Action<IEnumerable<ISynoItem>, long, ISynoItem> callback)
         {
-            var results = new List<SynoItem>();                       
+            var results = new List<ISynoItem>();                       
             // All music
             results.Add(new SynoItem
                 {
@@ -179,9 +177,9 @@
             callback(results, 6, artist);
         }
 
-        public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback)
+        public void GetTracksForAlbum(ISynoItem album, Action<IEnumerable<ISynoTrack>, long, ISynoItem> callback)
         {
-            var tracks = new List<SynoTrack>();
+            List<ISynoTrack> tracks = new List<ISynoTrack>();
             tracks.Add(new SynoTrack { Album = "Alice", Artist = "Tom Waits", Title = "Alice" });
             tracks.Add(new SynoTrack { Album = "Alice", Artist = "Tom Waits", Title = "Flower's grave" });
             tracks.Add(new SynoTrack { Album = "Alice", Artist = "Tom Waits", Title = "Kommeniedzuspedt" });

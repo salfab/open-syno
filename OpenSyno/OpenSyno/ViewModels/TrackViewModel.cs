@@ -3,6 +3,8 @@
     using System;
     using System.Runtime.Serialization;
 
+    using OpenSyno.Services;
+
     using Synology.AudioStationApi;
 
     [DataContract]
@@ -11,7 +13,7 @@
         private bool _isSelected;
         private const string IsSelectedPropertyName = "IsSelected";
         [DataMember]
-        public SynoTrack TrackInfo { get; set; }
+        public ISynoTrack TrackInfo { get; set; }
 
         [DataMember]
         public bool IsSelected
@@ -27,7 +29,7 @@
             }
         }
 
-        public TrackViewModel(SynoTrack synoTrack)
+        public TrackViewModel(ISynoTrack synoTrack)
         {
             if (synoTrack == null)
             {

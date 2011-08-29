@@ -5,12 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{431F6AB6-E2DF-4D54-B467-2AC8CC90889D}</ProjectGuid>
+    <ProjectGuid>{A353B441-D677-4688-836A-33044EF1E60E}</ProjectGuid>
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OpenSyno.BackgroundPlaybackAgent</RootNamespace>
-    <AssemblyName>OpenSyno.BackgroundPlaybackAgent</AssemblyName>
+    <RootNamespace>OpenSyno.Common</RootNamespace>
+    <AssemblyName>OpenSyno.Common</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <TargetFrameworkProfile>WindowsPhone71</TargetFrameworkProfile>
@@ -18,7 +18,6 @@
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
-    <BackgroundAgentType>AudioPlayerAgent</BackgroundAgentType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,7 +41,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Phone" />
     <Reference Include="Ninject">
       <HintPath>..\3rd party\Ninject\Ninject.dll</HintPath>
     </Reference>
@@ -54,18 +52,8 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioPlayer.cs" />
+    <Compile Include="IoC.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpemSyno.Contracts\OpemSyno.Contracts.csproj">
-      <Project>{231AB4AB-1043-4856-9730-7C3418717EA8}</Project>
-      <Name>OpemSyno.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenSyno.Common\OpenSyno.Common.csproj">
-      <Project>{A353B441-D677-4688-836A-33044EF1E60E}</Project>
-      <Name>OpenSyno.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

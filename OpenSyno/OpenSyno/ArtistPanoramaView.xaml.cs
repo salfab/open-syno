@@ -20,7 +20,7 @@ namespace OpenSyno
 
         private SynoItem _artist;
 
-        private IEnumerable<SynoItem> _artistItems;
+        private IEnumerable<ISynoItem> _artistItems;
 
         private const string ArtistPanoramaViewActivePanelIndex = "ArtistPanoramaViewActivePanelIndex";
 
@@ -78,7 +78,7 @@ namespace OpenSyno
 
                 if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewItems))
                 {
-                    _artistItems = (IEnumerable<SynoItem>)this.State[ArtistPanoramaViewItems];
+                    _artistItems = (IEnumerable<ISynoItem>)this.State[ArtistPanoramaViewItems];
                     artistPanoramaViewModel.BuildArtistItems(_artistItems);
                 }
                 else

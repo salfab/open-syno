@@ -24,7 +24,7 @@ namespace OpenSyno.Services
         /// the last started track
         /// </summary>
         /// <remarks>The MP3 Media Stream Source is buggy with Variable bitrates, so the duration is not computed correctly. Instead, we want to use the duration exposed by Synology. In order to do this, we need to keep a reference on the last played SynoTrack.</remarks>
-        private SynoTrack _lastStartedTrack;
+        private ISynoTrack _lastStartedTrack;
 
         private ILogService _logService;
 
@@ -45,7 +45,7 @@ namespace OpenSyno.Services
         /// Gets the items in the playqueue.
         /// </summary>
         /// <value>The items in the playqueue.</value>
-        public IList<SynoTrack> PlayqueueItems { get; private set; }
+        public IList<ISynoTrack> PlayqueueItems { get; private set; }
 
         public PlaybackStatus Status
         {
@@ -65,7 +65,7 @@ namespace OpenSyno.Services
         /// </summary>
         /// <param name="tracks">The tracks.</param>
         /// <param name="insertPosition">The position in the play queue where to insert the specified tracks.</param>
-        public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition)
+        public void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition)
         {
             foreach (var synoTrack in tracks)
             {
@@ -78,7 +78,7 @@ namespace OpenSyno.Services
         /// Plays the specified track. It must be present in the queue.
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
-        public void PlayTrackInQueue(SynoTrack trackToPlay)
+        public void PlayTrackInQueue(ISynoTrack trackToPlay)
         {            
             PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             // var index = PlayqueueItems.IndexOf(trackToPlay);
@@ -129,13 +129,13 @@ namespace OpenSyno.Services
             this._backgroundAudioRenderingService.PlaybackStarted += (sender, eventArgs) => OnTrackStarted(new TrackStartedEventArgs { Track = eventArgs.Track });
 
 
-            PlayqueueItems = new List<SynoTrack>();
+            PlayqueueItems = new List<ISynoTrack>();
         }
 
         public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
 
 
-        public SynoTrack GetNextTrack(SynoTrack currentTrack)
+        public ISynoTrack GetNextTrack(ISynoTrack currentTrack)
         {
             int currentTrackIndex = PlayqueueItems.IndexOf(currentTrack);
 
@@ -222,13 +222,5 @@ namespace OpenSyno.Services
         public event TrackEndedDelegate TrackEnded;
         public event TrackStartedDelegate TrackStarted;
         public event TrackCurrentPositionChangedDelegate TrackCurrentPositionChanged;
-    }
-    
-
-    public enum PlaybackStatus
-    {
-        Playing,
-        Stopped, 
-        Buffering
     }
 }

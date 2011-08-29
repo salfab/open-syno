@@ -35,7 +35,7 @@ namespace OpenSyno
 
         public ICommand ShowAlbumDetailCommand { get; set; }
 
-        public ArtistPanoramaAlbumsListItemViewModel(IEnumerable<SynoItem> albums, SynoItem artist, IPageSwitchingService pageSwitchingService, IPanoramaItemSwitchingService panoramaItemSwitchingService)
+        public ArtistPanoramaAlbumsListItemViewModel(IEnumerable<ISynoItem> albums, SynoItem artist, IPageSwitchingService pageSwitchingService, IPanoramaItemSwitchingService panoramaItemSwitchingService)
             : base(ArtistPanoramaItemKind.AlbumsList)
         {
             if (albums == null)

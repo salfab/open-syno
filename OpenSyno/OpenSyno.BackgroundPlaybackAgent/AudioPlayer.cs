@@ -4,9 +4,15 @@ using Microsoft.Phone.BackgroundAudio;
 
 namespace OpenSyno.BackgroundPlaybackAgent
 {
+    using Ninject;
+
+    using OpenSyno.Services;
+
     public class AudioPlayer : AudioPlayerAgent
     {
         private static volatile bool _classInitialized;
+
+        private IPlaybackService _playbackService;
 
         /// <remarks>
         /// AudioPlayer instances can share the same process. 
@@ -18,6 +24,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
             if (!_classInitialized)
             {
                 _classInitialized = true;
+                _playbackService = IoC.Container.Get<IPlaybackService>();
                 // Subscribe to the managed exception handler
                 Deployment.Current.Dispatcher.BeginInvoke(delegate
                 {
@@ -57,7 +64,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
             switch (playState)
             {
                 case PlayState.TrackEnded:
-                    player.Track = GetPreviousTrack();
+                    player.Track = GetNextTrack();
                     break;
                 case PlayState.TrackReady:
                     player.Play();
@@ -156,6 +163,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// <returns>an instance of AudioTrack, or null if the playback is completed</returns>
         private AudioTrack GetNextTrack()
         {
+            
             // TODO: add logic to get the next audio track
 
             AudioTrack track = null;

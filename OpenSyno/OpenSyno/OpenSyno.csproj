@@ -93,9 +93,7 @@
       <DependentUpon>SearchAllResultsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ViewModelProxy.cs" />
-    <Compile Include="Services\ISignInService.cs" />
     <Compile Include="Services\PanoramaItemSwitchingService.cs" />
-    <Compile Include="Services\SignInCompletedEventArgs.cs" />
     <Compile Include="Services\SignInService.cs" />
     <Compile Include="ViewModels\AboutBoxViewModel.cs" />
     <Compile Include="AlbumViewModel.cs" />
@@ -123,9 +121,7 @@
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
     <Compile Include="OpenSynoSettings.xaml.cs" />
-    <Compile Include="Services\MediaEndedEventArgs.cs" />
     <Compile Include="ReadWriteMemoryStream.cs" />
-    <Compile Include="Services\IPanoramaItemSwitchingService.cs" />
     <Compile Include="ViewModels\IUrlParameterToObjectsPlateHeater.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
@@ -133,13 +129,7 @@
     <Compile Include="ViewModels\SearchViewModel.cs" />
     <Compile Include="ViewModels\SearchResultItemViewModel.cs" />
     <Compile Include="Services\BackgroundAudioRenderingService.cs" />
-    <Compile Include="Services\IAudioRenderingService.cs" />
-    <Compile Include="Services\IPlaybackService.cs" />
-    <Compile Include="Services\LocalAudioRenderingService.cs" />
-    <Compile Include="Services\PlaybackContinuity.cs" />
     <Compile Include="Services\PlaybackService.cs" />
-    <Compile Include="Services\TrackCurrentPositionChangedDelegate.cs" />
-    <Compile Include="Services\TrackCurrentPositionChangedEventArgs.cs" />
     <Compile Include="TiltEffect.cs" />
     <Compile Include="ViewModels\TrackViewModel.cs" />
     <Compile Include="ViewModels\ArtistPanoramaViewModel.cs" />
@@ -148,7 +138,6 @@
     <Compile Include="Behaviors\EnterKeyUpToCommandBehavior.cs" />
     <Compile Include="Converters\BindingDebuggerConverter.cs" />
     <Compile Include="Group.cs" />
-    <Compile Include="IoC.cs" />
     <Compile Include="PlayListOperation.cs" />
     <Compile Include="PlayListOperationAggregatedEvent.cs" />
     <Compile Include="PlayQueueView.xaml.cs">
@@ -162,9 +151,7 @@
     <Compile Include="SearchView.xaml.cs">
       <DependentUpon>SearchView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Services\IPageSwitchingService.cs" />
     <Compile Include="Services\PageSwitchingService.cs" />
-    <Compile Include="Services\SearchResultsRetrievedAggregatedEvent.cs" />
     <Compile Include="ViewModels\UrlParameterToObjectsPlateHeater.xaml.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
@@ -219,9 +206,17 @@
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OpemSyno.Contracts\OpemSyno.Contracts.csproj">
+      <Project>{231AB4AB-1043-4856-9730-7C3418717EA8}</Project>
+      <Name>OpemSyno.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OpenSyno.BackgroundPlaybackAgent\OpenSyno.BackgroundPlaybackAgent.csproj">
       <Project>{431F6AB6-E2DF-4D54-B467-2AC8CC90889D}</Project>
       <Name>OpenSyno.BackgroundPlaybackAgent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSyno.Common\OpenSyno.Common.csproj">
+      <Project>{A353B441-D677-4688-836A-33044EF1E60E}</Project>
+      <Name>OpenSyno.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenSyno.SynoWP7\OpenSyno.SynoWP7.csproj">
       <Project>{16DA973A-2885-4E6E-89CD-5CA3825B3CA6}</Project>

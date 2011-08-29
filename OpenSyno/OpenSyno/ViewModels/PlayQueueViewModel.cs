@@ -157,7 +157,7 @@
         /// </summary>
         private void OnPlayNext()
         {
-            SynoTrack nextSynoTrack;
+            ISynoTrack nextSynoTrack;
 
             // Don't crash if there is no active track : take the first one in the playlist.
             // (shouldn't happen, though, unless no track has ever been added to the queue, in which case, the nextTrack will be null anyway...)

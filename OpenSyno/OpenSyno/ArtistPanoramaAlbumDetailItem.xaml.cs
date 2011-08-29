@@ -11,6 +11,7 @@ namespace OpenSyno
 {
     using System.Windows;
 
+    using OpenSyno.Services;
     using OpenSyno.ViewModels;
 
     public class ArtistPanoramaAlbumDetailItem : ArtistPanoramaItemViewModel
@@ -19,7 +20,7 @@ namespace OpenSyno
 
         private readonly ISearchService _searchService;
 
-        public SynoItem AlbumItemInfo { get; set; }
+        public ISynoItem AlbumItemInfo { get; set; }
 
         public ICommand SelectAllOrNoneCommand { get; set; }
 
@@ -43,7 +44,7 @@ namespace OpenSyno
             }
         }
 
-        public ArtistPanoramaAlbumDetailItem(SynoItem album, ISearchService searchService, IEventAggregator eventAggregator, INotificationService notificationService) : base(ArtistPanoramaItemKind.AlbumDetail)
+        public ArtistPanoramaAlbumDetailItem(ISynoItem album, ISearchService searchService, IEventAggregator eventAggregator, INotificationService notificationService) : base(ArtistPanoramaItemKind.AlbumDetail)
         {
             this._searchService = searchService;
             _eventAggregator = eventAggregator;
@@ -88,7 +89,7 @@ namespace OpenSyno
             }
         }
 
-        private void GetTracksForAlbumCompleted(IEnumerable<SynoTrack> tracks, long l, SynoItem arg3)
+        private void GetTracksForAlbumCompleted(IEnumerable<ISynoTrack> tracks, long l, ISynoItem arg3)
         {
             // We first want to populate a collection and then assign it to the bound property, otherwise, there will be just too many collection changed notiications.
             // we could also have disabled the binding and re-enabled, but hey, what's the gain ?

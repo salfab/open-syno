@@ -28,7 +28,7 @@ namespace OpenSyno.Services
         /// <remarks>
         /// Because we are using a private member, there can be only one track being played at a time, and therefore, this service is not thread-safe.
         /// </remarks>
-        private SynoTrack _currentTrack;
+        private ISynoTrack _currentTrack;
 
         public event EventHandler<MediaPositionChangedEventArgs> MediaPositionChanged;
 
@@ -59,13 +59,13 @@ namespace OpenSyno.Services
 
             Timer t = new Timer(
                 e =>
-                {
-                    if (this.MediaPositionChanged != null)
                     {
-                        this.MediaPositionChanged(
+                        if (this.MediaPositionChanged != null && this._currentTrack != null)
+                        {
+                            this.MediaPositionChanged(
                             this,
                             new MediaPositionChangedEventArgs
-                                {
+                                {                                    
                                     Duration = this._currentTrack.Duration,
                                     Position = this.Position
                                 });
@@ -74,7 +74,7 @@ namespace OpenSyno.Services
                 null,
                 0,
                 1000);
-
+           
             BackgroundAudioPlayer.Instance.PlayStateChanged += this.OnPlayStateChanged;
 
             //_mediaElement.MediaOpened += MediaOpened;
@@ -272,7 +272,7 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.Volume = volume;
         }
 
-        public void StreamTrack(SynoTrack trackToPlay)
+        public void StreamTrack(ISynoTrack trackToPlay)
         {
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
             string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}", _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token.Split('=')[1], HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
@@ -283,28 +283,5 @@ namespace OpenSyno.Services
         }
     }
 
-    public class PlayBackStartedEventArgs : EventArgs
-    {
-        public SynoTrack Track { get; set; }
-    }
-
-    public class BufferingProgressUpdatedEventArgs : EventArgs
-    {
-        public long BytesLeft { get; set; }
-
-        public long FileSize { get; set; }
-
-        public string FileName { get; set; }
-
-        public Stream BufferingStream { get; set; }
-
-        public SynoTrack SynoTrack { get; set; }
-    }
-
-    public class MediaPositionChangedEventArgs : EventArgs
-    {
-        public TimeSpan Position { get; set; }
-
-        public TimeSpan Duration { get; set; }
-    }
+  
 }

@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSyno.SynoWP7", "OpenSyn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSyno.BackgroundPlaybackAgent", "OpenSyno.BackgroundPlaybackAgent\OpenSyno.BackgroundPlaybackAgent.csproj", "{431F6AB6-E2DF-4D54-B467-2AC8CC90889D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSyno.Common", "OpenSyno.Common\OpenSyno.Common.csproj", "{A353B441-D677-4688-836A-33044EF1E60E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpemSyno.Contracts", "OpemSyno.Contracts\OpemSyno.Contracts.csproj", "{231AB4AB-1043-4856-9730-7C3418717EA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{431F6AB6-E2DF-4D54-B467-2AC8CC90889D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{431F6AB6-E2DF-4D54-B467-2AC8CC90889D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{431F6AB6-E2DF-4D54-B467-2AC8CC90889D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A353B441-D677-4688-836A-33044EF1E60E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A353B441-D677-4688-836A-33044EF1E60E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A353B441-D677-4688-836A-33044EF1E60E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A353B441-D677-4688-836A-33044EF1E60E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{231AB4AB-1043-4856-9730-7C3418717EA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{231AB4AB-1043-4856-9730-7C3418717EA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{231AB4AB-1043-4856-9730-7C3418717EA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{231AB4AB-1043-4856-9730-7C3418717EA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

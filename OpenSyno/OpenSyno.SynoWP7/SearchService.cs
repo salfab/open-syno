@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.Windows;
 
+    using OpenSyno.Services;
+
     using Synology.AudioStationApi;
 
     public class SearchService : ISearchService
@@ -15,7 +17,7 @@
             _audioStationSession = audioStationSession;            
         }
 
-        public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>, string> callback)
+        public bool SearchAllMusic(string pattern, Action<IEnumerable<ISynoTrack>, string> callback)
         {
             CheckIsSignedIn();
             this._audioStationSession.SearchAllMusic(pattern, o => callback(o, pattern), this.OnOperationReturnedWithError);
@@ -30,7 +32,7 @@
             }            
         }
 
-        public bool SearchArtists(string pattern, Action<IEnumerable<SynoItem>> callback)
+        public bool SearchArtists(string pattern, Action<IEnumerable<ISynoItem>> callback)
         {
             this.CheckIsSignedIn();
             _audioStationSession.SearchArtist(pattern, callback, OnOperationReturnedWithError);
@@ -38,18 +40,18 @@
            
         }
 
-        public void GetAllArtists(Action<IEnumerable<SynoItem>> callback)
+        public void GetAllArtists(Action<IEnumerable<ISynoItem>> callback)
         {
             throw new NotImplementedException();
         }
 
-        public void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback)
+        public void GetAlbumsForArtist(ISynoItem artist, Action<IEnumerable<ISynoItem>, long, ISynoItem> callback)
         {
             // an artist id looks like that (item_id): musiclib_music_aa/852502
             _audioStationSession.GetAlbumsForArtist(artist, callback, OnOperationReturnedWithError);
         }
 
-        public void GetTracksForAlbum(SynoItem album,  Action<IEnumerable<SynoTrack>, long, SynoItem> callback)
+        public void GetTracksForAlbum(ISynoItem album,  Action<IEnumerable<ISynoTrack>, long, ISynoItem> callback)
         {
             _audioStationSession.GetTracksForAlbum(album, callback, OnOperationReturnedWithError);
         }

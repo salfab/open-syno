@@ -2,7 +2,9 @@ using System;
 
 namespace Synology.AudioStationApi
 {
-    public class SynoTrack : SynoItem
+    using OpenSyno.Services;
+
+    public class SynoTrack : SynoItem, ISynoTrack
     {
         public string Album { get; set; }
 

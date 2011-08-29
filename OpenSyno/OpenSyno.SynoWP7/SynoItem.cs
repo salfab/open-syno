@@ -1,6 +1,8 @@
 ﻿namespace Synology.AudioStationApi
 {
-    public class SynoItem
+    using OpenSyno.Services;
+
+    public class SynoItem : ISynoItem
     {
         /// <summary>
         /// Gets or sets the title.

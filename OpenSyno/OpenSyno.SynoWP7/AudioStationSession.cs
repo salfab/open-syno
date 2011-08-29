@@ -12,6 +12,8 @@ namespace Synology.AudioStationApi
     using System.Runtime.Serialization;
     using System.Windows.Threading;
 
+    using OpenSyno.Services;
+
     [DataContract]
     public class AudioStationSession : IAudioStationSession
     {
@@ -131,7 +133,7 @@ namespace Synology.AudioStationApi
             client.DownloadStringAsync(uri);
         }
 
-        public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError)
+        public void SearchAllMusic(string pattern, Action<IEnumerable<ISynoTrack>> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
             var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
@@ -164,7 +166,7 @@ namespace Synology.AudioStationApi
                         var content = reader.ReadToEnd();
 
                         long count;
-                        IEnumerable<SynoTrack> tracks;
+                        IEnumerable<ISynoTrack> tracks;
                         SynologyJsonDeserializationHelper.ParseSynologyTracks(content, out tracks, out count, urlBase);
 
                         var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
@@ -193,7 +195,7 @@ namespace Synology.AudioStationApi
                 request);
         }
 
-        public void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError)
+        public void SearchArtist(string pattern, Action<IEnumerable<ISynoItem>> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
@@ -241,7 +243,7 @@ namespace Synology.AudioStationApi
                             var content = reader.ReadToEnd();
 
                             long count;
-                            IEnumerable<SynoItem> artists;
+                            IEnumerable<ISynoItem> artists;
                             SynologyJsonDeserializationHelper.ParseSynologyArtists(content, out artists, out count, urlBase);
 
 
@@ -326,7 +328,7 @@ namespace Synology.AudioStationApi
             return request;
         }
 
-        public void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback, Action<Exception> callbackError)
+        public void GetAlbumsForArtist(ISynoItem artist, Action<IEnumerable<ISynoItem>, long, ISynoItem> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
@@ -372,7 +374,7 @@ namespace Synology.AudioStationApi
                         var content = reader.ReadToEnd();
 
                         long count;
-                        IEnumerable<SynoItem> albums;
+                        IEnumerable<ISynoItem> albums;
                         SynologyJsonDeserializationHelper.ParseSynologyAlbums(content, out albums, out count, urlBase);
 
 
@@ -403,7 +405,7 @@ namespace Synology.AudioStationApi
                 request);
         }
 
-        public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError)
+        public void GetTracksForAlbum(ISynoItem album, Action<IEnumerable<ISynoTrack>, long, ISynoItem> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
 
@@ -448,7 +450,7 @@ namespace Synology.AudioStationApi
                         var content = reader.ReadToEnd();
 
                         long total;
-                        IEnumerable<SynoTrack> tracks;
+                        IEnumerable<ISynoTrack> tracks;
                         SynologyJsonDeserializationHelper.ParseSynologyTracks(content, out tracks, out total, urlBase);
 
                         tracks = tracks.OrderBy(o => o.Track);
