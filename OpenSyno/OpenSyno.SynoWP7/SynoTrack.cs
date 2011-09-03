@@ -4,6 +4,8 @@ namespace Synology.AudioStationApi
 {
     using OpenSyno.Services;
 
+    // For serialization purposes
+    [System.Xml.Serialization.XmlInclude(typeof(ISynoTrack))]
     public class SynoTrack : SynoItem, ISynoTrack
     {
         public string Album { get; set; }

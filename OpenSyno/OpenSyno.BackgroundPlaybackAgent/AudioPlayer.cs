@@ -1,9 +1,14 @@
-﻿using System;
-using System.Windows;
-using Microsoft.Phone.BackgroundAudio;
+﻿using Microsoft.Phone.BackgroundAudio;
 
 namespace OpenSyno.BackgroundPlaybackAgent
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.IsolatedStorage;
+    using System.Windows;
+    using System.Xml.Serialization;
+
     using Ninject;
 
     using OpenSyno.Services;
@@ -22,13 +27,40 @@ namespace OpenSyno.BackgroundPlaybackAgent
         public AudioPlayer()
         {
             if (!_classInitialized)
-            {
+            {                
                 _classInitialized = true;
                 // Subscribe to the managed exception handler
                 Deployment.Current.Dispatcher.BeginInvoke(delegate
                 {
                     Application.Current.UnhandledException += AudioPlayer_UnhandledException;
                 });
+
+                var tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
+
+                using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+                {
+                    XmlSerializer xs = new XmlSerializer(typeof(List<KeyValuePair<ISynoTrack, Guid>>));
+
+                    List<KeyValuePair<ISynoTrack, Guid>> deserialization;
+                    try
+                    {
+                        deserialization = (List<KeyValuePair<ISynoTrack, Guid>>)xs.Deserialize(playQueueFile);
+
+                        foreach (KeyValuePair<ISynoTrack, Guid> pair in deserialization)
+                        {
+                            tracksToPlayqueueGuidMapping.Add(pair.Value, pair.Key);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        tracksToPlayqueueGuidMapping = new Dictionary< Guid, ISynoTrack>();
+                    }
+
+
+
+
+                }
+
             }
         }
 

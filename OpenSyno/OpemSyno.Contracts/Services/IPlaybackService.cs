@@ -3,6 +3,7 @@
 namespace OpenSyno.Services
 {
     using System;
+    using System.Collections.ObjectModel;
 
     public interface IPlaybackService
     {
@@ -22,7 +23,7 @@ namespace OpenSyno.Services
         /// Gets the items in the playqueue.
         /// </summary>
         /// <value>The items in the playqueue.</value>
-        IList<ISynoTrack> PlayqueueItems { get; }
+        ObservableCollection<ISynoTrack> PlayqueueItems { get; }
 
         PlaybackStatus Status { get; }
 

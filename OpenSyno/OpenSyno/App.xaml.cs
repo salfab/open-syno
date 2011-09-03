@@ -110,9 +110,9 @@ namespace OpenSyno
             
             _notificationService = new NotificationService();
             IoC.Container.Bind<INotificationService>().ToConstant(_notificationService).InSingletonScope();
-
-            // Retrieve the type PlaybackService from a config file, so we can change it.
-            IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();
+            
+            IoC.Container.Bind<IPlaybackService>().To<PlaybackService>().InSingletonScope();
+            IoC.Container.Bind<IAudioRenderingService>().To<BackgroundAudioRenderingService>().InSingletonScope();
 
             ActivateEagerTypes();
 

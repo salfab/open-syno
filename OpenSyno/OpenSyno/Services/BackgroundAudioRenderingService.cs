@@ -5,12 +5,18 @@ using OpenSyno.Helpers;
 namespace OpenSyno.Services
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.IO.IsolatedStorage;
+    using System.Linq;
     using System.Net;
+    using System.Runtime.Serialization;
     using System.Threading;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Xml.Serialization;
 
     using Microsoft.Phone.BackgroundAudio;
 
@@ -45,6 +51,31 @@ namespace OpenSyno.Services
                 throw new ArgumentNullException("audioStationSession");
             }
             _audioStationSession = audioStationSession;
+
+
+            _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
+
+            using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(List<GuidToTrackMapping>), new Type[] { typeof(SynoTrack)});
+
+                List<GuidToTrackMapping> deserialization;
+                try
+                {
+                    deserialization = (List<GuidToTrackMapping>)xs.Deserialize(playQueueFile);
+
+                    foreach (GuidToTrackMapping pair in deserialization)
+                    {
+                        _tracksToPlayqueueGuidMapping.Add(pair.Guid, pair.Track);
+                    }
+                }
+                catch (Exception e)
+                {
+                    _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
+                }
+
+
+            }
 
             //_mediaElement = (MediaElement)Application.Current.Resources["MediaElement"];
 
@@ -168,6 +199,8 @@ namespace OpenSyno.Services
         private readonly ILogService _logService;
         private int _downloadTrackCallbackCount;
 
+        private Dictionary<Guid, ISynoTrack> _tracksToPlayqueueGuidMapping;
+
         public event EventHandler<PlayBackStartedEventArgs> PlaybackStarted;
 
         private void PlayingMediaEnded()
@@ -276,12 +309,67 @@ namespace OpenSyno.Services
         {
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
             string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}", _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token.Split('=')[1], HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-
             BackgroundAudioPlayer.Instance.Track = new AudioTrack(new Uri(url), trackToPlay.Title, trackToPlay.Artist, trackToPlay.Album, new Uri(trackToPlay.AlbumArtUrl));
             BackgroundAudioPlayer.Instance.Play();
 
         }
+
+        /// <summary>
+        /// Called when the playqueue items change.
+        /// </summary>
+        /// <param name="newItems">The new items.</param>
+        /// <param name="oldItems">The old items.</param>
+        /// <remarks>This can be leveraged to perform rendering implementation-specific tasks that need to be done when the list of the tracks to play is edited.</remarks>
+        public void OnPlayqueueItemsChanged(IList newItems, IList oldItems)
+        {
+            if (oldItems != null)
+            {
+                foreach (ISynoTrack oldItem in oldItems)
+                {
+                    if (_tracksToPlayqueueGuidMapping.ContainsValue(oldItem))
+                    {
+                        ISynoTrack item = oldItem;
+                        _tracksToPlayqueueGuidMapping.Remove(
+                            _tracksToPlayqueueGuidMapping.Where(o => o.Value == item).Select(o => o.Key).Single());
+                    }
+                }
+            }
+
+            if (newItems != null)
+            {
+                foreach (ISynoTrack newItem in newItems)
+                {
+                    Guid newGuid = Guid.NewGuid();
+                    _tracksToPlayqueueGuidMapping.Add(newGuid, newItem);
+                }
+            }
+
+            // 1. Read the playqueue file from the isostorage
+            // 2. match the instance of SynoTrack held in this class' internal dictionary<ISynoTrack, Guid> with the Guid found in the isostorage.
+            // 3. apply the operation on the matching track ( new / not found in dictionary = add it in the dictionary + in the isostorage file ; old = remove it from the dictionary and the dict. )
+            // 4. save the isostorage file.
+
+            using (var playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
+            {             
+                XmlSerializer xs = new XmlSerializer(typeof(List<GuidToTrackMapping>), new Type[] { _tracksToPlayqueueGuidMapping.First().Value.GetType()});
+                List<GuidToTrackMapping> listToSerialize = new List<GuidToTrackMapping>();
+                foreach (var pair in _tracksToPlayqueueGuidMapping)
+                {
+                    listToSerialize.Add(new GuidToTrackMapping { Guid = pair.Key, Track = pair.Value });
+                }
+
+                xs.Serialize(playQueueFile, listToSerialize);
+            }
+        }
     }
 
-  
+    [DataContract]
+    public class GuidToTrackMapping
+    {
+        [DataMember]
+        public Guid Guid { get; set; }
+
+        [DataMember]
+        public ISynoTrack Track { get; set; }
+    }
 }

@@ -35,6 +35,7 @@
         public TimeSpan Duration { get; set; }
     }
 
+
     public interface ISynoTrack
     {
         string Album { get; set; }

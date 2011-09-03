@@ -396,6 +396,9 @@
             {
                 case PlayListOperation.ClearAndPlay:
                     PlayQueueItems.Clear();
+                    // test lines below before uncommenting
+                    //_playbackService.ClearPlayQueue();
+                    //_playbackService.InsertTracksToQueue(e.Items.Select(o => o.TrackInfo), 0);
                     AppendItems(e.Items);
                     if (_playbackService.Status != PlaybackStatus.Stopped)
                     {
@@ -407,7 +410,8 @@
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
                 case PlayListOperation.Append:
-                    AppendItems(e.Items);
+                    AppendItems(e.Items);                    
+
                     if (_playbackService.Status == PlaybackStatus.Stopped)
                     {
                         trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();

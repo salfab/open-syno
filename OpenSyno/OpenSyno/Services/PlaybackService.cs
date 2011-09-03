@@ -6,6 +6,8 @@ namespace OpenSyno.Services
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Net;
 
     using Synology.AudioStationApi;
@@ -44,8 +46,8 @@ namespace OpenSyno.Services
         /// <summary>
         /// Gets the items in the playqueue.
         /// </summary>
-        /// <value>The items in the playqueue.</value>
-        public IList<ISynoTrack> PlayqueueItems { get; private set; }
+        /// <value>The items in the playqueue.</value>        
+        public ObservableCollection<ISynoTrack> PlayqueueItems { get; private set; }
 
         public PlaybackStatus Status
         {
@@ -110,17 +112,15 @@ namespace OpenSyno.Services
         /// Initializes a new instance of the <see cref="PlaybackService"/> class.
         /// </summary>
         /// <param name="backgroundAudioRenderingService">The audio rendering service.</param>
-        public PlaybackService(BackgroundAudioRenderingService backgroundAudioRenderingService)
+        public PlaybackService(IAudioRenderingService backgroundAudioRenderingService)
         {
-            _logService = IoC.Container.Get<ILogService>();
-
-            _status = PlaybackStatus.Stopped;
-
-
             if (backgroundAudioRenderingService == null)
             {
                 throw new ArgumentNullException("backgroundAudioRenderingService");
             }
+            _logService = IoC.Container.Get<ILogService>();
+
+            _status = PlaybackStatus.Stopped;            
 
             this._backgroundAudioRenderingService = backgroundAudioRenderingService;
             this._backgroundAudioRenderingService.BufferingProgressUpdated += (o, e) => OnBufferingProgressUpdated(e);
@@ -128,8 +128,13 @@ namespace OpenSyno.Services
             this._backgroundAudioRenderingService.MediaEnded += MediaEnded;
             this._backgroundAudioRenderingService.PlaybackStarted += (sender, eventArgs) => OnTrackStarted(new TrackStartedEventArgs { Track = eventArgs.Track });
 
+            // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
+            PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
-            PlayqueueItems = new List<ISynoTrack>();
+            this.PlayqueueItems.CollectionChanged += (o, e) =>
+                {
+                    _backgroundAudioRenderingService.OnPlayqueueItemsChanged(e.NewItems, e.OldItems);
+                };
         }
 
         public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
