@@ -41,6 +41,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -49,6 +50,7 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\GuidToTrackMapping.cs" />
     <Compile Include="EventArguments\MediaEndedEventArgs.cs" />
     <Compile Include="EventArguments\SearchResultsRetrievedAggregatedEvent.cs" />
     <Compile Include="EventArguments\SignInCompletedEventArgs.cs" />

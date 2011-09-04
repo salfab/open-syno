@@ -2,6 +2,10 @@
 using Ninject;
 using OpenSyno.Helpers;
 
+namespace OpenSyno.Contracts.Domain
+{
+}
+
 namespace OpenSyno.Services
 {
     using System;
@@ -12,13 +16,14 @@ namespace OpenSyno.Services
     using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Net;
-    using System.Runtime.Serialization;
     using System.Threading;
     using System.Windows;
     using System.Windows.Controls;
     using System.Xml.Serialization;
 
     using Microsoft.Phone.BackgroundAudio;
+
+    using OpenSyno.Contracts.Domain;
 
     using Synology.AudioStationApi;
 
@@ -55,27 +60,27 @@ namespace OpenSyno.Services
 
             _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
 
-            using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
-            {
-                XmlSerializer xs = new XmlSerializer(typeof(List<GuidToTrackMapping>), new Type[] { typeof(SynoTrack)});
+            //using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            //{
+            //    XmlSerializer xs = new XmlSerializer(typeof(List<GuidToTrackMapping>), new Type[] { typeof(SynoTrack)});
 
-                List<GuidToTrackMapping> deserialization;
-                try
-                {
-                    deserialization = (List<GuidToTrackMapping>)xs.Deserialize(playQueueFile);
+            //    List<GuidToTrackMapping> deserialization;
+            //    try
+            //    {
+            //        deserialization = (List<GuidToTrackMapping>)xs.Deserialize(playQueueFile);
 
-                    foreach (GuidToTrackMapping pair in deserialization)
-                    {
-                        _tracksToPlayqueueGuidMapping.Add(pair.Guid, pair.Track);
-                    }
-                }
-                catch (Exception e)
-                {
-                    _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
-                }
+            //        foreach (GuidToTrackMapping pair in deserialization)
+            //        {
+            //            _tracksToPlayqueueGuidMapping.Add(pair.Guid, pair.Track);
+            //        }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
+            //    }
 
 
-            }
+            //}
 
             //_mediaElement = (MediaElement)Application.Current.Resources["MediaElement"];
 
@@ -308,10 +313,22 @@ namespace OpenSyno.Services
         public void StreamTrack(ISynoTrack trackToPlay)
         {
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
-            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}", _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token.Split('=')[1], HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            BackgroundAudioPlayer.Instance.Track = new AudioTrack(new Uri(url), trackToPlay.Title, trackToPlay.Artist, trackToPlay.Album, new Uri(trackToPlay.AlbumArtUrl));
+            string url =
+                string.Format(
+                    "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+                    _audioStationSession.Host,
+                    _audioStationSession.Port,
+                    _audioStationSession.Token.Split('=')[1],
+                    HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
+            BackgroundAudioPlayer.Instance.Track = new AudioTrack(
+                new Uri(url),
+                trackToPlay.Title,
+                trackToPlay.Artist,
+                trackToPlay.Album,
+                new Uri(trackToPlay.AlbumArtUrl),
+                _tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single().ToString(),
+                EnabledPlayerControls.All);
             BackgroundAudioPlayer.Instance.Play();
-
         }
 
         /// <summary>
@@ -361,15 +378,5 @@ namespace OpenSyno.Services
                 xs.Serialize(playQueueFile, listToSerialize);
             }
         }
-    }
-
-    [DataContract]
-    public class GuidToTrackMapping
-    {
-        [DataMember]
-        public Guid Guid { get; set; }
-
-        [DataMember]
-        public ISynoTrack Track { get; set; }
     }
 }

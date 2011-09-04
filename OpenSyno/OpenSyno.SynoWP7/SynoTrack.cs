@@ -8,6 +8,11 @@ namespace Synology.AudioStationApi
     [System.Xml.Serialization.XmlInclude(typeof(ISynoTrack))]
     public class SynoTrack : SynoItem, ISynoTrack
     {
+        public SynoTrack()
+        {
+            
+        }
+
         public string Album { get; set; }
 
         public string Artist { get; set; }
