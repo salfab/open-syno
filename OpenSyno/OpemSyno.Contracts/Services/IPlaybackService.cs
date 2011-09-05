@@ -5,6 +5,9 @@ namespace OpenSyno.Services
     using System;
     using System.Collections.ObjectModel;
 
+    /// <summary>
+    /// The service in charge of managing the play queue, define which tracks comes next, handle random playback, repeat and other playback options.
+    /// </summary>
     public interface IPlaybackService
     {
         /// <summary>
@@ -64,6 +67,8 @@ namespace OpenSyno.Services
         double GetVolume();
 
         void SetVolume(double volume);
+
+        void SkipNext();
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);

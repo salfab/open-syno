@@ -3,7 +3,11 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
 
+    /// <summary>
+    /// Interface to implement for the service in charge of doing the actual rendering of the music.
+    /// </summary>
     public interface IAudioRenderingService
     {
         event EventHandler<MediaPositionChangedEventArgs> MediaPositionChanged;
@@ -24,6 +28,6 @@
 
         void StreamTrack(ISynoTrack trackToPlay);
 
-        void OnPlayqueueItemsChanged(IList newItems, IList oldItems);
+        void OnPlayqueueItemsChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs);
     }
 }

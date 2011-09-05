@@ -159,26 +159,27 @@
         {
             ISynoTrack nextSynoTrack;
 
-            // Don't crash if there is no active track : take the first one in the playlist.
-            // (shouldn't happen, though, unless no track has ever been added to the queue, in which case, the nextTrack will be null anyway...)
-            if (ActiveTrack == null)
-            {
-                nextSynoTrack = _playbackService.PlayqueueItems.FirstOrDefault();
-            }
-            else
-            {
-                nextSynoTrack = this._playbackService.GetNextTrack(this.ActiveTrack.TrackInfo);                
-            }
+            _playbackService.SkipNext();
+            //// Don't crash if there is no active track : take the first one in the playlist.
+            //// (shouldn't happen, though, unless no track has ever been added to the queue, in which case, the nextTrack will be null anyway...)
+            //if (ActiveTrack == null)
+            //{
+            //    nextSynoTrack = _playbackService.PlayqueueItems.FirstOrDefault();
+            //}
+            //else
+            //{
+            //    nextSynoTrack = this._playbackService.GetNextTrack(this.ActiveTrack.TrackInfo);                
+            //}
 
-            if (nextSynoTrack != null)
-            {
-                var nextTrack = new TrackViewModel(nextSynoTrack);
-                OnPlay(nextTrack);
-            }
-            else
-            {
-                _notificationService.Warning("There is no next track to play : all tracks have been played.", "No more tracks to play");                                
-            }
+            //if (nextSynoTrack != null)
+            //{
+            //    var nextTrack = new TrackViewModel(nextSynoTrack);
+            //    OnPlay(nextTrack);
+            //}
+            //else
+            //{
+            //    _notificationService.Warning("There is no next track to play : all tracks have been played.", "No more tracks to play");                                
+            //}
         }
 
         private double _currentPlaybackPercentComplete;
@@ -355,6 +356,7 @@
 
             int insertPosition = _playbackService.PlayqueueItems.Count();
 
+            //_playbackService.InsertTracksToQueue(tracks, insertPosition);
             foreach (var trackViewModel in items)
             {
                 PlayQueueItems.Add(trackViewModel);
@@ -415,6 +417,7 @@
                         trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
                         OnPlay(trackToPlay);
                     }
+                    
 
                     break;
                 default:

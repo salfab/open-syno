@@ -5,19 +5,34 @@ using OpenSyno.Helpers;
 namespace OpenSyno.Services
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
+    using System.IO;
+    using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Net;
+    using System.Xml.Serialization;
+
+    using Microsoft.Phone.BackgroundAudio;
+
+    using OpenSyno.BackgroundPlaybackAgent;
+    using OpenSyno.Contracts.Domain;
 
     using Synology.AudioStationApi;
 
-    public class PlaybackService : IPlaybackService
+    public class PlaybackService : IPlaybackService, IAudioRenderingService
     {
         /// <summary>
         /// The service responsible for downloading and rendering the audio files.
         /// </summary>
-        private readonly IAudioRenderingService _backgroundAudioRenderingService;
+
+        private readonly IAudioStationSession _audioStationSession;
+
+        private readonly IAudioTrackFactory _audioTrackFactory;
+
+        private Dictionary<Guid, ISynoTrack> _tracksToPlayqueueGuidMapping;
 
         private PlaybackStatus _status;
 
@@ -30,6 +45,8 @@ namespace OpenSyno.Services
 
         private ILogService _logService;
 
+        private Dictionary<Guid, ISynoTrack> _cachedAudioTracks;
+
         /// <summary>
         /// Gets or sets what strategy should be used to define the next track to play.
         /// </summary>
@@ -41,7 +58,6 @@ namespace OpenSyno.Services
         /// </summary>
         /// <value><c>true</c> if the next track to be played should be preloaded; otherwise, <c>false</c>.</value>
         public bool PreloadTracks { get; set; }
-
 
         /// <summary>
         /// Gets the items in the playqueue.
@@ -83,18 +99,7 @@ namespace OpenSyno.Services
         public void PlayTrackInQueue(ISynoTrack trackToPlay)
         {            
             PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
-            // var index = PlayqueueItems.IndexOf(trackToPlay);
-            this._backgroundAudioRenderingService.StreamTrack(trackToPlay);
-            //_audioRenderingService.Bufferize(BufferizedCallback, BufferingProgressChanged, trackToPlay);
-            //var client = new WebClient();
-            //client.OpenReadCompleted += (o, ea) =>
-            //    _audioRenderingService.Play(ea.Result);
-            //client.DownloadProgressChanged += (o, ea) =>
-            //    {
-            //        BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs = new BufferingProgressUpdatedEventArgs { BytesLeft = ea.TotalBytesToReceive - ea.BytesReceived, FileName = string.Empty, FileSize = ea.TotalBytesToReceive };
-            //        OnBufferingProgressUpdated(bufferingProgressUpdatedEventArgs);                    
-            //    };
-            //client.OpenReadAsync(new Uri(trackToPlay.Res));
+            StreamTrack(trackToPlay);
             _status = PlaybackStatus.Buffering;
         }
 
@@ -111,34 +116,39 @@ namespace OpenSyno.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="PlaybackService"/> class.
         /// </summary>
-        /// <param name="backgroundAudioRenderingService">The audio rendering service.</param>
-        public PlaybackService(IAudioRenderingService backgroundAudioRenderingService)
+        /// <param name="audioStationSession"></param>
+        /// <param name="audioTrackFactory"></param>
+        public PlaybackService(IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory)
         {
-            if (backgroundAudioRenderingService == null)
-            {
-                throw new ArgumentNullException("backgroundAudioRenderingService");
-            }
+
             _logService = IoC.Container.Get<ILogService>();
 
             _status = PlaybackStatus.Stopped;            
 
-            this._backgroundAudioRenderingService = backgroundAudioRenderingService;
-            this._backgroundAudioRenderingService.BufferingProgressUpdated += (o, e) => OnBufferingProgressUpdated(e);
-            this._backgroundAudioRenderingService.MediaPositionChanged += MediaPositionChanged;
-            this._backgroundAudioRenderingService.MediaEnded += MediaEnded;
-            this._backgroundAudioRenderingService.PlaybackStarted += (sender, eventArgs) => OnTrackStarted(new TrackStartedEventArgs { Track = eventArgs.Track });
-
+            _audioStationSession = audioStationSession;
+            _audioTrackFactory = audioTrackFactory;
+        
             // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
             PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
-            this.PlayqueueItems.CollectionChanged += (o, e) =>
-                {
-                    _backgroundAudioRenderingService.OnPlayqueueItemsChanged(e.NewItems, e.OldItems);
-                };
+            _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
+
+            this.PlayqueueItems.CollectionChanged += this.OnPlayqueueItemsChanged;
+            //(o, e) =>
+            //{
+            //    _backgroundAudioRenderingService.OnPlayqueueItemsChanged(e.NewItems, e.OldItems);
+            //};
         }
+        #region audioservice
+        public event EventHandler<MediaPositionChangedEventArgs> MediaPositionChanged;
+
+        public event EventHandler<MediaEndedEventArgs> MediaEnded;
 
         public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
 
+        public event EventHandler<PlayBackStartedEventArgs> PlaybackStarted;
+
+        #endregion
 
         public ISynoTrack GetNextTrack(ISynoTrack currentTrack)
         {
@@ -155,22 +165,123 @@ namespace OpenSyno.Services
 
         public void PausePlayback()
         {
-            this._backgroundAudioRenderingService.Pause();
+            BackgroundAudioPlayer.Instance.Pause();
         }
 
         public void ResumePlayback()
         {
-            this._backgroundAudioRenderingService.Resume();
+            BackgroundAudioPlayer.Instance.Play();
         }
+
+        #region audioservice
+
+        public void Pause()
+        {
+            BackgroundAudioPlayer.Instance.Pause();
+        }
+
+        public void Resume()
+        {
+            BackgroundAudioPlayer.Instance.Play();
+        }
+        #endregion
+
 
         public double GetVolume()
         {
-            return this._backgroundAudioRenderingService.GetVolume();
+            return BackgroundAudioPlayer.Instance.Volume;
         }
 
         public void SetVolume(double volume)
         {
-            this._backgroundAudioRenderingService.SetVolume(volume);
+            BackgroundAudioPlayer.Instance.Volume = volume;
+        }
+        #region audiorendering service
+        public void StreamTrack(ISynoTrack trackToPlay)
+        {
+            //// hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
+            //string url =
+            //    string.Format(
+            //        "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+            //        _audioStationSession.Host,
+            //        _audioStationSession.Port,
+            //        _audioStationSession.Token.Split('=')[1],
+            //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
+            var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+            BackgroundAudioPlayer.Instance.Track = audioTrack;
+                //new AudioTrack(
+                //new Uri(url),
+                //trackToPlay.Title,
+                //trackToPlay.Artist,
+                //trackToPlay.Album,
+                //new Uri(trackToPlay.AlbumArtUrl),
+                //_tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single().ToString(),
+                //EnabledPlayerControls.All);
+            BackgroundAudioPlayer.Instance.Play();
+        }
+
+        public void OnPlayqueueItemsChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            var oldItems = notifyCollectionChangedEventArgs.OldItems;
+            if (oldItems != null)
+            {
+                foreach (ISynoTrack oldItem in oldItems)
+                {
+                    if (_tracksToPlayqueueGuidMapping.ContainsValue(oldItem))
+                    {
+                        ISynoTrack item = oldItem;
+                        _tracksToPlayqueueGuidMapping.Remove(
+                            _tracksToPlayqueueGuidMapping.Where(o => o.Value == item).Select(o => o.Key).Single());
+                        _cachedAudioTracks.Clear(); // a bit rough !
+                    }
+                }
+            }
+
+            var newItems = notifyCollectionChangedEventArgs.NewItems;
+            if (newItems != null)
+            {
+                foreach (ISynoTrack newItem in newItems)
+                {
+                    Guid newGuid = Guid.NewGuid();
+                    _tracksToPlayqueueGuidMapping.Add(newGuid, newItem);
+                }
+            }
+
+            // 1. Read the playqueue file from the isostorage
+            // 2. match the instance of SynoTrack held in this class' internal dictionary<ISynoTrack, Guid> with the Guid found in the isostorage.
+            // 3. apply the operation on the matching track ( new / not found in dictionary = add it in the dictionary + in the isostorage file ; old = remove it from the dictionary and the dict. )
+            // 4. save the isostorage file.
+
+            using (var playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { _tracksToPlayqueueGuidMapping.First().Value.GetType() });
+                PlayqueueInterProcessCommunicationTransporter communicationTransporter = new PlayqueueInterProcessCommunicationTransporter();
+                communicationTransporter.Host = _audioStationSession.Host;
+                communicationTransporter.Port = _audioStationSession.Port;
+                communicationTransporter.Token = _audioStationSession.Token;
+                foreach (var pair in _tracksToPlayqueueGuidMapping)
+                {
+                    communicationTransporter.Mappings.Add(new GuidToTrackMapping { Guid = pair.Key, Track = pair.Value });
+                    //if (_cachedAudioTracks.ContainsKey(pair.Key))
+                    //{
+                    //    _cachedAudioTracks.Add(pair.Key, _audioTrackFactory.Create(pair.Value));
+                    //}
+                }
+
+                xs.Serialize(playQueueFile, communicationTransporter);
+            }
+        }
+
+        #endregion
+
+
+        public void SkipNext()
+        {
+            // here, we should implement the logic to find the next track to play, but since the bachgroundAudioRenderingService exposes such features, we'll rely on them.
+            // remember though that it makes the PlaybackService tightly coupled with the BackgroundAudioRenderingService.
+            // or maybe we should merge those two services for this particular implementation of PlaybackService.
+            BackgroundAudioPlayer.Instance.SkipNext();
+            //this._backgroundAudioRenderingService.SkipNext();
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
@@ -181,7 +292,7 @@ namespace OpenSyno.Services
             }
         }
 
-        private void MediaPositionChanged(object sender, MediaPositionChangedEventArgs e)
+        private void OnMediaPositionChanged(object sender, MediaPositionChangedEventArgs e)
         {
             OnTrackCurrentPositionChanged(e);
         }
@@ -197,9 +308,9 @@ namespace OpenSyno.Services
         }
 
 
-        private void MediaEnded(object sender, MediaEndedEventArgs e)
+        private void OnMediaEnded(object sender, MediaEndedEventArgs e)
         {
-            _logService.Trace("PlaybackService.MediaEnded : " + e.Track.Title);
+            _logService.Trace("PlaybackService.OnMediaEnded : " + e.Track.Title);
             _status = PlaybackStatus.Stopped;
             var currentTrackItem = PlayqueueItems.IndexOf(e.Track);
             

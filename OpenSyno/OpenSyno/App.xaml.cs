@@ -114,7 +114,7 @@ namespace OpenSyno
             IoC.Container.Bind<INotificationService>().ToConstant(_notificationService).InSingletonScope();
             
             IoC.Container.Bind<IPlaybackService>().To<PlaybackService>().InSingletonScope();
-            IoC.Container.Bind<IAudioRenderingService>().To<BackgroundAudioRenderingService>().InSingletonScope();
+            //IoC.Container.Bind<IAudioRenderingService>().To<PlaybackService>().InSingletonScope();
 
             ActivateEagerTypes();
 
