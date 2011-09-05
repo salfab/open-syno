@@ -355,7 +355,10 @@
 
             int insertPosition = _playbackService.PlayqueueItems.Count();
 
-            _playbackService.InsertTracksToQueue(tracks, insertPosition);
+            foreach (var trackViewModel in items)
+            {
+                PlayQueueItems.Add(trackViewModel);
+            }
         }
 
         private void OnPlay(TrackViewModel trackViewModel)
