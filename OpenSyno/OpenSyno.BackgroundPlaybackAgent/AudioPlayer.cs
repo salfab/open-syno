@@ -1,4 +1,6 @@
-﻿using Microsoft.Phone.BackgroundAudio;
+﻿using System.Runtime.Serialization;
+using Microsoft.Phone.BackgroundAudio;
+using OpenSyno.Common;
 
 namespace OpenSyno.BackgroundPlaybackAgent
 {
@@ -22,6 +24,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
         private static volatile bool _classInitialized;
 
         private IPlaybackService _playbackService;
+        private IAudioTrackFactory _audioTrackFactory;
 
         /// <remarks>
         /// AudioPlayer instances can share the same process. 
@@ -30,8 +33,9 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// </remarks>
         public AudioPlayer()
         {
+            _audioTrackFactory = new AudioTrackFactory();
             if (!_classInitialized)
-            {                
+            {
                 _classInitialized = true;
                 // Subscribe to the managed exception handler
                 Deployment.Current.Dispatcher.BeginInvoke(delegate
@@ -100,13 +104,13 @@ namespace OpenSyno.BackgroundPlaybackAgent
             switch (playState)
             {
                 case PlayState.TrackEnded:
-                    Func<Dictionary<Guid, ISynoTrack>, AudioTrack, GuidToTrackMapping> DefineNextTrackPredicate = (dict, currentTrack) =>
+                    Func<Dictionary<Guid, ISynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (dict, currentTrack) =>
                         {
                             var index = dict.Keys.ToList().IndexOf(new Guid(currentTrack.Tag));
                             index++;
                             return new GuidToTrackMapping() { Guid = dict.ToArray().ElementAt(index).Key, Track = dict.ToArray().ElementAt(index).Value };
                         };
-                    player.Track = GetNextTrack(track, DefineNextTrackPredicate);
+                    player.Track = GetNextTrack(track, defineNextTrackPredicate);
                     break;
                 case PlayState.TrackReady:
                     player.Play();
@@ -215,20 +219,21 @@ namespace OpenSyno.BackgroundPlaybackAgent
             {
                 throw new ArgumentNullException("defineNextTrackPredicate");
             }
-            var tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
+            var tracksToGuidMapping = new Dictionary<Guid, ISynoTrack>();
 
+            PlayqueueInterProcessCommunicationTransporter deserialization = null;
             using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
             {
-                var xs = new XmlSerializer(typeof(List<GuidToTrackMapping>), new Type[] { typeof(SynoTrack) });
+                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
+                var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
 
-                List<GuidToTrackMapping> deserialization;
                 try
                 {
-                    deserialization = (List<GuidToTrackMapping>)xs.Deserialize(playQueueFile);
+                    deserialization = (PlayqueueInterProcessCommunicationTransporter)xs.Deserialize(playQueueFile);
 
-                    foreach (GuidToTrackMapping pair in deserialization)
+                    foreach (GuidToTrackMapping pair in deserialization.Mappings)
                     {
-                        tracksToPlayqueueGuidMapping.Add(pair.Guid, pair.Track);
+                        tracksToGuidMapping.Add(pair.Guid, pair.Track);
                     }
                 }
                 catch (Exception e)
@@ -237,12 +242,12 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     return null; 
                 }
             }
-
-            GuidToTrackMapping guidToTrackMapping = defineNextTrackPredicate(tracksToPlayqueueGuidMapping, audioTrack);
+            var mappedTrack = tracksToGuidMapping[new Guid(audioTrack.Tag)];
+            GuidToTrackMapping guidToTrackMapping = defineNextTrackPredicate(tracksToGuidMapping, audioTrack);
 
             ISynoTrack nextTrack = guidToTrackMapping.Track;
 
-            AudioTrack track = new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
+            AudioTrack track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, deserialization.Host, deserialization.Port, deserialization.Token);// new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
 
             // specify the track
 
@@ -306,5 +311,22 @@ namespace OpenSyno.BackgroundPlaybackAgent
         {
 
         }
+    }
+
+    [DataContract]
+    public class PlayqueueInterProcessCommunicationTransporter
+    {
+        public PlayqueueInterProcessCommunicationTransporter()
+        {
+            Mappings = new List<GuidToTrackMapping>();
+        }
+        [DataMember]
+        public string Host { get; set; }
+        [DataMember]
+        public int Port { get; set; }
+        [DataMember]
+        public string Token { get; set; }
+        [DataMember]
+        public List<GuidToTrackMapping> Mappings { get; set; }
     }
 }

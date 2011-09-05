@@ -46,6 +46,7 @@
     <Reference Include="Ninject">
       <HintPath>..\3rd party\Ninject\Ninject.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />

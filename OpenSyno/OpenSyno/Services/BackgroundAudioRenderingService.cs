@@ -1,5 +1,6 @@
 ﻿using System.Windows.Data;
 using Ninject;
+using OpenSyno.BackgroundPlaybackAgent;
 using OpenSyno.Helpers;
 
 namespace OpenSyno.Contracts.Domain
@@ -45,7 +46,7 @@ namespace OpenSyno.Services
 
         public event EventHandler<MediaEndedEventArgs> MediaEnded;
 
-        public BackgroundAudioRenderingService(IAudioStationSession audioStationSession)
+        public BackgroundAudioRenderingService(IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory)
         {
             // todo : inject ?
             _logService = IoC.Container.Get<ILogService>();
@@ -56,6 +57,7 @@ namespace OpenSyno.Services
                 throw new ArgumentNullException("audioStationSession");
             }
             _audioStationSession = audioStationSession;
+            _audioTrackFactory = audioTrackFactory;
 
 
             _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
@@ -205,6 +207,8 @@ namespace OpenSyno.Services
         private int _downloadTrackCallbackCount;
 
         private Dictionary<Guid, ISynoTrack> _tracksToPlayqueueGuidMapping;
+        private Dictionary<Guid, AudioTrack>_cachedAudioTracks;
+        private IAudioTrackFactory _audioTrackFactory;
 
         public event EventHandler<PlayBackStartedEventArgs> PlaybackStarted;
 
@@ -348,6 +352,7 @@ namespace OpenSyno.Services
                         ISynoTrack item = oldItem;
                         _tracksToPlayqueueGuidMapping.Remove(
                             _tracksToPlayqueueGuidMapping.Where(o => o.Value == item).Select(o => o.Key).Single());
+                        _cachedAudioTracks.Clear(); // a bit rough !
                     }
                 }
             }
@@ -367,15 +372,22 @@ namespace OpenSyno.Services
             // 4. save the isostorage file.
 
             using (var playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
-            {             
-                XmlSerializer xs = new XmlSerializer(typeof(List<GuidToTrackMapping>), new Type[] { _tracksToPlayqueueGuidMapping.First().Value.GetType()});
-                List<GuidToTrackMapping> listToSerialize = new List<GuidToTrackMapping>();
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { _tracksToPlayqueueGuidMapping.First().Value.GetType() });
+                PlayqueueInterProcessCommunicationTransporter communicationTransporter = new PlayqueueInterProcessCommunicationTransporter();
+                communicationTransporter.Host = _audioStationSession.Host;
+                communicationTransporter.Port = _audioStationSession.Port;
+                communicationTransporter.Token = _audioStationSession.Token;
                 foreach (var pair in _tracksToPlayqueueGuidMapping)
                 {
-                    listToSerialize.Add(new GuidToTrackMapping { Guid = pair.Key, Track = pair.Value });
+                    communicationTransporter.Mappings.Add(new GuidToTrackMapping { Guid = pair.Key, Track = pair.Value });
+                    //if (_cachedAudioTracks.ContainsKey(pair.Key))
+                    //{
+                    //    _cachedAudioTracks.Add(pair.Key, _audioTrackFactory.Create(pair.Value));
+                    //}
                 }
 
-                xs.Serialize(playQueueFile, listToSerialize);
+                xs.Serialize(playQueueFile, communicationTransporter);
             }
         }
     }

@@ -7,6 +7,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Practices.Prism.Events;
 using Ninject;
+using OpenSyno.Common;
 using OpenSyno.Helpers;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;
@@ -107,6 +108,7 @@ namespace OpenSyno
             IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
             IoC.Container.Bind<ISearchResultItemViewModelFactory>().To<SearchResultItemViewModelFactory>().InSingletonScope();
             IoC.Container.Bind<IUrlParameterToObjectsPlateHeater>().To<UrlParameterToObjectsPlateHeater>().InSingletonScope();
+            IoC.Container.Bind<IAudioTrackFactory>().To<AudioTrackFactory>().InSingletonScope();
             
             _notificationService = new NotificationService();
             IoC.Container.Bind<INotificationService>().ToConstant(_notificationService).InSingletonScope();

@@ -86,7 +86,6 @@
     <Compile Include="INotificationService.xaml.cs" />
     <Compile Include="NotificationService.xaml.cs" />
     <Compile Include="Playlist.xaml.cs" />
-    <Compile Include="Services\GuidToTrackMapping.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Helpers\ViewModelResolver.cs" />
     <Compile Include="IBusyable.cs" />
@@ -165,7 +164,9 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\AppManifest.xml" />
+    <None Include="Properties\AppManifest.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\WMAppManifest.xml">
       <SubType>Designer</SubType>
     </None>
