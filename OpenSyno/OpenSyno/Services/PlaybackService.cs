@@ -13,6 +13,9 @@ namespace OpenSyno.Services
     using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Net;
+    using System.Threading;
+    using System.Windows;
+    using System.Windows.Threading;
     using System.Xml.Serialization;
 
     using Microsoft.Phone.BackgroundAudio;
@@ -46,6 +49,8 @@ namespace OpenSyno.Services
         private ILogService _logService;
 
         private Dictionary<Guid, ISynoTrack> _cachedAudioTracks;
+
+        private Timer _progressUpdater;
 
         /// <summary>
         /// Gets or sets what strategy should be used to define the next track to play.
@@ -120,7 +125,6 @@ namespace OpenSyno.Services
         /// <param name="audioTrackFactory"></param>
         public PlaybackService(IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory)
         {
-
             _logService = IoC.Container.Get<ILogService>();
 
             _status = PlaybackStatus.Stopped;            
@@ -134,6 +138,59 @@ namespace OpenSyno.Services
             _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
 
             this.PlayqueueItems.CollectionChanged += this.OnPlayqueueItemsChanged;
+
+            
+            this._progressUpdater = new Timer(
+                e =>
+                    {
+                        var backgroundAudioPlayer = BackgroundAudioPlayer.Instance;
+                        if (this.TrackCurrentPositionChanged != null && backgroundAudioPlayer.Track != null)
+                        {
+                            
+                            Deployment.Current.Dispatcher.BeginInvoke( () =>
+                                {
+                                    TrackCurrentPositionChangedEventArgs trackCurrentPositionChangedEventArgs = new TrackCurrentPositionChangedEventArgs();
+
+                                    trackCurrentPositionChangedEventArgs.LoadPercentComplete = backgroundAudioPlayer.BufferingProgress;
+                                    double totalSeconds = 0;
+                                    double position = 0;
+
+                                    try
+                                    {
+                                        position  = backgroundAudioPlayer.Position.TotalSeconds;
+                                    }
+                                    catch (SystemException)
+                                    {
+                                        
+                                        // swallow exception : we get an HRESULT error, when no valid position could be retrieved. Maybe a beta behavior that will change in the future. since we can ignore the error and set the duration to 0 ( maybe the track hasn't been loaded yet ) we'll just swallow the exception.
+                                    }
+
+                                    try
+                                    {
+                                        totalSeconds = backgroundAudioPlayer.Position.TotalSeconds;
+                                    }
+                                    catch (SystemException)
+                                    {
+                                        // swallow exception : we get an HRESULT error, when no valid duration could be retrieved. Maybe a beta behavior that will change in the future. since we can ignore the error and set the duration to 0 ( maybe the track hasn't been loaded yet ) we'll just swallow the exception.
+                                    }
+
+                                    if (position == 0)
+                                    {
+                                        // avoid zero-division
+                                        trackCurrentPositionChangedEventArgs.PlaybackPercentComplete = 0;
+                                    }
+                                    else
+                                    {
+                                        trackCurrentPositionChangedEventArgs.PlaybackPercentComplete = totalSeconds / backgroundAudioPlayer.Track.Duration.TotalSeconds;
+                                    }                                 
+
+                                    this.TrackCurrentPositionChanged(this, trackCurrentPositionChangedEventArgs);
+                                });
+                        }
+                    },
+                null,
+                0,
+                200);
             //(o, e) =>
             //{
             //    _backgroundAudioRenderingService.OnPlayqueueItemsChanged(e.NewItems, e.OldItems);

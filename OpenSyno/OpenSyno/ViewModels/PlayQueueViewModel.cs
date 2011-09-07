@@ -73,6 +73,8 @@
             _playbackService = playbackService;
             this._notificationService = notificationService;
             _openSynoSettings = openSynoSettings;
+
+
             _playbackService.BufferingProgressUpdated += (o, e) =>
                 {
                     // throttle refresh through binding.
@@ -194,7 +196,10 @@
             set
             {
                 _currentPlaybackPercentComplete = value;
-                OnPropertyChanged(CurrentPlaybackPercentCompletePropertyName);
+                if (!double.IsInfinity(value) && !double.IsNaN(value))
+                {
+                    OnPropertyChanged(CurrentPlaybackPercentCompletePropertyName);
+                }
             }
         }
 

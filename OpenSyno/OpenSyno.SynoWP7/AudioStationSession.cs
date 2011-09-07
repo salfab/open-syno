@@ -113,7 +113,7 @@ namespace Synology.AudioStationApi
                                                               throw new SynoNetworkException("Open Syno could not connect to the server. Please make sure your server's SSL certificate has been issued by a trusted Certificate Authority. see http://bit.ly/qODji5  for further detail.", e.Error);
                                                           }
 
-                                                          throw new SynoNetworkException("Open Syno could not complete the operation. Please check that your phone is not in flight mode.", e.Error);
+                                                          throw new SynoNetworkException("Open Syno could not complete the operation. Please check that your phone is not in flight mode and that you are getting a proper signal.", e.Error);
                                                       }
                                                       else
                                                       {
