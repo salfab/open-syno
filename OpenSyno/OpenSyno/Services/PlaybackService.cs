@@ -72,7 +72,7 @@ namespace OpenSyno.Services
 
         public PlaybackStatus Status
         {
-            get { return _status; }            
+            get { return _status; }
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace OpenSyno.Services
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
         public void PlayTrackInQueue(ISynoTrack trackToPlay)
-        {            
+        {
             PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             StreamTrack(trackToPlay);
             _status = PlaybackStatus.Buffering;
@@ -127,11 +127,11 @@ namespace OpenSyno.Services
         {
             _logService = IoC.Container.Get<ILogService>();
 
-            _status = PlaybackStatus.Stopped;            
+            _status = PlaybackStatus.Stopped;
 
             _audioStationSession = audioStationSession;
             _audioTrackFactory = audioTrackFactory;
-        
+
             // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
             PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
@@ -139,55 +139,57 @@ namespace OpenSyno.Services
 
             this.PlayqueueItems.CollectionChanged += this.OnPlayqueueItemsChanged;
 
-            
+            BackgroundAudioPlayer.Instance.PlayStateChanged += new EventHandler(this.BackgroundPlayerPlayStateChanged);
+
             this._progressUpdater = new Timer(
                 e =>
+                {
+                    var backgroundAudioPlayer = BackgroundAudioPlayer.Instance;
+                    if (this.TrackCurrentPositionChanged != null && backgroundAudioPlayer.Track != null)
                     {
-                        var backgroundAudioPlayer = BackgroundAudioPlayer.Instance;
-                        if (this.TrackCurrentPositionChanged != null && backgroundAudioPlayer.Track != null)
-                        {
-                            
-                            Deployment.Current.Dispatcher.BeginInvoke( () =>
+
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                TrackCurrentPositionChangedEventArgs trackCurrentPositionChangedEventArgs = new TrackCurrentPositionChangedEventArgs();
+
+                                trackCurrentPositionChangedEventArgs.LoadPercentComplete = backgroundAudioPlayer.BufferingProgress;
+                                double totalSeconds = 0;
+                                TimeSpan position = new TimeSpan();
+
+                                try
                                 {
-                                    TrackCurrentPositionChangedEventArgs trackCurrentPositionChangedEventArgs = new TrackCurrentPositionChangedEventArgs();
+                                    position = backgroundAudioPlayer.Position;
+                                }
+                                catch (SystemException)
+                                {
 
-                                    trackCurrentPositionChangedEventArgs.LoadPercentComplete = backgroundAudioPlayer.BufferingProgress;
-                                    double totalSeconds = 0;
-                                    double position = 0;
+                                    // swallow exception : we get an HRESULT error, when no valid position could be retrieved. Maybe a beta behavior that will change in the future. since we can ignore the error and set the duration to 0 ( maybe the track hasn't been loaded yet ) we'll just swallow the exception.
+                                }
 
-                                    try
-                                    {
-                                        position  = backgroundAudioPlayer.Position.TotalSeconds;
-                                    }
-                                    catch (SystemException)
-                                    {
-                                        
-                                        // swallow exception : we get an HRESULT error, when no valid position could be retrieved. Maybe a beta behavior that will change in the future. since we can ignore the error and set the duration to 0 ( maybe the track hasn't been loaded yet ) we'll just swallow the exception.
-                                    }
+                                try
+                                {
+                                    totalSeconds = backgroundAudioPlayer.Position.TotalSeconds;
+                                }
+                                catch (SystemException)
+                                {
+                                    // swallow exception : we get an HRESULT error, when no valid duration could be retrieved. Maybe a beta behavior that will change in the future. since we can ignore the error and set the duration to 0 ( maybe the track hasn't been loaded yet ) we'll just swallow the exception.
+                                }
 
-                                    try
-                                    {
-                                        totalSeconds = backgroundAudioPlayer.Position.TotalSeconds;
-                                    }
-                                    catch (SystemException)
-                                    {
-                                        // swallow exception : we get an HRESULT error, when no valid duration could be retrieved. Maybe a beta behavior that will change in the future. since we can ignore the error and set the duration to 0 ( maybe the track hasn't been loaded yet ) we'll just swallow the exception.
-                                    }
+                                if (position.TotalSeconds == 0)
+                                {
+                                    // avoid zero-division
+                                    trackCurrentPositionChangedEventArgs.PlaybackPercentComplete = 0;
+                                }
+                                else
+                                {
+                                    trackCurrentPositionChangedEventArgs.PlaybackPercentComplete = totalSeconds / backgroundAudioPlayer.Track.Duration.TotalSeconds;
+                                    trackCurrentPositionChangedEventArgs.Position = position;
+                                }
 
-                                    if (position == 0)
-                                    {
-                                        // avoid zero-division
-                                        trackCurrentPositionChangedEventArgs.PlaybackPercentComplete = 0;
-                                    }
-                                    else
-                                    {
-                                        trackCurrentPositionChangedEventArgs.PlaybackPercentComplete = totalSeconds / backgroundAudioPlayer.Track.Duration.TotalSeconds;
-                                    }                                 
-
-                                    this.TrackCurrentPositionChanged(this, trackCurrentPositionChangedEventArgs);
-                                });
-                        }
-                    },
+                                this.TrackCurrentPositionChanged(this, trackCurrentPositionChangedEventArgs);
+                            });
+                    }
+                },
                 null,
                 0,
                 200);
@@ -196,6 +198,46 @@ namespace OpenSyno.Services
             //    _backgroundAudioRenderingService.OnPlayqueueItemsChanged(e.NewItems, e.OldItems);
             //};
         }
+
+        private void BackgroundPlayerPlayStateChanged(object sender, EventArgs e)
+        {
+            switch (BackgroundAudioPlayer.Instance.PlayerState)
+            {
+                case PlayState.Unknown:
+                    break;
+                case PlayState.Stopped:
+                    break;
+                case PlayState.Paused:
+                    break;
+                case PlayState.Playing:
+                    var guid = Guid.Parse(BackgroundAudioPlayer.Instance.Track.Tag);
+                    if (this._tracksToPlayqueueGuidMapping.ContainsKey(guid))
+                    {
+                        ISynoTrack synoTrack = this._tracksToPlayqueueGuidMapping[guid];
+                        OnTrackStarted(new TrackStartedEventArgs { Track = synoTrack });
+                    }
+                    break;
+                case PlayState.BufferingStarted:
+                    break;
+                case PlayState.BufferingStopped:
+                    break;
+                case PlayState.TrackReady:
+                    break;
+                case PlayState.TrackEnded:
+                    break;
+                case PlayState.Rewinding:
+                    break;
+                case PlayState.FastForwarding:
+                    break;
+                case PlayState.Shutdown:
+                    break;
+                case PlayState.Error:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         #region audioservice
         public event EventHandler<MediaPositionChangedEventArgs> MediaPositionChanged;
 
@@ -214,7 +256,7 @@ namespace OpenSyno.Services
             if (PlayqueueItems.Count > currentTrackIndex + 1)
             {
                 return PlayqueueItems[currentTrackIndex + 1];
-            } 
+            }
 
             // if there is no track next, then we return null.
             return null;
@@ -266,14 +308,14 @@ namespace OpenSyno.Services
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
             var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
             BackgroundAudioPlayer.Instance.Track = audioTrack;
-                //new AudioTrack(
-                //new Uri(url),
-                //trackToPlay.Title,
-                //trackToPlay.Artist,
-                //trackToPlay.Album,
-                //new Uri(trackToPlay.AlbumArtUrl),
-                //_tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single().ToString(),
-                //EnabledPlayerControls.All);
+            //new AudioTrack(
+            //new Uri(url),
+            //trackToPlay.Title,
+            //trackToPlay.Artist,
+            //trackToPlay.Album,
+            //new Uri(trackToPlay.AlbumArtUrl),
+            //_tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single().ToString(),
+            //EnabledPlayerControls.All);
             BackgroundAudioPlayer.Instance.Play();
         }
 
@@ -370,7 +412,7 @@ namespace OpenSyno.Services
             _logService.Trace("PlaybackService.OnMediaEnded : " + e.Track.Title);
             _status = PlaybackStatus.Stopped;
             var currentTrackItem = PlayqueueItems.IndexOf(e.Track);
-            
+
             if (PlayqueueItems.Count > currentTrackItem + 1)
             {
                 var nextTrack = GetNextTrack(e.Track);
@@ -387,9 +429,9 @@ namespace OpenSyno.Services
                     // we know that with version 7.0 : this operation is not supported, so instead of testing the version to see if it is supported,
                     // we try it anyway, and if the OS supports it, then good for us. otherwise, it will be just as if we hadn't even tried it.                    
                 }
-                
+
             }
-            
+
         }
 
         public event TrackEndedDelegate TrackEnded;
