@@ -8,6 +8,16 @@
     [DataContract]
     public class GuidToTrackMapping
     {
+        public GuidToTrackMapping(Guid guid, ISynoTrack track) : this()
+        {
+            Guid = guid;
+            Track = track;
+        }
+
+        public GuidToTrackMapping()
+        {
+        }
+
         [DataMember]
         public Guid Guid { get; set; }
 

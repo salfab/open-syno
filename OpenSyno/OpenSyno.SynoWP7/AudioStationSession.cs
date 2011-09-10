@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using OpenSyno.SynoWP7;
-
-namespace Synology.AudioStationApi
+﻿namespace Synology.AudioStationApi
 {
     using System.Runtime.Serialization;
     using System.Windows.Threading;
 
     using OpenSyno.Services;
+
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Windows;
+
+    using OpenSyno.SynoWP7;
 
     [DataContract]
     public class AudioStationSession : IAudioStationSession

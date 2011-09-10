@@ -67,10 +67,12 @@
 
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
-            PlayQueueItems = new ObservableCollection<TrackViewModel>();
-            PlayQueueItems.CollectionChanged += OnPlayQueueEdited;
-            eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             _playbackService = playbackService;
+            _playQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => new TrackViewModel(o)));
+            _playbackService.PlayqueueChanged += new NotifyCollectionChangedEventHandler(OnPlayqueueChanged);
+            //PlayQueueItems = new ObservableCollection<TrackViewModel>(_playbackService.PlayqueueItems.Select(synoTrack => new TrackViewModel(synoTrack)));
+            // PlayQueueItems.CollectionChanged += OnPlayQueueEdited;
+            eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             this._notificationService = notificationService;
             _openSynoSettings = openSynoSettings;
 
@@ -101,21 +103,22 @@
             SavePlaylistCommand = new DelegateCommand(OnSavePlaylist);
         }
 
-        private void OnPlayQueueEdited(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnPlayqueueChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
-                foreach (TrackViewModel oldItem in e.OldItems)
+                foreach (ISynoTrack oldItem in e.OldItems)
                 {
-                    this._playbackService.PlayqueueItems.Remove(oldItem.TrackInfo);
+                    ISynoTrack item = oldItem;
+                    this.PlayQueueItems.Remove(this.PlayQueueItems.Single(o => o.TrackInfo == item));
                 }
             }
 
             if (e.NewItems != null)
             {
-                foreach (TrackViewModel newItem in e.NewItems)
+                foreach (ISynoTrack newItem in e.NewItems)
                 {
-                    this._playbackService.PlayqueueItems.Add(newItem.TrackInfo);
+                    this.PlayQueueItems.Add(new TrackViewModel(newItem));
                 }
             }
         }
@@ -359,13 +362,13 @@
         {
             var tracks = items.Select(o=>o.TrackInfo);
 
-            int insertPosition = _playbackService.PlayqueueItems.Count();
+            int insertPosition = PlayQueueItems.Count();
 
-            //_playbackService.InsertTracksToQueue(tracks, insertPosition);
-            foreach (var trackViewModel in items)
-            {
-                PlayQueueItems.Add(trackViewModel);
-            }
+            _playbackService.InsertTracksToQueue(tracks, insertPosition);
+            //foreach (var trackViewModel in items)
+            //{
+            //    PlayQueueItems.Add(trackViewModel);
+            //}
         }
 
         private void OnPlay(TrackViewModel trackViewModel)

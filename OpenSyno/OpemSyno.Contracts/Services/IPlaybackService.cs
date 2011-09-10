@@ -4,6 +4,7 @@ namespace OpenSyno.Services
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
 
     /// <summary>
     /// The service in charge of managing the play queue, define which tracks comes next, handle random playback, repeat and other playback options.
@@ -22,25 +23,25 @@ namespace OpenSyno.Services
         /// <value><c>true</c> if the next track to be played should be preloaded; otherwise, <c>false</c>.</value>
         bool PreloadTracks { get; set; }
 
-        /// <summary>
-        /// Gets the items in the playqueue.
-        /// </summary>
-        /// <value>The items in the playqueue.</value>
-        ObservableCollection<ISynoTrack> PlayqueueItems { get; }
+        ///// <summary>
+        ///// Gets the items in the playqueue.
+        ///// </summary>
+        ///// <value>The items in the playqueue.</value>
+        //ObservableCollection<ISynoTrack> PlayqueueItems { get; }
 
         PlaybackStatus Status { get; }
 
-        /// <summary>
-        /// Clears the play queue.
-        /// </summary>
-        void ClearPlayQueue();
+        ///// <summary>
+        ///// Clears the play queue.
+        ///// </summary>
+        //void ClearPlayQueue();
 
-        /// <summary>
-        /// Inserts the specified tracks to the play queue.
-        /// </summary>
-        /// <param name="tracks">The tracks.</param>
-        /// <param name="insertPosition"></param>
-        void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition);
+        ///// <summary>
+        ///// Inserts the specified tracks to the play queue.
+        ///// </summary>
+        ///// <param name="tracks">The tracks.</param>
+        ///// <param name="insertPosition"></param>
+        //void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition);
 
         /// <summary>
         /// Plays the specified track. It must be present in the queue.
@@ -58,7 +59,7 @@ namespace OpenSyno.Services
 
         event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
 
-        ISynoTrack GetNextTrack(ISynoTrack currentTrack);
+        //ISynoTrack GetNextTrack(ISynoTrack currentTrack);
 
         void PausePlayback();
 
@@ -69,6 +70,12 @@ namespace OpenSyno.Services
         void SetVolume(double volume);
 
         void SkipNext();
+
+        event NotifyCollectionChangedEventHandler PlayqueueChanged;
+
+        void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition);
+
+        IEnumerable<ISynoTrack> GetTracksInQueue();
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);

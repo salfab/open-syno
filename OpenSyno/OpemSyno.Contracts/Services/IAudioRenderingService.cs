@@ -27,7 +27,6 @@
         void SetVolume(double volume);
 
         void StreamTrack(ISynoTrack trackToPlay);
-
-        void OnPlayqueueItemsChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs);
+        
     }
 }

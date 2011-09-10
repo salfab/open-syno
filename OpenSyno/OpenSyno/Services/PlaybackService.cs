@@ -35,7 +35,7 @@ namespace OpenSyno.Services
 
         private readonly IAudioTrackFactory _audioTrackFactory;
 
-        private Dictionary<Guid, ISynoTrack> _tracksToPlayqueueGuidMapping;
+        private Dictionary<Guid, ISynoTrack> _tracksToGuidMapping;
 
         private PlaybackStatus _status;
 
@@ -64,38 +64,38 @@ namespace OpenSyno.Services
         /// <value><c>true</c> if the next track to be played should be preloaded; otherwise, <c>false</c>.</value>
         public bool PreloadTracks { get; set; }
 
-        /// <summary>
-        /// Gets the items in the playqueue.
-        /// </summary>
-        /// <value>The items in the playqueue.</value>        
-        public ObservableCollection<ISynoTrack> PlayqueueItems { get; private set; }
+        ///// <summary>
+        ///// Gets the items in the playqueue.
+        ///// </summary>
+        ///// <value>The items in the playqueue.</value>        
+        //public ObservableCollection<ISynoTrack> PlayqueueItems { get; private set; }
 
         public PlaybackStatus Status
         {
             get { return _status; }
         }
 
-        /// <summary>
-        /// Clears the play queue.
-        /// </summary>
-        public void ClearPlayQueue()
-        {
-            PlayqueueItems.Clear();
-        }
+        ///// <summary>
+        ///// Clears the play queue.
+        ///// </summary>
+        //public void ClearPlayQueue()
+        //{
+        //    PlayqueueItems.Clear();
+        //}
 
-        /// <summary>
-        /// Inserts the specified tracks to the play queue.
-        /// </summary>
-        /// <param name="tracks">The tracks.</param>
-        /// <param name="insertPosition">The position in the play queue where to insert the specified tracks.</param>
-        public void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition)
-        {
-            foreach (var synoTrack in tracks)
-            {
-                PlayqueueItems.Insert(insertPosition, synoTrack);
-                insertPosition++;
-            }
-        }
+        ///// <summary>
+        ///// Inserts the specified tracks to the play queue.
+        ///// </summary>
+        ///// <param name="tracks">The tracks.</param>
+        ///// <param name="insertPosition">The position in the play queue where to insert the specified tracks.</param>
+        //public void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition)
+        //{
+        //    foreach (var synoTrack in tracks)
+        //    {
+        //        PlayqueueItems.Insert(insertPosition, synoTrack);
+        //        insertPosition++;
+        //    }
+        //}
 
         /// <summary>
         /// Plays the specified track. It must be present in the queue.
@@ -133,11 +133,35 @@ namespace OpenSyno.Services
             _audioTrackFactory = audioTrackFactory;
 
             // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
-            PlayqueueItems = new ObservableCollection<ISynoTrack>();
+            //PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
-            _tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
+            this._tracksToGuidMapping = new Dictionary<Guid, ISynoTrack>();
+            
 
-            this.PlayqueueItems.CollectionChanged += this.OnPlayqueueItemsChanged;
+            PlayqueueInterProcessCommunicationTransporter deserialization = null;
+            using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            {
+                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
+                var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+
+                try
+                {
+                    deserialization = (PlayqueueInterProcessCommunicationTransporter)xs.Deserialize(playQueueFile);
+
+                    foreach (GuidToTrackMapping pair in deserialization.Mappings)
+                    {
+                        this._tracksToGuidMapping.Add(pair.Guid, pair.Track);
+                    }
+                }
+                catch (Exception e)
+                {
+                    // could not deserialize XML for playlist : let's keep it empty.
+                    
+                }
+            }
+
+
+            //this.PlayqueueItems.CollectionChanged += this.OnPlayqueueItemsChanged;
 
             BackgroundAudioPlayer.Instance.PlayStateChanged += new EventHandler(this.BackgroundPlayerPlayStateChanged);
 
@@ -211,9 +235,9 @@ namespace OpenSyno.Services
                     break;
                 case PlayState.Playing:
                     var guid = Guid.Parse(BackgroundAudioPlayer.Instance.Track.Tag);
-                    if (this._tracksToPlayqueueGuidMapping.ContainsKey(guid))
+                    if (this._tracksToGuidMapping.ContainsKey(guid))
                     {
-                        ISynoTrack synoTrack = this._tracksToPlayqueueGuidMapping[guid];
+                        ISynoTrack synoTrack = this._tracksToGuidMapping[guid];
                         OnTrackStarted(new TrackStartedEventArgs { Track = synoTrack });
                     }
                     break;
@@ -249,18 +273,18 @@ namespace OpenSyno.Services
 
         #endregion
 
-        public ISynoTrack GetNextTrack(ISynoTrack currentTrack)
-        {
-            int currentTrackIndex = PlayqueueItems.IndexOf(currentTrack);
+        //public ISynoTrack GetNextTrack(ISynoTrack currentTrack)
+        //{
+        //    int currentTrackIndex = PlayqueueItems.IndexOf(currentTrack);
 
-            if (PlayqueueItems.Count > currentTrackIndex + 1)
-            {
-                return PlayqueueItems[currentTrackIndex + 1];
-            }
+        //    if (PlayqueueItems.Count > currentTrackIndex + 1)
+        //    {
+        //        return PlayqueueItems[currentTrackIndex + 1];
+        //    }
 
-            // if there is no track next, then we return null.
-            return null;
-        }
+        //    // if there is no track next, then we return null.
+        //    return null;
+        //}
 
         public void PausePlayback()
         {
@@ -306,7 +330,7 @@ namespace OpenSyno.Services
             //        _audioStationSession.Port,
             //        _audioStationSession.Token.Split('=')[1],
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+            var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
             BackgroundAudioPlayer.Instance.Track = audioTrack;
             //new AudioTrack(
             //new Uri(url),
@@ -319,57 +343,7 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.Play();
         }
 
-        public void OnPlayqueueItemsChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
-        {
-            var oldItems = notifyCollectionChangedEventArgs.OldItems;
-            if (oldItems != null)
-            {
-                foreach (ISynoTrack oldItem in oldItems)
-                {
-                    if (_tracksToPlayqueueGuidMapping.ContainsValue(oldItem))
-                    {
-                        ISynoTrack item = oldItem;
-                        _tracksToPlayqueueGuidMapping.Remove(
-                            _tracksToPlayqueueGuidMapping.Where(o => o.Value == item).Select(o => o.Key).Single());
-                        _cachedAudioTracks.Clear(); // a bit rough !
-                    }
-                }
-            }
-
-            var newItems = notifyCollectionChangedEventArgs.NewItems;
-            if (newItems != null)
-            {
-                foreach (ISynoTrack newItem in newItems)
-                {
-                    Guid newGuid = Guid.NewGuid();
-                    _tracksToPlayqueueGuidMapping.Add(newGuid, newItem);
-                }
-            }
-
-            // 1. Read the playqueue file from the isostorage
-            // 2. match the instance of SynoTrack held in this class' internal dictionary<ISynoTrack, Guid> with the Guid found in the isostorage.
-            // 3. apply the operation on the matching track ( new / not found in dictionary = add it in the dictionary + in the isostorage file ; old = remove it from the dictionary and the dict. )
-            // 4. save the isostorage file.
-
-            using (var playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
-            {
-                XmlSerializer xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { _tracksToPlayqueueGuidMapping.First().Value.GetType() });
-                PlayqueueInterProcessCommunicationTransporter communicationTransporter = new PlayqueueInterProcessCommunicationTransporter();
-                communicationTransporter.Host = _audioStationSession.Host;
-                communicationTransporter.Port = _audioStationSession.Port;
-                communicationTransporter.Token = _audioStationSession.Token;
-                foreach (var pair in _tracksToPlayqueueGuidMapping)
-                {
-                    communicationTransporter.Mappings.Add(new GuidToTrackMapping { Guid = pair.Key, Track = pair.Value });
-                    //if (_cachedAudioTracks.ContainsKey(pair.Key))
-                    //{
-                    //    _cachedAudioTracks.Add(pair.Key, _audioTrackFactory.Create(pair.Value));
-                    //}
-                }
-
-                xs.Serialize(playQueueFile, communicationTransporter);
-            }
-        }
+        
 
         #endregion
 
@@ -381,6 +355,64 @@ namespace OpenSyno.Services
             // or maybe we should merge those two services for this particular implementation of PlaybackService.
             BackgroundAudioPlayer.Instance.SkipNext();
             //this._backgroundAudioRenderingService.SkipNext();
+        }
+
+        public event NotifyCollectionChangedEventHandler PlayqueueChanged;
+
+        public void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition)
+        {
+            if (insertPosition != _tracksToGuidMapping.Count())
+            {
+                // we need to change the infrastructure and replace the dictionary with a list so we can choose the order !
+                throw new NotSupportedException("Can only insert tracks at the end of the queue for now. sorry :(");
+            }
+            var i = 0;
+            // FIXME : Be able to choose the position
+            foreach (var synoTrack in tracks)
+            {
+                _tracksToGuidMapping.Add(Guid.NewGuid(), synoTrack);    
+                // FIXME : Urgent : replace NotifyCollectionChanged by a custom event that can propagate bulk collection changes ! (optimize writes on disk )
+                OnTracksInQueueChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, synoTrack, insertPosition+i));
+                i++;
+            }
+        }
+
+        private void OnTracksInQueueChanged(NotifyCollectionChangedEventArgs eventArgs)
+        {
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+
+            SerializePlayqueue();
+
+            if (PlayqueueChanged != null)
+            {
+                PlayqueueChanged(this, eventArgs);
+            }
+        }
+
+        private void SerializePlayqueue()
+        {
+            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            {
+                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
+                var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+
+                var serialization = new PlayqueueInterProcessCommunicationTransporter()
+                    {
+                        Host = _audioStationSession.Host,
+                        Port = _audioStationSession.Port,
+                        Mappings = _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key, o.Value)).ToList(),
+                        Token = _audioStationSession.Token
+                    };
+                    xs.Serialize(playQueueFile, serialization);
+            }
+        }
+
+        public IEnumerable<ISynoTrack> GetTracksInQueue()
+        {
+            return _tracksToGuidMapping.Values;
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
@@ -404,34 +436,6 @@ namespace OpenSyno.Services
                 TrackCurrentPositionChanged(this, new TrackCurrentPositionChangedEventArgs { LoadPercentComplete = 1, PlaybackPercentComplete = mediaPositionChangedEventArgs.Position.TotalSeconds / _lastStartedTrack.Duration.TotalSeconds, Position = mediaPositionChangedEventArgs.Position });
                 //TrackCurrentPositionChanged(this, new TrackCurrentPositionChangedEventArgs { LoadPercentComplete = 1, PlaybackPercentComplete = mediaPositionChangedEventArgs.Position.TotalSeconds / mediaPositionChangedEventArgs.Duration.TotalSeconds, Position = mediaPositionChangedEventArgs.Position });
             }
-        }
-
-
-        private void OnMediaEnded(object sender, MediaEndedEventArgs e)
-        {
-            _logService.Trace("PlaybackService.OnMediaEnded : " + e.Track.Title);
-            _status = PlaybackStatus.Stopped;
-            var currentTrackItem = PlayqueueItems.IndexOf(e.Track);
-
-            if (PlayqueueItems.Count > currentTrackItem + 1)
-            {
-                var nextTrack = GetNextTrack(e.Track);
-                PlayTrackInQueue(nextTrack);
-            }
-            else
-            {
-                try
-                {
-                    PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Enabled;
-                }
-                catch (InvalidOperationException)
-                {
-                    // we know that with version 7.0 : this operation is not supported, so instead of testing the version to see if it is supported,
-                    // we try it anyway, and if the OS supports it, then good for us. otherwise, it will be just as if we hadn't even tried it.                    
-                }
-
-            }
-
         }
 
         public event TrackEndedDelegate TrackEnded;

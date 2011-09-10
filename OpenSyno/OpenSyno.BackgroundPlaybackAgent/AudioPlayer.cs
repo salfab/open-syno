@@ -41,34 +41,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
                 Deployment.Current.Dispatcher.BeginInvoke(delegate
                 {
                     Application.Current.UnhandledException += AudioPlayer_UnhandledException;
-                });
-
-                var tracksToPlayqueueGuidMapping = new Dictionary<Guid, ISynoTrack>();
-
-                using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
-                {
-                    XmlSerializer xs = new XmlSerializer(typeof(List<KeyValuePair<ISynoTrack, Guid>>));
-
-                    List<KeyValuePair<ISynoTrack, Guid>> deserialization;
-                    try
-                    {
-                        deserialization = (List<KeyValuePair<ISynoTrack, Guid>>)xs.Deserialize(playQueueFile);
-
-                        foreach (KeyValuePair<ISynoTrack, Guid> pair in deserialization)
-                        {
-                            tracksToPlayqueueGuidMapping.Add(pair.Value, pair.Key);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        tracksToPlayqueueGuidMapping = new Dictionary< Guid, ISynoTrack>();
-                    }
-
-
-
-
-                }
-
+                });               
             }
         }
 
