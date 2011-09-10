@@ -107,16 +107,16 @@
         {
             if (e.OldItems != null)
             {
-                foreach (ISynoTrack oldItem in e.OldItems)
+                foreach (SynoTrack oldItem in e.OldItems)
                 {
-                    ISynoTrack item = oldItem;
+                    SynoTrack item = oldItem;
                     this.PlayQueueItems.Remove(this.PlayQueueItems.Single(o => o.TrackInfo == item));
                 }
             }
 
             if (e.NewItems != null)
             {
-                foreach (ISynoTrack newItem in e.NewItems)
+                foreach (SynoTrack newItem in e.NewItems)
                 {
                     this.PlayQueueItems.Add(new TrackViewModel(newItem));
                 }
@@ -162,7 +162,7 @@
         /// </summary>
         private void OnPlayNext()
         {
-            ISynoTrack nextSynoTrack;
+            SynoTrack nextSynoTrack;
 
             _playbackService.SkipNext();
             //// Don't crash if there is no active track : take the first one in the playlist.

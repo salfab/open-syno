@@ -1,25 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Newtonsoft.Json.Linq;
-using Synology.AudioStationApi;
-
 namespace OpenSyno.SynoWP7
 {
-    using OpenSyno.Services;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Newtonsoft.Json.Linq;
+
+    using Synology.AudioStationApi;
 
     public class SynologyJsonDeserializationHelper
     {
-        public static void ParseSynologyArtists(string result, out IEnumerable<ISynoItem> artists, out long total, string urlBase)
+        public static void ParseSynologyArtists(string result, out IEnumerable<SynoItem> artists, out long total, string urlBase)
         {
             JObject jObject = JObject.Parse(result);
             total = 0L;
@@ -36,7 +27,7 @@ namespace OpenSyno.SynoWP7
                                             Sequence = album["sequence"].Value<int>(),
                                             Support = album["support"].Value<bool>(),
                                             Title = album["title"].Value<string>()
-                                        }).Cast<ISynoItem>();
+                                        }).Cast<SynoItem>();
             total = jObject["total"].Value<long>();
         }
 
@@ -55,7 +46,7 @@ namespace OpenSyno.SynoWP7
             return urlBase + rootPath + relativeAlbumArtUrl;
         }
 
-        public static void ParseSynologyAlbums(string content, out IEnumerable<ISynoItem> albums, out long total, string urlBase)
+        public static void ParseSynologyAlbums(string content, out IEnumerable<SynoItem> albums, out long total, string urlBase)
         {
             ParseSynologyArtists(content, out albums, out total, urlBase);
 
@@ -72,7 +63,7 @@ namespace OpenSyno.SynoWP7
         /// <remarks>
         /// There a bug in Audio Station 3.0 where the AlbumArtUrl field does not point to an album art, but rather to an artist art. fixing the url on the client will work just fine untill they fix it.
         /// </remarks>
-        private static IEnumerable<ISynoItem> WorkaroundAlbumArtBug(ISynoItem[] albums)
+        private static IEnumerable<SynoItem> WorkaroundAlbumArtBug(SynoItem[] albums)
         {
             foreach (var synoItem in albums)
             {
@@ -81,7 +72,7 @@ namespace OpenSyno.SynoWP7
             return albums;
         }
 
-        public static void ParseSynologyTracks(string content, out IEnumerable<ISynoTrack> tracks, out long total, string urlBase)
+        public static void ParseSynologyTracks(string content, out IEnumerable<SynoTrack> tracks, out long total, string urlBase)
         {
             JObject o = JObject.Parse(content);
             JToken items = o["items"];
@@ -113,7 +104,7 @@ namespace OpenSyno.SynoWP7
                                            Title = p["title"].Value<string>(),
                                            Track = p["track"].Value<int>(),
                                            Year = p["year"].Value<int>()
-                                       }).Cast<ISynoTrack>()
+                                       }).Cast<SynoTrack>()
                 ;
         }
     }

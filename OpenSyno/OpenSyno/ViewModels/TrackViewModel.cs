@@ -13,7 +13,7 @@
         private bool _isSelected;
         private const string IsSelectedPropertyName = "IsSelected";
         [DataMember]
-        public ISynoTrack TrackInfo { get; set; }
+        public SynoTrack TrackInfo { get; set; }
 
         [DataMember]
         public bool IsSelected
@@ -29,7 +29,7 @@
             }
         }
 
-        public TrackViewModel(ISynoTrack synoTrack)
+        public TrackViewModel(SynoTrack synoTrack)
         {
             if (synoTrack == null)
             {

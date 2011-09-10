@@ -2,8 +2,10 @@
 {
     using System;
 
+    using Synology.AudioStationApi;
+
     public class MediaEndedEventArgs : EventArgs
     {
-        public ISynoTrack Track { get; set; }
+        public SynoTrack Track { get; set; }
     }
 }

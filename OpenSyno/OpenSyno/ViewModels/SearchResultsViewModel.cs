@@ -50,7 +50,7 @@ namespace OpenSyno.ViewModels
         private IEnumerable<SearchResultItemViewModel> _searchResults;
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
-        private IEnumerable<ISynoItem> _unfilteredSearchResults;
+        private IEnumerable<SynoItem> _unfilteredSearchResults;
         private const string ArtistsPropertyName = "Artists";
         private const string SearchResultsPropertyName = "SearchResults";
 
@@ -149,7 +149,7 @@ namespace OpenSyno.ViewModels
         }
 
         // Eventaggregator needs to be moved to .ctor
-        public SearchResultItemViewModel Create(ISynoItem result, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
+        public SearchResultItemViewModel Create(SynoItem result, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
         {
             return new SearchResultItemViewModel(result, eventAggregator, pageSwitchingService, _urlParameterToObjectsPlateHeater);
         }
@@ -157,6 +157,6 @@ namespace OpenSyno.ViewModels
 
     public interface ISearchResultItemViewModelFactory
     {
-        SearchResultItemViewModel Create(ISynoItem result, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService);
+        SearchResultItemViewModel Create(SynoItem result, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService);
     }
 }

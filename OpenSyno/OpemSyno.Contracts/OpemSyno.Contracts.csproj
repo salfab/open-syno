@@ -68,7 +68,12 @@
     <Compile Include="Services\PlaybackStatus.cs" />
     <Compile Include="Services\TrackCurrentPositionChangedDelegate.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\OpenSyno.SynoWP7\OpenSyno.SynoWP7.csproj">
+      <Project>{16DA973A-2885-4E6E-89CD-5CA3825B3CA6}</Project>
+      <Name>OpenSyno.SynoWP7</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions />

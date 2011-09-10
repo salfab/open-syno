@@ -23,7 +23,7 @@
         /// <param name="eventAggregator">The event aggregator.</param>
         /// <param name="pageSwitchingService">The page switching service.</param>
         /// <param name="urlParameterToObjectsPlateHeater"></param>
-        public SearchResultItemViewModel(ISynoItem itemInfo, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater)
+        public SearchResultItemViewModel(SynoItem itemInfo, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater)
         {
             if (itemInfo == null) throw new ArgumentNullException("itemInfo");
             ItemSelectedCommand = new DelegateCommand(OnItemSelected);
@@ -48,6 +48,6 @@
 
         public DelegateCommand ItemSelectedCommand { get; set; }
 
-        public ISynoItem ItemInfo { get; set; }
+        public SynoItem ItemInfo { get; set; }
     }
 }

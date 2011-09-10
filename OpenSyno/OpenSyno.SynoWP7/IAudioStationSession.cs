@@ -5,8 +5,6 @@
     using System.Net;
     using System.Runtime.Serialization;
 
-    using OpenSyno.Services;
-
     public interface IAudioStationSession
     {
         /// <summary>
@@ -19,10 +17,10 @@
 
         void LoginAsync(string login, string password, Action<string> callback, Action<Exception> callbackError, bool useSsl);
 
-        void SearchAllMusic(string pattern, Action<IEnumerable<ISynoTrack>> callback, Action<Exception> callbackError);
-        void SearchArtist(string pattern, Action<IEnumerable<ISynoItem>> callback, Action<Exception> callbackError);
-        void GetAlbumsForArtist(ISynoItem artist, Action<IEnumerable<ISynoItem>, long, ISynoItem> callback, Action<Exception> callbackError);
-        void GetTracksForAlbum(ISynoItem album, Action<IEnumerable<ISynoTrack>, long, ISynoItem> callback, Action<Exception> callbackError);
+        void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError);
+        void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError);
+        void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback, Action<Exception> callbackError);
+        void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError);
 
         bool IsSignedIn { get; }
 

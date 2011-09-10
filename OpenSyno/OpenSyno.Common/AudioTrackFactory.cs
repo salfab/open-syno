@@ -5,11 +5,13 @@ using OpenSyno.Services;
 
 namespace OpenSyno.Common
 {
+    using Synology.AudioStationApi;
+
     public class AudioTrackFactory : IAudioTrackFactory
     {
         #region Implementation of IAudioTrackFactory
 
-        public AudioTrack Create(ISynoTrack baseSynoTrack, Guid guid, string host, int port, string token)
+        public AudioTrack Create(SynoTrack baseSynoTrack, Guid guid, string host, int port, string token)
         {
             string url =
                 string.Format(

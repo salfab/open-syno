@@ -158,7 +158,7 @@ namespace OpenSyno.ViewModels
 
         public ICommand ShowPlayQueueCommand { get; set; }
 
-        public void BuildArtistItems(IEnumerable<ISynoItem> albums)
+        public void BuildArtistItems(IEnumerable<SynoItem> albums)
         {
             this.ArtistItems.Clear();            
 

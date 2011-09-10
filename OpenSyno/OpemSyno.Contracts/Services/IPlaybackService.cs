@@ -6,6 +6,8 @@ namespace OpenSyno.Services
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
 
+    using Synology.AudioStationApi;
+
     /// <summary>
     /// The service in charge of managing the play queue, define which tracks comes next, handle random playback, repeat and other playback options.
     /// </summary>
@@ -47,7 +49,7 @@ namespace OpenSyno.Services
         /// Plays the specified track. It must be present in the queue.
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
-        void PlayTrackInQueue(ISynoTrack trackToPlay);
+        void PlayTrackInQueue(SynoTrack trackToPlay);
 
         event TrackEndedDelegate TrackEnded;
 
@@ -73,22 +75,22 @@ namespace OpenSyno.Services
 
         event NotifyCollectionChangedEventHandler PlayqueueChanged;
 
-        void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition);
+        void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition);
 
-        IEnumerable<ISynoTrack> GetTracksInQueue();
+        IEnumerable<SynoTrack> GetTracksInQueue();
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);
 
     public class TrackStartedEventArgs
     {
-        public ISynoTrack Track { get; set; }
+        public SynoTrack Track { get; set; }
     }
 
     public delegate void TrackEndedDelegate(object sender, TrackEndedDelegateArgs args);
 
     public class TrackEndedDelegateArgs
     {
-        public ISynoTrack Track { get; set; }
+        public SynoTrack Track { get; set; }
     }
 }

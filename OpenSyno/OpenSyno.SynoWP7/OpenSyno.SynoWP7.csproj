@@ -65,12 +65,6 @@
     <Compile Include="SynologyJsonDeserializationHelper.cs" />
     <Compile Include="SynoTrack.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpemSyno.Contracts\OpemSyno.Contracts.csproj">
-      <Project>{231AB4AB-1043-4856-9730-7C3418717EA8}</Project>
-      <Name>OpemSyno.Contracts</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions />

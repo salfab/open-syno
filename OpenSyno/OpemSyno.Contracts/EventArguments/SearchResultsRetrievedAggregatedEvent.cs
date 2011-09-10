@@ -2,11 +2,13 @@
 
 namespace OpenSyno.Services
 {
+    using Synology.AudioStationApi;
+
     public class SearchResultsRetrievedAggregatedEvent
     {
-        public IEnumerable<ISynoItem> Results { get; set; }
+        public IEnumerable<SynoItem> Results { get; set; }
 
-        public SearchResultsRetrievedAggregatedEvent(IEnumerable<ISynoItem> results)
+        public SearchResultsRetrievedAggregatedEvent(IEnumerable<SynoItem> results)
         {
             Results = results;
         }

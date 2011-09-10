@@ -164,7 +164,7 @@ namespace OpenSyno.ViewModels
             IsBusy = isSearchIssued;
         }
 
-        private void SearchAllCompleted(IEnumerable<ISynoTrack> results, string keyword)
+        private void SearchAllCompleted(IEnumerable<SynoTrack> results, string keyword)
         {
             if (results == null) throw new ArgumentNullException("results");
             IsBusy = false;
@@ -172,7 +172,7 @@ namespace OpenSyno.ViewModels
             _pageSwitchingService.NavigateToSearchAllResults(keyword);
         }
 
-        private void SearchCompleted(IEnumerable<ISynoItem> results)
+        private void SearchCompleted(IEnumerable<SynoItem> results)
         {
             IsBusy = false;
             _pageSwitchingService.NavigateToSearchResults();

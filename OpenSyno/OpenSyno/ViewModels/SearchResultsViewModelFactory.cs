@@ -11,7 +11,7 @@
 
     public class SearchResultsViewModelFactory
     {
-        private IEnumerable<ISynoItem> _lastSearchResults;
+        private IEnumerable<SynoItem> _lastSearchResults;
         private IEventAggregator _eventAggregator;
 
         private ISearchResultItemViewModelFactory _searchResultItemViewModelFactory;
@@ -24,7 +24,7 @@
             }
             _eventAggregator = eventAggregator;
             _searchResultItemViewModelFactory = searchResultItemViewModelFactory;
-            _lastSearchResults = new List<ISynoItem>();
+            _lastSearchResults = new List<SynoItem>();
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Subscribe(SearchResultsUpdated, true);
         }
 

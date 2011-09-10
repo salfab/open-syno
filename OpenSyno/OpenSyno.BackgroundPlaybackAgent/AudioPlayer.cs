@@ -77,7 +77,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
             switch (playState)
             {
                 case PlayState.TrackEnded:
-                    Func<Dictionary<Guid, ISynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (dict, currentTrack) =>
+                    Func<Dictionary<Guid, SynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (dict, currentTrack) =>
                         {
                             var index = dict.Keys.ToList().IndexOf(new Guid(currentTrack.Tag));
                             index++;
@@ -154,7 +154,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     player.Position = (TimeSpan)param;
                     break;
                 case UserAction.SkipNext:
-                        Func<Dictionary<Guid, ISynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (dict, currentTrack) =>
+                        Func<Dictionary<Guid, SynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (dict, currentTrack) =>
                         {
                             var index = dict.Keys.ToList().IndexOf(new Guid(currentTrack.Tag));
                             index++;
@@ -186,13 +186,13 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// (c) MediaStreamSource (null)
         /// </remarks>
         /// <returns>an instance of AudioTrack, or null if the playback is completed</returns>
-        private AudioTrack GetNextTrack(AudioTrack audioTrack, Func<Dictionary<Guid, ISynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate)
+        private AudioTrack GetNextTrack(AudioTrack audioTrack, Func<Dictionary<Guid, SynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate)
         {
             if (defineNextTrackPredicate == null)
             {
                 throw new ArgumentNullException("defineNextTrackPredicate");
             }
-            var tracksToGuidMapping = new Dictionary<Guid, ISynoTrack>();
+            var tracksToGuidMapping = new Dictionary<Guid, SynoTrack>();
 
             PlayqueueInterProcessCommunicationTransporter deserialization = null;
             using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
@@ -218,7 +218,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
             var mappedTrack = tracksToGuidMapping[new Guid(audioTrack.Tag)];
             GuidToTrackMapping guidToTrackMapping = defineNextTrackPredicate(tracksToGuidMapping, audioTrack);
 
-            ISynoTrack nextTrack = guidToTrackMapping.Track;
+            SynoTrack nextTrack = guidToTrackMapping.Track;
 
             AudioTrack track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, deserialization.Host, deserialization.Port, deserialization.Token);// new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
 

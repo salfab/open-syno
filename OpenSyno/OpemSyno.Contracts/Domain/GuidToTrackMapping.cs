@@ -5,10 +5,12 @@
 
     using OpenSyno.Services;
 
+    using Synology.AudioStationApi;
+
     [DataContract]
     public class GuidToTrackMapping
     {
-        public GuidToTrackMapping(Guid guid, ISynoTrack track) : this()
+        public GuidToTrackMapping(Guid guid, SynoTrack track) : this()
         {
             Guid = guid;
             Track = track;
@@ -22,6 +24,6 @@
         public Guid Guid { get; set; }
 
         [DataMember]
-        public ISynoTrack Track { get; set; }
+        public SynoTrack Track { get; set; }
     }
 }

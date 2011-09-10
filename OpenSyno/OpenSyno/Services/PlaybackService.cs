@@ -35,7 +35,7 @@ namespace OpenSyno.Services
 
         private readonly IAudioTrackFactory _audioTrackFactory;
 
-        private Dictionary<Guid, ISynoTrack> _tracksToGuidMapping;
+        private Dictionary<Guid, SynoTrack> _tracksToGuidMapping;
 
         private PlaybackStatus _status;
 
@@ -44,11 +44,11 @@ namespace OpenSyno.Services
         /// the last started track
         /// </summary>
         /// <remarks>The MP3 Media Stream Source is buggy with Variable bitrates, so the duration is not computed correctly. Instead, we want to use the duration exposed by Synology. In order to do this, we need to keep a reference on the last played SynoTrack.</remarks>
-        private ISynoTrack _lastStartedTrack;
+        private SynoTrack _lastStartedTrack;
 
         private ILogService _logService;
 
-        private Dictionary<Guid, ISynoTrack> _cachedAudioTracks;
+        private Dictionary<Guid, SynoTrack> _cachedAudioTracks;
 
         private Timer _progressUpdater;
 
@@ -101,7 +101,7 @@ namespace OpenSyno.Services
         /// Plays the specified track. It must be present in the queue.
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
-        public void PlayTrackInQueue(ISynoTrack trackToPlay)
+        public void PlayTrackInQueue(SynoTrack trackToPlay)
         {
             PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             StreamTrack(trackToPlay);
@@ -135,7 +135,7 @@ namespace OpenSyno.Services
             // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
             //PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
-            this._tracksToGuidMapping = new Dictionary<Guid, ISynoTrack>();
+            this._tracksToGuidMapping = new Dictionary<Guid, SynoTrack>();
             
 
             PlayqueueInterProcessCommunicationTransporter deserialization = null;
@@ -237,7 +237,7 @@ namespace OpenSyno.Services
                     var guid = Guid.Parse(BackgroundAudioPlayer.Instance.Track.Tag);
                     if (this._tracksToGuidMapping.ContainsKey(guid))
                     {
-                        ISynoTrack synoTrack = this._tracksToGuidMapping[guid];
+                        SynoTrack synoTrack = this._tracksToGuidMapping[guid];
                         OnTrackStarted(new TrackStartedEventArgs { Track = synoTrack });
                     }
                     break;
@@ -320,7 +320,7 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.Volume = volume;
         }
         #region audiorendering service
-        public void StreamTrack(ISynoTrack trackToPlay)
+        public void StreamTrack(SynoTrack trackToPlay)
         {
             //// hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
             //string url =
@@ -359,7 +359,7 @@ namespace OpenSyno.Services
 
         public event NotifyCollectionChangedEventHandler PlayqueueChanged;
 
-        public void InsertTracksToQueue(IEnumerable<ISynoTrack> tracks, int insertPosition)
+        public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition)
         {
             if (insertPosition != _tracksToGuidMapping.Count())
             {
@@ -410,7 +410,7 @@ namespace OpenSyno.Services
             }
         }
 
-        public IEnumerable<ISynoTrack> GetTracksInQueue()
+        public IEnumerable<SynoTrack> GetTracksInQueue()
         {
             return _tracksToGuidMapping.Values;
         }

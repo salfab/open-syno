@@ -6,11 +6,11 @@ namespace OpenSyno
 
     public class AlbumViewModel
     {
-        public AlbumViewModel(ISynoItem album)
+        public AlbumViewModel(SynoItem album)
         {
             this.Album = album;
         }
 
-        public ISynoItem Album { get; set; }
+        public SynoItem Album { get; set; }
     }
 }

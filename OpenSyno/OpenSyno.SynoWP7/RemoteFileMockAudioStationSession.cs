@@ -2,10 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Net;
-
-    using OpenSyno.Services;
 
     public class RemoteFileMockAudioStationSession : IAudioStationSession
     {
@@ -56,14 +53,14 @@
             callback("#FAKETOKEN!");
         }
 
-        public void SearchAllMusic(string pattern, Action<IEnumerable<ISynoTrack>> callback, Action<Exception> callbackError)
+        public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError)
         {
             throw new NotImplementedException();
         }
 
-        public void SearchArtist(string pattern, Action<IEnumerable<ISynoItem>> callback, Action<Exception> callbackError)
+        public void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError)
         {
-            var results = new List<ISynoItem>();
+            var results = new List<SynoItem>();
 
             results.Add(new SynoItem
             {
@@ -86,12 +83,12 @@
             callback(results);
         }
 
-        public void GetAlbumsForArtist(ISynoItem artist, Action<IEnumerable<ISynoItem>, long, ISynoItem> callback, Action<Exception> callbackError)
+        public void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback, Action<Exception> callbackError)
         {
             throw new NotImplementedException();
         }
 
-        public void GetTracksForAlbum(ISynoItem album, Action<IEnumerable<ISynoTrack>, long, ISynoItem> callback, Action<Exception> callbackError)
+        public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError)
         {
             throw new NotImplementedException();
         }

@@ -5,6 +5,8 @@
     using System.Collections.Generic;
     using System.Collections.Specialized;
 
+    using Synology.AudioStationApi;
+
     /// <summary>
     /// Interface to implement for the service in charge of doing the actual rendering of the music.
     /// </summary>
@@ -26,7 +28,7 @@
 
         void SetVolume(double volume);
 
-        void StreamTrack(ISynoTrack trackToPlay);
+        void StreamTrack(SynoTrack trackToPlay);
         
     }
 }
