@@ -81,6 +81,8 @@ namespace OpenSyno.Services
                 catch (Exception e)
                 {
                     _logService.Trace(string.Format("ReadWriteMemoryStream.Read : Read error : {0} - {1}", e.GetType().FullName, e.Message));
+                    // TODO : maybe we should swallow the error and raise an event so that we can relay the problem to the UI.
+                    // ... this or handle the exceptions in the Mp3MediaStreamSource + MediaParser dll so the apps don't crash with unhandled exceptions.
                     throw;
                 }
                        

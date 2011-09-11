@@ -40,15 +40,15 @@ namespace OpenSyno.Services
 
                 var audioStation = IoC.Container.Get<IAudioStationSession>();
                 audioStation.LoginAsync(
-                    _openSynoSettings.UserName,
-                    _openSynoSettings.Password,
+                    this._openSynoSettings.UserName,
+                    this._openSynoSettings.Password,
                     token =>
-                    {
-                        _openSynoSettings.Token = token;
-                        OnSignInCompleted(new SignInCompletedEventArgs { Token = token, IsBusy =  false});
-                        _eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Publish(new SynoTokenReceivedAggregatedEvent { Token = token });
-                    },
-                   exception => { throw exception; });
+                        {
+                            this._openSynoSettings.Token = token;
+                            this.OnSignInCompleted(new SignInCompletedEventArgs { Token = token, IsBusy =  false});
+                            this._eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Publish(new SynoTokenReceivedAggregatedEvent { Token = token });
+                        },
+                   exception => { throw exception; }, this._openSynoSettings.UseSsl);
             }
         }
 
