@@ -358,6 +358,15 @@
 
         #region Methods
 
+        public void WakeUpFromTombstone()
+        {
+            var currentTrack = this._playbackService.GetCurrentTrack();
+            if (currentTrack != null)
+            {
+                this.ActiveTrack = new TrackViewModel(currentTrack);
+            }
+        }
+
         private void AppendItems(IEnumerable<TrackViewModel> items)
         {
             var tracks = items.Select(o=>o.TrackInfo);

@@ -198,11 +198,11 @@ namespace OpenSyno.BackgroundPlaybackAgent
             using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
             {
                 // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
-                var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+                var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
 
                 try
                 {
-                    deserialization = (PlayqueueInterProcessCommunicationTransporter)xs.Deserialize(playQueueFile);
+                    deserialization = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
 
                     foreach (GuidToTrackMapping pair in deserialization.Mappings)
                     {

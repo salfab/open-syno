@@ -13,6 +13,7 @@ namespace OpenSyno.Services
     using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Net;
+    using System.Runtime.Serialization;
     using System.Threading;
     using System.Windows;
     using System.Windows.Threading;
@@ -141,12 +142,13 @@ namespace OpenSyno.Services
             PlayqueueInterProcessCommunicationTransporter deserialization = null;
             using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
             {
-                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
-                var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+
+                DataContractSerializer dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
 
                 try
                 {
-                    deserialization = (PlayqueueInterProcessCommunicationTransporter)xs.Deserialize(playQueueFile);
+                    deserialization = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
 
                     foreach (GuidToTrackMapping pair in deserialization.Mappings)
                     {
@@ -396,8 +398,7 @@ namespace OpenSyno.Services
         {
             using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
             {
-                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
-                var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+                var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
 
                 var serialization = new PlayqueueInterProcessCommunicationTransporter()
                     {
@@ -406,13 +407,24 @@ namespace OpenSyno.Services
                         Mappings = _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key, o.Value)).ToList(),
                         Token = _audioStationSession.Token
                     };
-                    xs.Serialize(playQueueFile, serialization);
+                    dcs.WriteObject(playQueueFile, serialization);
             }
         }
 
         public IEnumerable<SynoTrack> GetTracksInQueue()
         {
             return _tracksToGuidMapping.Values;
+        }
+
+        public SynoTrack GetCurrentTrack()
+        {
+            var audioTrack = BackgroundAudioPlayer.Instance.Track;
+            if (audioTrack == null)
+            {
+                return null;
+            }
+
+            return _tracksToGuidMapping[Guid.Parse(audioTrack.Tag)];
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)

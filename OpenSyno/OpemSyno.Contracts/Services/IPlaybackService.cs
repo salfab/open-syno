@@ -78,6 +78,8 @@ namespace OpenSyno.Services
         void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition);
 
         IEnumerable<SynoTrack> GetTracksInQueue();
+
+        SynoTrack GetCurrentTrack();
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);
