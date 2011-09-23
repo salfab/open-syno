@@ -99,8 +99,6 @@
                     Scheme = useSsl ? "https" : "http"
                 }.Uri;
 
-            // uri = new Uri("https://ds509.hamilcar.ch:5001/webman/index.cgi");
-            // uri = new Uri("http://www.google.com/accounts/ServiceLogin?service=mail&passive=true&rm=false&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F%3Fui%3Dhtml%26zy%3Dl&bsv=llya694le36z&ss=1&scc=1&ltmpl=default&ltmplcache=2&from=login");
             client.DownloadStringCompleted += (sender, e) =>
                                                   {
                                                       if (e.Error != null)
