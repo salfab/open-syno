@@ -5,12 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{231AB4AB-1043-4856-9730-7C3418717EA8}</ProjectGuid>
+    <ProjectGuid>{6E1DCE88-264F-49AD-827F-52059D4C983D}</ProjectGuid>
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OpemSyno.Contracts</RootNamespace>
-    <AssemblyName>OpemSyno.Contracts</AssemblyName>
+    <RootNamespace>OpenSyno.AudioStreamAgent</RootNamespace>
+    <AssemblyName>OpenSyno.AudioStreamAgent</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <TargetFrameworkProfile>WindowsPhone71</TargetFrameworkProfile>
@@ -18,6 +18,7 @@
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <BackgroundAgentType>AudioStreamingAgent</BackgroundAgentType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +42,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MediaParsers.Phone">
+      <HintPath>..\3rd party\ManagedMediaHelpers\MediaParsers.Phone.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Phone" />
+    <Reference Include="Mp3MediaStreamSource.Phone">
+      <HintPath>..\3rd party\ManagedMediaHelpers\Mp3MediaStreamSource.Phone.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows" />
     <Reference Include="system" />
@@ -51,28 +58,17 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\GuidToTrackMapping.cs" />
-    <Compile Include="Domain\IAudioTrackFactory.cs" />
-    <Compile Include="EventArguments\MediaEndedEventArgs.cs" />
-    <Compile Include="EventArguments\SearchResultsRetrievedAggregatedEvent.cs" />
-    <Compile Include="EventArguments\SignInCompletedEventArgs.cs" />
-    <Compile Include="EventArguments\TrackCurrentPositionChangedEventArgs.cs" />
-    <Compile Include="Services\ILogService.cs" />
+    <Compile Include="AudioStreamer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IAudioRenderingService.cs" />
-    <Compile Include="Services\IPageSwitchingService.cs" />
-    <Compile Include="Services\IPanoramaItemSwitchingService.cs" />
-    <Compile Include="Services\IPlaybackService.cs" />
-    <Compile Include="Services\ISignInService.cs" />
-    <Compile Include="Domain\ISynoItem.cs" />
-    <Compile Include="Services\PlaybackContinuity.cs" />
-    <Compile Include="Services\PlaybackStatus.cs" />
-    <Compile Include="Services\TrackCurrentPositionChangedDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenSyno.SynoWP7\OpenSyno.SynoWP7.csproj">
-      <Project>{16DA973A-2885-4E6E-89CD-5CA3825B3CA6}</Project>
-      <Name>OpenSyno.SynoWP7</Name>
+    <ProjectReference Include="..\OpemSyno.Contracts\OpemSyno.Contracts.csproj">
+      <Project>{231AB4AB-1043-4856-9730-7C3418717EA8}</Project>
+      <Name>OpemSyno.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSyno.Common\OpenSyno.Common.csproj">
+      <Project>{A353B441-D677-4688-836A-33044EF1E60E}</Project>
+      <Name>OpenSyno.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />

@@ -87,15 +87,14 @@
     <Compile Include="NotificationService.xaml.cs" />
     <Compile Include="Playlist.xaml.cs" />
     <Compile Include="Services\LogService.cs" />
-    <Compile Include="Helpers\ViewModelResolver.cs" />
     <Compile Include="IBusyable.cs" />
     <Compile Include="PerformanceProgressBar\RelativeAnimatingContentControl.cs" />
     <Compile Include="SearchAllResultsView.xaml.cs">
       <DependentUpon>SearchAllResultsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\ViewModelProxy.cs" />
     <Compile Include="Services\PanoramaItemSwitchingService.cs" />
     <Compile Include="Services\SignInService.cs" />
+    <Compile Include="ViewModelResolver.cs" />
     <Compile Include="ViewModels\AboutBoxViewModel.cs" />
     <Compile Include="AlbumViewModel.cs" />
     <Compile Include="App.xaml.cs">
@@ -116,13 +115,11 @@
     <Compile Include="AboutBoxView.xaml.cs">
       <DependentUpon>AboutBoxView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\AppBarBindingsHelper.cs" />
     <Compile Include="IOpenSynoSettings.cs" />
     <Compile Include="LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
     <Compile Include="OpenSynoSettings.xaml.cs" />
-    <Compile Include="ReadWriteMemoryStream.cs" />
     <Compile Include="ViewModels\IUrlParameterToObjectsPlateHeater.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
@@ -153,7 +150,6 @@
     </Compile>
     <Compile Include="Services\PageSwitchingService.cs" />
     <Compile Include="ViewModels\UrlParameterToObjectsPlateHeater.xaml.cs" />
-    <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +207,10 @@
     <ProjectReference Include="..\OpemSyno.Contracts\OpemSyno.Contracts.csproj">
       <Project>{231AB4AB-1043-4856-9730-7C3418717EA8}</Project>
       <Name>OpemSyno.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSyno.AudioStreamAgent\OpenSyno.AudioStreamAgent.csproj">
+      <Project>{6E1DCE88-264F-49AD-827F-52059D4C983D}</Project>
+      <Name>OpenSyno.AudioStreamAgent</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenSyno.BackgroundPlaybackAgent\OpenSyno.BackgroundPlaybackAgent.csproj">
       <Project>{431F6AB6-E2DF-4D54-B467-2AC8CC90889D}</Project>

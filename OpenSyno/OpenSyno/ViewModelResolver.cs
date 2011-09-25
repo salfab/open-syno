@@ -1,20 +1,17 @@
-﻿using System.Collections.Generic;
-using Ninject;
+﻿using Ninject;
 using Ninject.Activation;
-using Ninject.Parameters;
 using Ninject.Planning.Bindings;
-using OpenSyno.Services;
 
 namespace OpenSyno.Helpers
 {
     using System;
-    using System.ComponentModel;
     using System.Windows;
 
-    using OpenSyno.Converters;
     using OpenSyno.ViewModels;
 
-
+    /// <summary>
+    /// Bad design : if the view model to resolve is not in the same assembly, it will not work ! change it and move this class to the common dll !
+    /// </summary>
     public class ViewModelResolver
     {
         // Note : Too bad, TypeNameConverter does not exist for WP7 :(

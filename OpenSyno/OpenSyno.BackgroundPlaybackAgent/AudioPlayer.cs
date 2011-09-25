@@ -9,6 +9,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
     using System.IO;
     using System.IO.IsolatedStorage;
     using System.Linq;
+    using System.Text;
     using System.Windows;
     using System.Xml.Serialization;
 
@@ -79,7 +80,8 @@ namespace OpenSyno.BackgroundPlaybackAgent
                 case PlayState.TrackEnded:
                     Func<Dictionary<Guid, SynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (dict, currentTrack) =>
                         {
-                            var index = dict.Keys.ToList().IndexOf(new Guid(currentTrack.Tag));
+                            Guid guid = ((GuidToTrackMapping)(new DataContractSerializer(typeof(GuidToTrackMapping)).ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(currentTrack.Tag))))).Guid;                            
+                            var index = dict.Keys.ToList().IndexOf(guid);
                             index++;
                             return new GuidToTrackMapping() { Guid = dict.ToArray().ElementAt(index).Key, Track = dict.ToArray().ElementAt(index).Value };
                         };

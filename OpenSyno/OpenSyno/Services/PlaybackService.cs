@@ -332,7 +332,8 @@ namespace OpenSyno.Services
             //        _audioStationSession.Port,
             //        _audioStationSession.Token.Split('=')[1],
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+            var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);            
+            
             BackgroundAudioPlayer.Instance.Track = audioTrack;
             //new AudioTrack(
             //new Uri(url),

@@ -221,9 +221,7 @@
 
         #endregion
 
-        #region Properties
-
-        
+        #region Properties        
 
         public double Volume
         {
