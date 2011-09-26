@@ -126,6 +126,7 @@
     </Compile>
     <Compile Include="OpenSynoSettings.xaml.cs" />
     <Compile Include="ReadWriteMemoryStream.cs" />
+    <Compile Include="ViewModels\DashboardRecentViewModel.cs" />
     <Compile Include="ViewModels\IUrlParameterToObjectsPlateHeater.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
