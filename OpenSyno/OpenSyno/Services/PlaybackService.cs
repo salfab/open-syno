@@ -332,17 +332,20 @@ namespace OpenSyno.Services
             //        _audioStationSession.Port,
             //        _audioStationSession.Token.Split('=')[1],
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
-            BackgroundAudioPlayer.Instance.Track = audioTrack;
-            //new AudioTrack(
-            //new Uri(url),
-            //trackToPlay.Title,
-            //trackToPlay.Artist,
-            //trackToPlay.Album,
-            //new Uri(trackToPlay.AlbumArtUrl),
-            //_tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single().ToString(),
-            //EnabledPlayerControls.All);
-            BackgroundAudioPlayer.Instance.Play();
+            _audioTrackFactory.BeginCreate(
+                trackToPlay,
+                this._tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(),
+                this._audioStationSession.Host,
+                this._audioStationSession.Port,
+                this._audioStationSession.Token,
+                track =>
+                    {
+                        BackgroundAudioPlayer.Instance.Track = track;
+                        BackgroundAudioPlayer.Instance.Play();
+                    },
+                e => { throw e; }
+
+    );            
         }
 
         
@@ -419,7 +422,7 @@ namespace OpenSyno.Services
         public SynoTrack GetCurrentTrack()
         {
             var audioTrack = BackgroundAudioPlayer.Instance.Track;
-            if (audioTrack == null)
+            if (audioTrack == null || !_tracksToGuidMapping.ContainsKey(Guid.Parse(audioTrack.Tag)))
             {
                 return null;
             }
