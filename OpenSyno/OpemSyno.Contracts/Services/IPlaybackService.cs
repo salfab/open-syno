@@ -6,6 +6,8 @@ namespace OpenSyno.Services
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
 
+    using OpenSyno.Contracts.Domain;
+
     using Synology.AudioStationApi;
 
     /// <summary>
@@ -73,13 +75,26 @@ namespace OpenSyno.Services
 
         void SkipNext();
 
-        event NotifyCollectionChangedEventHandler PlayqueueChanged;
+        event PlayqueueChangedEventHandler PlayqueueChanged;
 
         void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition);
 
-        IEnumerable<SynoTrack> GetTracksInQueue();
+        IEnumerable<GuidToTrackMapping> GetTracksInQueue();
 
-        SynoTrack GetCurrentTrack();
+        GuidToTrackMapping GetCurrentTrack();
+
+        void RemoveTracksFromQueue(IEnumerable<SynoTrack> tracksToRemove);
+    }
+
+    public delegate void PlayqueueChangedEventHandler(object sender, PlayqueueChangedEventArgs args);
+
+    public class PlayqueueChangedEventArgs
+    {
+        public IEnumerable<GuidToTrackMapping> RemovedItems { get; set; }
+
+        public IEnumerable<GuidToTrackMapping> AddedItems { get; set; }
+
+        public int AddedItemsPosition { get; set; }
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);
@@ -87,6 +102,8 @@ namespace OpenSyno.Services
     public class TrackStartedEventArgs
     {
         public SynoTrack Track { get; set; }
+
+        public Guid Guid { get; set; }
     }
 
     public delegate void TrackEndedDelegate(object sender, TrackEndedDelegateArgs args);

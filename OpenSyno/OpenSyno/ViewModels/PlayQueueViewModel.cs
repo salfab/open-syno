@@ -11,6 +11,7 @@
     using Microsoft.Practices.Prism.Commands;
     using Microsoft.Practices.Prism.Events;
 
+    using OpenSyno.Contracts.Domain;
     using OpenSyno.Services;
 
     using Synology.AudioStationApi;
@@ -68,8 +69,8 @@
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
             _playbackService = playbackService;
-            _playQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => new TrackViewModel(o)));
-            _playbackService.PlayqueueChanged += new NotifyCollectionChangedEventHandler(OnPlayqueueChanged);
+            _playQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => new TrackViewModel(o.Guid, o.Track)));
+            _playbackService.PlayqueueChanged += this.OnPlayqueueChanged;
             //PlayQueueItems = new ObservableCollection<TrackViewModel>(_playbackService.PlayqueueItems.Select(synoTrack => new TrackViewModel(synoTrack)));
             // PlayQueueItems.CollectionChanged += OnPlayQueueEdited;
             eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
@@ -103,22 +104,22 @@
             SavePlaylistCommand = new DelegateCommand(OnSavePlaylist);
         }
 
-        private void OnPlayqueueChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnPlayqueueChanged(object sender, PlayqueueChangedEventArgs e)
         {
-            if (e.OldItems != null)
+            if (e.RemovedItems != null)
             {
-                foreach (SynoTrack oldItem in e.OldItems)
+                foreach (var oldItem in e.RemovedItems)
                 {
-                    SynoTrack item = oldItem;
-                    this.PlayQueueItems.Remove(this.PlayQueueItems.Single(o => o.TrackInfo == item));
+                    var guid = oldItem.Guid;
+                    this.PlayQueueItems.Remove(this.PlayQueueItems.Single(o => o.Guid == guid));
                 }
             }
 
-            if (e.NewItems != null)
+            if (e.AddedItems != null)
             {
-                foreach (SynoTrack newItem in e.NewItems)
+                foreach (GuidToTrackMapping newItem in e.AddedItems)
                 {
-                    this.PlayQueueItems.Add(new TrackViewModel(newItem));
+                    this.PlayQueueItems.Add(new TrackViewModel(newItem.Guid, newItem.Track));
                 }
             }
         }
@@ -132,13 +133,15 @@
         private void OnRemoveTracksFromQueue(IEnumerable<object> tracks)
         {
             
-            for (int i = this.PlayQueueItems.Count - 1; i >= 0; i--)
-            {
-                if (this.PlayQueueItems[i].IsSelected)
-                {
-                    this.PlayQueueItems.RemoveAt(i);
-                }
-            }
+            //for (int i = this.PlayQueueItems.Count - 1; i >= 0; i--)
+            //{
+            //    if (this.PlayQueueItems[i].IsSelected)
+            //    {
+            //        this.PlayQueueItems.RemoveAt(i);
+            //    }
+            //}
+            _playbackService.RemoveTracksFromQueue(this.PlayQueueItems.Where(o=>o.IsSelected).Select(o=>o.TrackInfo));
+
         }
 
         private void OnResumePlayback()
@@ -363,7 +366,7 @@
             var currentTrack = this._playbackService.GetCurrentTrack();
             if (currentTrack != null)
             {
-                this.ActiveTrack = new TrackViewModel(currentTrack);
+                this.ActiveTrack = new TrackViewModel(currentTrack.Guid, currentTrack.Track);
             }
         }
 
@@ -396,7 +399,7 @@
                                                      CurrentArtwork = new Uri(ea.Track.AlbumArtUrl, UriKind.Absolute);
 
                                                      // FIXME : Use a factory so we can mock the active track !
-                                                     ActiveTrack = new TrackViewModel(ea.Track);
+                                                     ActiveTrack = new TrackViewModel(ea.Guid, ea.Track);
                                                  };
         }
 
