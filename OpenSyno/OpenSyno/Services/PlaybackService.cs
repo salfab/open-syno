@@ -435,15 +435,16 @@ namespace OpenSyno.Services
             return new GuidToTrackMapping(guid, _tracksToGuidMapping[guid]);
         }
 
-        public void RemoveTracksFromQueue(IEnumerable<SynoTrack> tracksToRemove)
+        public void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove)
         {
-            SynoTrack[] synoTracks = tracksToRemove.ToArray();
-            foreach (var track in synoTracks)
+            var guidsToRemove = tracksToRemove.ToArray();
+            foreach (var guid in guidsToRemove)
             {
-                KeyValuePair<Guid, SynoTrack> guidAndTrackKeyValuePair = this._tracksToGuidMapping.Where(o => o.Value == track).Single();
-                _tracksToGuidMapping.Remove(guidAndTrackKeyValuePair.Key);
+                var guidToTrackMapping = new GuidToTrackMapping(guid, _tracksToGuidMapping[guid]);
+                _tracksToGuidMapping.Remove(guid);
+
                 PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
-                ea.RemovedItems = new[] { new GuidToTrackMapping(guidAndTrackKeyValuePair.Key,guidAndTrackKeyValuePair.Value)  };
+                ea.RemovedItems = new[] { guidToTrackMapping  };
                 this.OnTracksInQueueChanged(ea);
             }
         }

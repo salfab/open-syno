@@ -169,7 +169,13 @@ namespace OpenSyno.BackgroundPlaybackAgent
                             }
                             return new GuidToTrackMapping() { Guid = dict.ToArray().ElementAt(index).Key, Track = dict.ToArray().ElementAt(index).Value };
                         };
-                        GetNextTrack(track, defineNextTrackPredicate, t => { player.Track = t; }, e => { throw e; });
+                        GetNextTrack(track, defineNextTrackPredicate, t =>
+                                                                          {
+                                                                              if (t!= null)
+                                                                              {
+                                                                                  player.Track = t;
+                                                                              }
+                                                                          }, e => { throw e; });
                     break;
                 case UserAction.SkipPrevious:
                     AudioTrack previousTrack = GetPreviousTrack();

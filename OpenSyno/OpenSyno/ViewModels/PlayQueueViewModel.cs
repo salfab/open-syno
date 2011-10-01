@@ -140,7 +140,7 @@
             //        this.PlayQueueItems.RemoveAt(i);
             //    }
             //}
-            _playbackService.RemoveTracksFromQueue(this.PlayQueueItems.Where(o=>o.IsSelected).Select(o=>o.TrackInfo));
+            _playbackService.RemoveTracksFromQueue(this.PlayQueueItems.Where(o=>o.IsSelected).Select(o=>o.Guid));
 
         }
 
