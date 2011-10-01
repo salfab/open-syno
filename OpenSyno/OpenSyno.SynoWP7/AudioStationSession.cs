@@ -1,4 +1,6 @@
-﻿namespace Synology.AudioStationApi
+﻿using Newtonsoft.Json.Linq;
+
+namespace Synology.AudioStationApi
 {
     using System.Runtime.Serialization;
     using System;
@@ -127,12 +129,18 @@
                                                           string rawCookie = ((WebClient)sender).ResponseHeaders["Set-Cookie"];
                                                           if (rawCookie == null)
                                                           {
-                                                              throw new SynoLoginException("The login and the password don't match, please check your credentials", null);
+                                                              if (JObject.Parse(e.Result)["success"].Value<bool>() != true)
+                                                              {
+                                                                  throw new SynoLoginException("The login and the password don't match, please check your credentials", null);                                                                  
+                                                              }
                                                           }
-
-                                                          string cookie = rawCookie.Split(';').Where(s => s.StartsWith("id=")).Single();
-                                                          this.Token = cookie;
-                                                          callback(cookie);
+                                                          else
+                                                          {
+                                                              string cookie = rawCookie.Split(';').Where(s => s.StartsWith("id=")).Single();
+                                                              this.Token = cookie;
+                                                          }                                                          
+                                                          
+                                                          callback(this.Token);
                                                       }
 
                                                   };
