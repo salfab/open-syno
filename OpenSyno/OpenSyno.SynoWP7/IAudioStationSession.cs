@@ -32,5 +32,8 @@
 
         [DataMember]
         string Token { get; set; }
+
+        [DataMember]
+        string Protocol { get; set; }
     }
 }

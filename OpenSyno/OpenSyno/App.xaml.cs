@@ -86,7 +86,11 @@ namespace OpenSyno
             }
             else
             {
-                audioStationSession = new AudioStationSession { Host = _openSynoSettings.Host, Port = _openSynoSettings.Port, Token = _openSynoSettings.Token };
+                audioStationSession = new AudioStationSession(
+                    _openSynoSettings.UseSsl ? "https" : "http",
+                    _openSynoSettings.Host,
+                    _openSynoSettings.Port,
+                    _openSynoSettings.Token);
             }
 
             IoC.Container.Bind<IAudioStationSession>().ToConstant(audioStationSession).InSingletonScope();

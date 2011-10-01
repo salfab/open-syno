@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Runtime.Serialization;
 
     public class RemoteFileMockAudioStationSession : IAudioStationSession
     {
@@ -136,5 +137,8 @@
                 throw new NotImplementedException();
             }
         }
+
+        [DataMember]
+        public string Protocol { get; set; }
     }
 }

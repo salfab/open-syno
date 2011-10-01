@@ -17,11 +17,23 @@
         [DataMember]
         public string Host { get;  set; }
 
+        public AudioStationSession(string protocol, string host, int port, string token)
+        {
+            this.Protocol = protocol;
+            this.Host = host;
+            this.Port = port;
+            this.Token = token;
+
+        }
+
         [DataMember]
-        public int Port { get;  set; }
+        public int Port { get; set; }
 
         [DataMember]
         public string Token { get; set; }
+
+        [DataMember]
+        public string Protocol { get; set; }
 
         /// <summary>
         /// Gets the remote file network stream.
@@ -44,7 +56,7 @@
             var client = new WebClient();
 
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
-            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", this.Host, this.Port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20").Replace("&", "%26"));
+            string url = string.Format("{0}://{1}:{2}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={3}",this.Protocol, this.Host, this.Port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20").Replace("&", "%26"));
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.CookieContainer = new CookieContainer();
@@ -130,7 +142,7 @@
 
         public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError)
         {
-            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            string urlBase = string.Format("{0}://{1}:{2}", this.Protocol, this.Host, this.Port);
             var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
 
             HttpWebRequest request = BuildRequest(url);
@@ -192,7 +204,7 @@
 
         public void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError)
         {
-            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            string urlBase = string.Format("{0}://{1}:{2}", this.Protocol,this.Host, this.Port);
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
 
             HttpWebRequest request = BuildRequest(url);
@@ -325,11 +337,12 @@
 
         public void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback, Action<Exception> callbackError)
         {
-            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            
+            string urlBase = string.Format("{0}://{1}:{2}", this.Protocol, this.Host, this.Port);
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-
+            
             request.Accept = "*/*";
             request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
 
@@ -400,7 +413,7 @@
 
         public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError)
         {
-            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            string urlBase = string.Format("{0}://{1}:{2}",this.Protocol, this.Host, this.Port);
 
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
 

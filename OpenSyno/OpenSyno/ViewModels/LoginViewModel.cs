@@ -56,6 +56,7 @@
             _synoSettings.Port = Port;
             _audioStationSession.Host = Host;
             _audioStationSession.Port = Port;
+            _audioStationSession.Protocol = UseSsl ? "https" : "http";
             try
             {
                 _audioStationSession.LoginAsync(this.UserName, this.Password, this.OnLoginAsyncCompleted, this.OnLoginAsyncException, this._synoSettings.UseSsl);

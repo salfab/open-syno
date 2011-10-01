@@ -334,7 +334,7 @@ namespace OpenSyno.Services
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
             _audioTrackFactory.BeginCreate(
                 trackToPlay,
-                this._tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(),
+                this._tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), this._audioStationSession.Protocol,
                 this._audioStationSession.Host,
                 this._audioStationSession.Port,
                 this._audioStationSession.Token,
@@ -400,7 +400,7 @@ namespace OpenSyno.Services
 
         private void SerializePlayqueue()
         {
-            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
             {
                 var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
 
@@ -409,7 +409,8 @@ namespace OpenSyno.Services
                         Host = _audioStationSession.Host,
                         Port = _audioStationSession.Port,
                         Mappings = _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key, o.Value)).ToList(),
-                        Token = _audioStationSession.Token
+                        Token = _audioStationSession.Token,
+                        Protocol = _audioStationSession.Protocol
                     };
                     dcs.WriteObject(playQueueFile, serialization);
             }

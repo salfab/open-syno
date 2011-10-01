@@ -7,6 +7,6 @@ namespace OpenSyno.Services
 
     public interface IAudioTrackFactory
     {
-        void BeginCreate(SynoTrack baseSynoTrack, Guid guid, string host, int port, string token, Action<AudioTrack> successCallback, Action<Exception> errorCallback);
+        void BeginCreate(SynoTrack baseSynoTrack, Guid guid, string protocol, string host, int port, string token, Action<AudioTrack> successCallback, Action<Exception> errorCallback);
     }
 }
