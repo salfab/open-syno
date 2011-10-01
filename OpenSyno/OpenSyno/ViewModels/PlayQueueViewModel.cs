@@ -76,7 +76,11 @@
             eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             this._notificationService = notificationService;
             _openSynoSettings = openSynoSettings;
-
+            _playbackService.TrackStarted += (o, e) =>
+                                                 {
+                                                     CurrentArtwork = new Uri(e.Track.AlbumArtUrl, UriKind.Absolute);
+                                                     this.ActiveTrack = new TrackViewModel(e.Guid, e.Track);
+                                                 };
 
             _playbackService.BufferingProgressUpdated += (o, e) =>
                 {
@@ -96,7 +100,7 @@
                     CurrentTrackPosition = e.Position;
                 };
 
-            PlayCommand = new DelegateCommand<TrackViewModel>(OnPlay, track => track != null);
+            PlayCommand = new DelegateCommand<TrackViewModel>(o => OnPlay(o.Guid), track => track != null);
             PlayNextCommand = new DelegateCommand(OnPlayNext);
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
@@ -370,37 +374,27 @@
             }
         }
 
-        private void AppendItems(IEnumerable<TrackViewModel> items)
+        private Dictionary<SynoTrack, Guid> AppendItems(IEnumerable<TrackViewModel> items)
         {
             var tracks = items.Select(o=>o.TrackInfo);
 
             int insertPosition = PlayQueueItems.Count();
 
-            _playbackService.InsertTracksToQueue(tracks, insertPosition);
+            return _playbackService.InsertTracksToQueue(tracks, insertPosition);
             //foreach (var trackViewModel in items)
             //{
             //    PlayQueueItems.Add(trackViewModel);
             //}
         }
 
-        private void OnPlay(TrackViewModel trackViewModel)
+        private void OnPlay(Guid guidOfTrackToPlay)
         {
-            // HACK : with silverlight 4 on the phone, there will be proper support for commanding and disabling buttons when canExecute is false
-            if (!PlayCommand.CanExecute(trackViewModel)) 
-                return;
-            if (trackViewModel == null)
+            if (guidOfTrackToPlay == Guid.Empty)
             {
-                throw new ArgumentNullException("trackViewModel", "The play command has been triggered without specifying a track to play.");
+                throw new ArgumentNullException("guidOfTrackToPlay", "The play command has been triggered without specifying a track to play.");
             }
 
-            _playbackService.PlayTrackInQueue(trackViewModel.Guid);
-            _playbackService.TrackStarted += (sender, ea) =>
-                                                 {
-                                                     CurrentArtwork = new Uri(ea.Track.AlbumArtUrl, UriKind.Absolute);
-
-                                                     // FIXME : Use a factory so we can mock the active track !
-                                                     ActiveTrack = new TrackViewModel(ea.Guid, ea.Track);
-                                                 };
+            _playbackService.PlayTrackInQueue(guidOfTrackToPlay);
         }
 
         public ICommand RemoveTracksFromQueueCommand { get; set; }
@@ -412,6 +406,7 @@
         private void OnPlayListOperation(PlayListOperationAggregatedEvent e)
         {
             TrackViewModel trackToPlay;
+            Dictionary<SynoTrack, Guid> matchingGeneratedGuids;
             switch (e.Operation)
             {
                 case PlayListOperation.ClearAndPlay:
@@ -419,23 +414,25 @@
                     // test lines below before uncommenting
                     //_playbackService.ClearPlayQueue();
                     //_playbackService.InsertTracksToQueue(e.Items.Select(o => o.TrackInfo), 0);
-                    AppendItems(e.Items);
+                    matchingGeneratedGuids = AppendItems(e.Items);
                     if (_playbackService.Status != PlaybackStatus.Stopped)
                     {
                         // stop the playback
                     }
-                    trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
-                    OnPlay(trackToPlay);
+                    trackToPlay = e.Items.First();
+                    OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
                     break;
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
                 case PlayListOperation.Append:
-                    AppendItems(e.Items);                    
+                    matchingGeneratedGuids = AppendItems(e.Items);
 
                     if (_playbackService.Status == PlaybackStatus.Stopped)
                     {
-                        trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
-                        OnPlay(trackToPlay);
+                        trackToPlay = e.Items.First();
+
+
+                        OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
                     }
                     
 

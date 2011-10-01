@@ -365,7 +365,7 @@ namespace OpenSyno.Services
 
         public event PlayqueueChangedEventHandler PlayqueueChanged;
 
-        public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition)
+        public Dictionary<SynoTrack, Guid> InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition)
         {
             if (insertPosition != _tracksToGuidMapping.Count())
             {
@@ -382,6 +382,7 @@ namespace OpenSyno.Services
                 OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = new [] { new GuidToTrackMapping(newGuid, synoTrack)}, AddedItemsPosition = insertPosition+i });
                 i++;
             }
+            return _tracksToGuidMapping.Where(o => tracks.Contains(o.Value)).ToDictionary(o=>o.Value, o=>o.Key);
         }
 
         private void OnTracksInQueueChanged(PlayqueueChangedEventArgs eventArgs)
