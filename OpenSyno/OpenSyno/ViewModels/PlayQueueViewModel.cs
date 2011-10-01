@@ -393,7 +393,7 @@
                 throw new ArgumentNullException("trackViewModel", "The play command has been triggered without specifying a track to play.");
             }
 
-            _playbackService.PlayTrackInQueue(trackViewModel.TrackInfo);
+            _playbackService.PlayTrackInQueue(trackViewModel.Guid);
             _playbackService.TrackStarted += (sender, ea) =>
                                                  {
                                                      CurrentArtwork = new Uri(ea.Track.AlbumArtUrl, UriKind.Absolute);

@@ -102,7 +102,7 @@ namespace OpenSyno.Services
         /// Plays the specified track. It must be present in the queue.
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
-        public void PlayTrackInQueue(SynoTrack trackToPlay)
+        public void PlayTrackInQueue(Guid trackToPlay)
         {
             PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             StreamTrack(trackToPlay);
@@ -322,7 +322,7 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.Volume = volume;
         }
         #region audiorendering service
-        public void StreamTrack(SynoTrack trackToPlay)
+        public void StreamTrack(Guid guidOfTrackToPlay)
         {
             //// hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
             //string url =
@@ -333,8 +333,9 @@ namespace OpenSyno.Services
             //        _audioStationSession.Token.Split('=')[1],
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
             _audioTrackFactory.BeginCreate(
-                trackToPlay,
-                this._tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), this._audioStationSession.Protocol,
+                _tracksToGuidMapping[guidOfTrackToPlay],
+                guidOfTrackToPlay,
+                this._audioStationSession.Protocol,
                 this._audioStationSession.Host,
                 this._audioStationSession.Port,
                 this._audioStationSession.Token,

@@ -28,7 +28,7 @@
 
         void SetVolume(double volume);
 
-        void StreamTrack(SynoTrack trackToPlay);
+        void StreamTrack(Guid guidOfTrackToPlay);
         
     }
 }

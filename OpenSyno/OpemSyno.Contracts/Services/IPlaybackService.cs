@@ -51,7 +51,7 @@ namespace OpenSyno.Services
         /// Plays the specified track. It must be present in the queue.
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
-        void PlayTrackInQueue(SynoTrack trackToPlay);
+        void PlayTrackInQueue(Guid trackToPlay);
 
         event TrackEndedDelegate TrackEnded;
 
