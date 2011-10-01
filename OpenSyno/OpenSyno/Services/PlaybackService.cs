@@ -102,9 +102,8 @@ namespace OpenSyno.Services
         /// Plays the specified track. It must be present in the queue.
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
-        public void PlayTrackInQueue(SynoTrack trackToPlay)
+        public void PlayTrackInQueue(Guid trackToPlay)
         {
-            PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             StreamTrack(trackToPlay);
             _status = PlaybackStatus.Buffering;
         }
@@ -240,7 +239,7 @@ namespace OpenSyno.Services
                     if (this._tracksToGuidMapping.ContainsKey(guid))
                     {
                         SynoTrack synoTrack = this._tracksToGuidMapping[guid];
-                        OnTrackStarted(new TrackStartedEventArgs { Track = synoTrack });
+                        OnTrackStarted(new TrackStartedEventArgs { Guid = guid, Track = synoTrack });
                     }
                     break;
                 case PlayState.BufferingStarted:
@@ -322,7 +321,7 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.Volume = volume;
         }
         #region audiorendering service
-        public void StreamTrack(SynoTrack trackToPlay)
+        public void StreamTrack(Guid guidOfTrackToPlay)
         {
             //// hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
             //string url =
@@ -332,7 +331,7 @@ namespace OpenSyno.Services
             //        _audioStationSession.Port,
             //        _audioStationSession.Token.Split('=')[1],
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+            var audioTrack = _audioTrackFactory.Create(_tracksToGuidMapping[guidOfTrackToPlay], guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
             BackgroundAudioPlayer.Instance.Track = audioTrack;
             //new AudioTrack(
             //new Uri(url),
@@ -359,9 +358,9 @@ namespace OpenSyno.Services
             //this._backgroundAudioRenderingService.SkipNext();
         }
 
-        public event NotifyCollectionChangedEventHandler PlayqueueChanged;
+        public event PlayqueueChangedEventHandler PlayqueueChanged;
 
-        public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition)
+        public Dictionary<SynoTrack, Guid> InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition)
         {
             if (insertPosition != _tracksToGuidMapping.Count())
             {
@@ -372,14 +371,16 @@ namespace OpenSyno.Services
             // FIXME : Be able to choose the position
             foreach (var synoTrack in tracks)
             {
-                _tracksToGuidMapping.Add(Guid.NewGuid(), synoTrack);    
+                Guid newGuid = Guid.NewGuid();
+                _tracksToGuidMapping.Add(newGuid, synoTrack);    
                 // FIXME : Urgent : replace NotifyCollectionChanged by a custom event that can propagate bulk collection changes ! (optimize writes on disk )
-                OnTracksInQueueChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, synoTrack, insertPosition+i));
+                OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = new [] { new GuidToTrackMapping(newGuid, synoTrack)}, AddedItemsPosition = insertPosition+i });
                 i++;
             }
+            return _tracksToGuidMapping.Where(o => tracks.Contains(o.Value)).ToDictionary(o=>o.Value, o=>o.Key);
         }
 
-        private void OnTracksInQueueChanged(NotifyCollectionChangedEventArgs eventArgs)
+        private void OnTracksInQueueChanged(PlayqueueChangedEventArgs eventArgs)
         {
             if (eventArgs == null)
             {
@@ -411,12 +412,14 @@ namespace OpenSyno.Services
             }
         }
 
-        public IEnumerable<SynoTrack> GetTracksInQueue()
+        public IEnumerable<GuidToTrackMapping> GetTracksInQueue()
         {
-            return _tracksToGuidMapping.Values;
+            return _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key,o.Value));
         }
 
-        public SynoTrack GetCurrentTrack()
+        
+
+        public GuidToTrackMapping GetCurrentTrack()
         {
             var audioTrack = BackgroundAudioPlayer.Instance.Track;
             if (audioTrack == null)
@@ -424,7 +427,22 @@ namespace OpenSyno.Services
                 return null;
             }
 
-            return _tracksToGuidMapping[Guid.Parse(audioTrack.Tag)];
+            Guid guid = Guid.Parse(audioTrack.Tag);
+            return new GuidToTrackMapping(guid, _tracksToGuidMapping[guid]);
+        }
+
+        public void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove)
+        {
+            var guidsToRemove = tracksToRemove.ToArray();
+            foreach (var guid in guidsToRemove)
+            {
+                var guidToTrackMapping = new GuidToTrackMapping(guid, _tracksToGuidMapping[guid]);
+                _tracksToGuidMapping.Remove(guid);
+
+                PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
+                ea.RemovedItems = new[] { guidToTrackMapping  };
+                this.OnTracksInQueueChanged(ea);
+            }
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)

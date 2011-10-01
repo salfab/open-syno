@@ -235,24 +235,28 @@ namespace OpenSyno
                                                           string exceptionName = e.GetType().Name;
                                                           if (helpDebug == MessageBoxResult.OK)
                                                           {
-                                                              var mailContent = new StringBuilder();
+                                                              var exceptionContent = new StringBuilder();
                                                               while (e != null)
                                                               {
-                                                                  mailContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
-                                                                  mailContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
-                                                                  mailContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
-                                                                  mailContent.AppendLine("Inner exception : \r\n");
+                                                                  exceptionContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
+                                                                  exceptionContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
+                                                                  exceptionContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
+                                                                  exceptionContent.AppendLine("Inner exception : \r\n");
                                                                   e = e.InnerException;
                                                               }
 
                                                               ILogService logService = IoC.Container.Get<ILogService>();
-                                                              logService.Error(mailContent.ToString());
+                                                              logService.Error(exceptionContent.ToString());
 
                                                               EmailComposeTask emailComposeTask = new EmailComposeTask();
                                                               emailComposeTask.To = "opensyno@seesharp.ch";
-                                                              emailComposeTask.Body = mailContent.ToString();
+                                                              emailComposeTask.Body = "Log : \r\n" + logService.GetLogFileSinceAppStart();
                                                               emailComposeTask.Subject = "Open syno Unhandled exception - " + exceptionName;
-                                                              emailComposeTask.Show();
+                                                              emailComposeTask.Show();  
+                                                              
+
+                                                              // Ugliest code I ever wrote, but somehow, it seems that if returning too quickly, the email task window doesn't even show up... race condition within the OS ?
+                                                              Thread.Sleep(1000);
                                                               mre.Set();
                                                           }
                                                       };

@@ -6,6 +6,8 @@ namespace OpenSyno.Services
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
 
+    using OpenSyno.Contracts.Domain;
+
     using Synology.AudioStationApi;
 
     /// <summary>
@@ -49,7 +51,7 @@ namespace OpenSyno.Services
         /// Plays the specified track. It must be present in the queue.
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
-        void PlayTrackInQueue(SynoTrack trackToPlay);
+        void PlayTrackInQueue(Guid trackToPlay);
 
         event TrackEndedDelegate TrackEnded;
 
@@ -73,13 +75,26 @@ namespace OpenSyno.Services
 
         void SkipNext();
 
-        event NotifyCollectionChangedEventHandler PlayqueueChanged;
+        event PlayqueueChangedEventHandler PlayqueueChanged;
 
-        void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition);
+        Dictionary<SynoTrack, Guid> InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition);
 
-        IEnumerable<SynoTrack> GetTracksInQueue();
+        IEnumerable<GuidToTrackMapping> GetTracksInQueue();
 
-        SynoTrack GetCurrentTrack();
+        GuidToTrackMapping GetCurrentTrack();
+
+        void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove);
+    }
+
+    public delegate void PlayqueueChangedEventHandler(object sender, PlayqueueChangedEventArgs args);
+
+    public class PlayqueueChangedEventArgs
+    {
+        public IEnumerable<GuidToTrackMapping> RemovedItems { get; set; }
+
+        public IEnumerable<GuidToTrackMapping> AddedItems { get; set; }
+
+        public int AddedItemsPosition { get; set; }
     }
 
     public delegate void TrackStartedDelegate(object sender, TrackStartedEventArgs args);
@@ -87,6 +102,8 @@ namespace OpenSyno.Services
     public class TrackStartedEventArgs
     {
         public SynoTrack Track { get; set; }
+
+        public Guid Guid { get; set; }
     }
 
     public delegate void TrackEndedDelegate(object sender, TrackEndedDelegateArgs args);

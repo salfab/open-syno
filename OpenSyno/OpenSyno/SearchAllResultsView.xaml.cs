@@ -129,7 +129,8 @@ namespace OpenSyno
             SearchResults = new ObservableCollection<TrackViewModel>();
             foreach (var lastResult in lastResults)
             {
-                SearchResults.Add(new TrackViewModel(lastResult));
+                // GUIDS will be generated later when / if inserted in the playqueue.
+                SearchResults.Add(new TrackViewModel(Guid.Empty, lastResult));
             }
         }
 
