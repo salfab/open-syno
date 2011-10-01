@@ -49,7 +49,7 @@
         }
 
 
-        public void LoginAsync(string login, string password, Action<string> callback, Action<Exception> callbackError)
+        public void LoginAsync(string login, string password, Action<string> callback, Action<Exception> callbackError, bool useSsl)
         {
             callback("#FAKETOKEN!");
         }

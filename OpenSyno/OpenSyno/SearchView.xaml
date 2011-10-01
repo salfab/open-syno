@@ -55,8 +55,8 @@
 <!--Search contexts-->
 
                     <RadioButton Content="artist"    Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Artist" Style="{StaticResource RadioButtonTilesTemplate}" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsChecked="True" Margin="0,0,2,2" />
-                    <RadioButton Grid.Column="1" Content="track"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Track" Style="{StaticResource RadioButtonTilesTemplate}" VerticalAlignment="Bottom" Margin="2,0,0,2" />
-                    <RadioButton Grid.Row="1" Content="album"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Album" Style="{StaticResource RadioButtonTilesTemplate}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,2,2,0" />
+                    <!--<RadioButton Grid.Column="1" Content="track"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Track" Style="{StaticResource RadioButtonTilesTemplate}" VerticalAlignment="Bottom" Margin="2,0,0,2" />
+                    <RadioButton Grid.Row="1" Content="album"     Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="Album" Style="{StaticResource RadioButtonTilesTemplate}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,2,2,0" />-->
                     <RadioButton Grid.Row="1" Grid.Column="1" Content="all music" Behaviors:RadioButtonCheckedToCommandBehavior.Command="{Binding SearchContextChangedCommand}" Behaviors:RadioButtonCheckedToCommandBehavior.CommandParameter="AllMusic" Style="{StaticResource RadioButtonTilesTemplate}" VerticalAlignment="Top" Margin="2,2,0,0" />
 
                 </Grid>

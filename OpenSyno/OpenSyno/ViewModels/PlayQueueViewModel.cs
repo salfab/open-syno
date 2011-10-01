@@ -13,6 +13,8 @@
 
     using OpenSyno.Services;
 
+    using Synology.AudioStationApi;
+
     public class PlayQueueViewModel : ViewModelBase
     {
         #region Constants and Fields
@@ -150,9 +152,24 @@
             //OnPlay(previousTrack);
         }
 
+        /// <summary>
+        /// Called when the Play next command is triggered.
+        /// </summary>
         private void OnPlayNext()
         {
-            var nextSynoTrack = _playbackService.GetNextTrack(ActiveTrack.TrackInfo);
+            SynoTrack nextSynoTrack;
+
+            // Don't crash if there is no active track : take the first one in the playlist.
+            // (shouldn't happen, though, unless no track has ever been added to the queue, in which case, the nextTrack will be null anyway...)
+            if (ActiveTrack == null)
+            {
+                nextSynoTrack = _playbackService.PlayqueueItems.FirstOrDefault();
+            }
+            else
+            {
+                nextSynoTrack = this._playbackService.GetNextTrack(this.ActiveTrack.TrackInfo);                
+            }
+
             if (nextSynoTrack != null)
             {
                 var nextTrack = new TrackViewModel(nextSynoTrack);

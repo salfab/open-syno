@@ -70,6 +70,12 @@
                         </TextBox.InputScope>
                     </TextBox>
                 </Grid>
+                <CheckBox IsChecked="{Binding UseSsl, Mode=TwoWay}" Content="Use SSL encryption (only trusted CA*)" />
+                <TextBlock Text="* Only SSL certificates issued by trusted certificate authorities are supported.
+A list of trusted CA is available at
+http://bit.ly/qODji5.                           
+Also, please read :" TextWrapping="Wrap" />
+                <HyperlinkButton Content="http://wp.me/p1BE2Y-2c" NavigateUri="http://wp.me/p1BE2Y-2c" TargetName="_blank" />
                 <!--<ProgressBar IsIndeterminate="True" />-->
             </StackPanel>
         </Grid>

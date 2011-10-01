@@ -32,6 +32,7 @@
             _audioStationSession = audioStationSession;
             _synoSettings = synoSettings;
             UserName = _synoSettings.UserName;
+            UseSsl = _synoSettings.UseSsl;
             Password = _synoSettings.Password;
             Host = _synoSettings.Host;
             Port = _synoSettings.Port;
@@ -50,13 +51,14 @@
             // Store it in SynoSettings and serialize SynoSettings in the Isolated Storage.
             _synoSettings.UserName = UserName;
             _synoSettings.Password = Password;
+            _synoSettings.UseSsl = UseSsl;
             _synoSettings.Host = Host;
             _synoSettings.Port = Port;
             _audioStationSession.Host = Host;
             _audioStationSession.Port = Port;
             try
             {
-                _audioStationSession.LoginAsync(UserName, Password, OnLoginAsyncCompleted, OnLoginAsyncException);
+                _audioStationSession.LoginAsync(this.UserName, this.Password, this.OnLoginAsyncCompleted, this.OnLoginAsyncException, this._synoSettings.UseSsl);
             }
             catch (ArgumentNullException exception)
             {
@@ -75,6 +77,8 @@
                     MessageBoxButton.OK);
             }
         }
+
+        public bool UseSsl { get; set; }
 
         private void OnLoginAsyncException(Exception exception)
         {
