@@ -77,16 +77,16 @@ namespace OpenSyno.BackgroundPlaybackAgent
             switch (playState)
             {
                 case PlayState.TrackEnded:
-                    Func<Dictionary<Guid, SynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (dict, currentTrack) =>
+                    Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (mappings, currentTrack) =>
                         {
-                            var index = dict.Keys.ToList().IndexOf(new Guid(currentTrack.Tag));
+                            var index = mappings.IndexOf(mappings.Single(o=>o.Guid == new Guid(currentTrack.Tag)));
                             index++;
-                            if (index >= dict.Count)
+                            if (index >= mappings.Count)
                             {
                                 // no random, no repeat !
                                 return null;
                             }
-                            return new GuidToTrackMapping() { Guid = dict.ToArray().ElementAt(index).Key, Track = dict.ToArray().ElementAt(index).Value };
+                            return new GuidToTrackMapping { Guid = mappings[index].Guid, Track = mappings[index].Track };
                         };
                     player.Track = GetNextTrack(track, defineNextTrackPredicate);
                     break;
@@ -159,15 +159,17 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     player.Position = (TimeSpan)param;
                     break;
                 case UserAction.SkipNext:
-                        Func<Dictionary<Guid, SynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (dict, currentTrack) =>
+                        Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (mappings, currentTrack) =>
                         {
-                            var index = dict.Keys.ToList().IndexOf(new Guid(currentTrack.Tag));
+                            var index = mappings.IndexOf(mappings.Single(o => o.Guid == new Guid(currentTrack.Tag)));
                             index++;
-                            if (index == dict.Count())
+                            if (index >= mappings.Count)
                             {
+                                // no random, no repeat !
                                 return null;
                             }
-                            return new GuidToTrackMapping() { Guid = dict.ToArray().ElementAt(index).Key, Track = dict.ToArray().ElementAt(index).Value };
+                            return new GuidToTrackMapping { Guid = mappings[index].Guid, Track = mappings[index].Track };
+                         
                         };
                     player.Track = GetNextTrack(track, defineNextTrackPredicate);
    
@@ -196,13 +198,13 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// (c) MediaStreamSource (null)
         /// </remarks>
         /// <returns>an instance of AudioTrack, or null if the playback is completed</returns>
-        private AudioTrack GetNextTrack(AudioTrack audioTrack, Func<Dictionary<Guid, SynoTrack>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate)
+        private AudioTrack GetNextTrack(AudioTrack audioTrack, Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate)
         {
             if (defineNextTrackPredicate == null)
             {
                 throw new ArgumentNullException("defineNextTrackPredicate");
             }
-            var tracksToGuidMapping = new Dictionary<Guid, SynoTrack>();
+            var tracksToGuidMapping = new List<GuidToTrackMapping>();
 
             PlayqueueInterProcessCommunicationTransporter deserialization = null;
             using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
@@ -216,7 +218,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
 
                     foreach (GuidToTrackMapping pair in deserialization.Mappings)
                     {
-                        tracksToGuidMapping.Add(pair.Guid, pair.Track);
+                        tracksToGuidMapping.Add(pair);
                     }
                 }
                 catch (Exception e)
