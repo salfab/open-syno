@@ -28,24 +28,24 @@ namespace OpenSyno.Common
                     token.Split('=')[1],
                     HttpUtility.UrlEncode(baseSynoTrack.Res).Replace("+", "%20"));
             // ugly fix for backgroundAudioPlayer that does not support & > 7bits characters
-            if (baseSynoTrack.Res.Contains("&") || baseSynoTrack.Res.Any(o => o > 127))
-            {
-                // Use url-shortening service.
-                // http://t0.tv/api/shorten?u=<url>
-                WebClient webClient = new WebClient();
-                string result = null;
-                var mre = new ManualResetEvent(false);
-                webClient.DownloadStringCompleted += (s, e) =>
-                    {
-                        result = e.Result;
+            //if (baseSynoTrack.Res.Contains("&") || baseSynoTrack.Res.Any(o => o > 127))
+            //{
+            //    // Use url-shortening service.
+            //    // http://t0.tv/api/shorten?u=<url>
+            //    WebClient webClient = new WebClient();
+            //    string result = null;
+            //    var mre = new ManualResetEvent(false);
+            //    webClient.DownloadStringCompleted += (s, e) =>
+            //        {
+            //            result = e.Result;
 
-                        mre.Set();
-                    };
-                webClient.DownloadStringAsync(new Uri("http://t0.tv/api/shorten?u=" + url ));
-                mre.WaitOne();
-                JObject jo = JObject.Parse(result);
-                url = jo["short_url"].Value<string>();
-            }
+            //            mre.Set();
+            //        };
+            //    webClient.DownloadStringAsync(new Uri("http://t0.tv/api/shorten?u=" + url ));
+            //    mre.WaitOne();
+            //    JObject jo = JObject.Parse(result);
+            //    url = jo["short_url"].Value<string>();
+            //}
 
             return new AudioTrack(
                 new Uri(url),
