@@ -81,6 +81,11 @@ namespace OpenSyno.BackgroundPlaybackAgent
                         {
                             var index = dict.Keys.ToList().IndexOf(new Guid(currentTrack.Tag));
                             index++;
+                            if (index >= dict.Count)
+                            {
+                                // no random, no repeat !
+                                return null;
+                            }
                             return new GuidToTrackMapping() { Guid = dict.ToArray().ElementAt(index).Key, Track = dict.ToArray().ElementAt(index).Value };
                         };
                     GetNextTrack(track, defineNextTrackPredicate, t => { player.Track = t; }, e => { throw e; });
@@ -158,6 +163,10 @@ namespace OpenSyno.BackgroundPlaybackAgent
                         {
                             var index = dict.Keys.ToList().IndexOf(new Guid(currentTrack.Tag));
                             index++;
+                            if (index == dict.Count())
+                            {
+                                return null;
+                            }
                             return new GuidToTrackMapping() { Guid = dict.ToArray().ElementAt(index).Key, Track = dict.ToArray().ElementAt(index).Value };
                         };
                         GetNextTrack(track, defineNextTrackPredicate, t => { player.Track = t; }, e => { throw e; });
@@ -215,12 +224,30 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     successCallback(null); 
                 }
             }
-            var mappedTrack = tracksToGuidMapping[new Guid(audioTrack.Tag)];
-            GuidToTrackMapping guidToTrackMapping = defineNextTrackPredicate(tracksToGuidMapping, audioTrack);
+            SynoTrack mappedTrack;
+            if (audioTrack != null && !string.IsNullOrWhiteSpace(audioTrack.Tag))
+            {
 
-            SynoTrack nextTrack = guidToTrackMapping.Track;
+                GuidToTrackMapping guidToTrackMapping = defineNextTrackPredicate(tracksToGuidMapping, audioTrack);
 
-            _audioTrackFactory.BeginCreate(nextTrack, guidToTrackMapping.Guid, deserialization.Host, deserialization.Port, deserialization.Token, successCallback, errorCallback);// new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
+                if (guidToTrackMapping != null )
+                {
+
+                    SynoTrack nextTrack = guidToTrackMapping.Track;
+
+                    _audioTrackFactory.BeginCreate(
+                        nextTrack,
+                        guidToTrackMapping.Guid, 
+                        deserialization.Protocol,
+                        deserialization.Host,
+                        deserialization.Port,
+                        deserialization.Token,
+                        successCallback,
+                        errorCallback);
+                    // new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
+                }
+            }
+
 
             // specify the track
 
@@ -300,5 +327,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
         public string Token { get; set; }
         [DataMember]
         public List<GuidToTrackMapping> Mappings { get; set; }
+        [DataMember]
+        public string Protocol { get; set; }
     }
 }
