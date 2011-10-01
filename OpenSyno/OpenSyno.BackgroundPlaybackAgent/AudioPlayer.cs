@@ -323,7 +323,5 @@ namespace OpenSyno.BackgroundPlaybackAgent
         public string Token { get; set; }
         [DataMember]
         public List<GuidToTrackMapping> Mappings { get; set; }
-        [DataMember]
-        public string Protocol { get; set; }
     }
 }

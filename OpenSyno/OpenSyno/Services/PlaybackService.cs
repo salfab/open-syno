@@ -397,7 +397,7 @@ namespace OpenSyno.Services
 
         private void SerializePlayqueue()
         {
-            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
             {
                 var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
 
@@ -422,7 +422,7 @@ namespace OpenSyno.Services
         public GuidToTrackMapping GetCurrentTrack()
         {
             var audioTrack = BackgroundAudioPlayer.Instance.Track;
-            if (audioTrack == null)
+            if (audioTrack == null || !_tracksToGuidMapping.ContainsKey(Guid.Parse(audioTrack.Tag)))
             {
                 return null;
             }
