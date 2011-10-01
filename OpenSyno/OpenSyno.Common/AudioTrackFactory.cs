@@ -28,8 +28,8 @@ namespace OpenSyno.Common
                     port,
                     token.Split('=')[1],
                     HttpUtility.UrlEncode(baseSynoTrack.Res).Replace("+", "%20"));
-
-            if (baseSynoTrack.Res.Contains("&"))
+            // ugly fix for backgroundAudioPlayer that does not support & > 7bits characters
+            if (baseSynoTrack.Res.Contains("&") || baseSynoTrack.Res.Any(o => o > 127))
             {
                 try
                 {
