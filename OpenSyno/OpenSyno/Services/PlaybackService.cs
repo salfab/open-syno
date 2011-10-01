@@ -104,7 +104,6 @@ namespace OpenSyno.Services
         /// <param name="trackToPlay">The track to play.</param>
         public void PlayTrackInQueue(Guid trackToPlay)
         {
-            PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             StreamTrack(trackToPlay);
             _status = PlaybackStatus.Buffering;
         }
