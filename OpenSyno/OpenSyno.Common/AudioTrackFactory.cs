@@ -27,6 +27,8 @@ namespace OpenSyno.Common
                     port,
                     token.Split('=')[1],
                     HttpUtility.UrlEncode(baseSynoTrack.Res).Replace("+", "%20"));
+
+            return Create(baseSynoTrack, guid,host, port, token, url);
             // ugly fix for backgroundAudioPlayer that does not support & > 7bits characters
             //if (baseSynoTrack.Res.Contains("&") || baseSynoTrack.Res.Any(o => o > 127))
             //{
@@ -47,8 +49,13 @@ namespace OpenSyno.Common
             //    url = jo["short_url"].Value<string>();
             //}
 
+
+        }
+
+        public AudioTrack Create(SynoTrack baseSynoTrack, Guid guid, string host, int port, string token, string urlOverride)
+        {
             return new AudioTrack(
-                new Uri(url),
+                new Uri(urlOverride),
                 baseSynoTrack.Title,
                 baseSynoTrack.Artist,
                 baseSynoTrack.Album,

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Phone.Shell;
+using Newtonsoft.Json.Linq;
 using Ninject;
 using OpenSyno.Helpers;
 
@@ -37,6 +38,8 @@ namespace OpenSyno.Services
         private readonly IAudioTrackFactory _audioTrackFactory;
 
         private Dictionary<Guid, SynoTrack> _tracksToGuidMapping;
+
+        private Dictionary<string, string> _asciiUriFixes;
 
         private PlaybackStatus _status;
 
@@ -136,10 +139,10 @@ namespace OpenSyno.Services
             //PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
             this._tracksToGuidMapping = new Dictionary<Guid, SynoTrack>();
-            
+            this._asciiUriFixes = new Dictionary<string, string>();
 
             PlayqueueInterProcessCommunicationTransporter deserialization = null;
-            using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
             {
 
                 DataContractSerializer dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
@@ -157,7 +160,7 @@ namespace OpenSyno.Services
                 catch (Exception e)
                 {
                     // could not deserialize XML for playlist : let's keep it empty.
-                    
+
                 }
             }
 
@@ -331,7 +334,16 @@ namespace OpenSyno.Services
             //        _audioStationSession.Port,
             //        _audioStationSession.Token.Split('=')[1],
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            var audioTrack = _audioTrackFactory.Create(_tracksToGuidMapping[guidOfTrackToPlay], guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+            SynoTrack baseSynoTrack = _tracksToGuidMapping[guidOfTrackToPlay];
+            AudioTrack audioTrack;
+            if (_asciiUriFixes.ContainsKey(baseSynoTrack.Res))
+            {
+                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, _asciiUriFixes[baseSynoTrack.Res]);                
+            }
+            else
+            {
+                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+            }
             BackgroundAudioPlayer.Instance.Track = audioTrack;
             //new AudioTrack(
             //new Uri(url),
@@ -344,7 +356,7 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.Play();
         }
 
-        
+
 
         #endregion
 
@@ -360,7 +372,7 @@ namespace OpenSyno.Services
 
         public event PlayqueueChangedEventHandler PlayqueueChanged;
 
-        public Dictionary<SynoTrack, Guid> InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition)
+        public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition, Action<Dictionary<SynoTrack, Guid>> callback)
         {
             if (insertPosition != _tracksToGuidMapping.Count())
             {
@@ -372,12 +384,44 @@ namespace OpenSyno.Services
             foreach (var synoTrack in tracks)
             {
                 Guid newGuid = Guid.NewGuid();
-                _tracksToGuidMapping.Add(newGuid, synoTrack);    
+                _tracksToGuidMapping.Add(newGuid, synoTrack);
+                var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Value.Res == fix.Key) && mapping.Value.Res.Any(c => c == '&' || c > 127)).Select(t => t.Value);
+                foreach (var track in tracksToFix)
+                {
+                    _asciiUriFixes.Add(track.Res, null);
+
+                    // query shorten URL
+
+                    // Use url-shortening service.
+                    // http://t0.tv/api/shorten?u=<url>
+                    WebClient webClient = new WebClient();
+
+
+                    webClient.DownloadStringCompleted += (s, e) =>
+                        {
+                            var shortUrl = e.Result;
+                            var res = (string)e.UserState;
+                            _asciiUriFixes[res] = shortUrl;
+                            if (!_asciiUriFixes.ContainsValue(null))
+                            {
+                                callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Value)).ToDictionary(o => o.Value, o => o.Key));
+                            }
+                        };
+                    string url =
+                   string.Format(
+                       "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+                       _audioStationSession.Host,
+                       _audioStationSession.Port,
+                       _audioStationSession.Token.Split('=')[1],
+                       HttpUtility.UrlEncode(track.Res).Replace("+", "%20"));
+
+                    webClient.DownloadStringAsync(new Uri("http://tinyurl.com/api-create.php?url=" + HttpUtility.UrlEncode(url)), track.Res);
+
+                }
                 // FIXME : Urgent : replace NotifyCollectionChanged by a custom event that can propagate bulk collection changes ! (optimize writes on disk )
-                OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = new [] { new GuidToTrackMapping(newGuid, synoTrack)}, AddedItemsPosition = insertPosition+i });
+                OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = new[] { new GuidToTrackMapping(newGuid, synoTrack) }, AddedItemsPosition = insertPosition + i });
                 i++;
             }
-            return _tracksToGuidMapping.Where(o => tracks.Contains(o.Value)).ToDictionary(o=>o.Value, o=>o.Key);
         }
 
         private void OnTracksInQueueChanged(PlayqueueChangedEventArgs eventArgs)
@@ -408,16 +452,16 @@ namespace OpenSyno.Services
                         Mappings = _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key, o.Value)).ToList(),
                         Token = _audioStationSession.Token
                     };
-                    dcs.WriteObject(playQueueFile, serialization);
+                dcs.WriteObject(playQueueFile, serialization);
             }
         }
 
         public IEnumerable<GuidToTrackMapping> GetTracksInQueue()
         {
-            return _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key,o.Value));
+            return _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key, o.Value));
         }
 
-        
+
 
         public GuidToTrackMapping GetCurrentTrack()
         {
@@ -440,7 +484,7 @@ namespace OpenSyno.Services
                 _tracksToGuidMapping.Remove(guid);
 
                 PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
-                ea.RemovedItems = new[] { guidToTrackMapping  };
+                ea.RemovedItems = new[] { guidToTrackMapping };
                 this.OnTracksInQueueChanged(ea);
             }
         }

@@ -374,13 +374,13 @@
             }
         }
 
-        private Dictionary<SynoTrack, Guid> AppendItems(IEnumerable<TrackViewModel> items)
+        private void AppendItems(IEnumerable<TrackViewModel> items, Action<Dictionary<SynoTrack, Guid>> callback)
         {
             var tracks = items.Select(o=>o.TrackInfo);
 
             int insertPosition = PlayQueueItems.Count();
 
-            return _playbackService.InsertTracksToQueue(tracks, insertPosition);
+            _playbackService.InsertTracksToQueue(tracks, insertPosition, callback);
             //foreach (var trackViewModel in items)
             //{
             //    PlayQueueItems.Add(trackViewModel);
@@ -406,7 +406,7 @@
         private void OnPlayListOperation(PlayListOperationAggregatedEvent e)
         {
             TrackViewModel trackToPlay;
-            Dictionary<SynoTrack, Guid> matchingGeneratedGuids;
+
             switch (e.Operation)
             {
                 case PlayListOperation.ClearAndPlay:
@@ -414,26 +414,34 @@
                     // test lines below before uncommenting
                     //_playbackService.ClearPlayQueue();
                     //_playbackService.InsertTracksToQueue(e.Items.Select(o => o.TrackInfo), 0);
-                    matchingGeneratedGuids = AppendItems(e.Items);
+
+                    AppendItems(e.Items, matchingGeneratedGuids =>
+                    {
+                        if (_playbackService.Status == PlaybackStatus.Stopped)
+                        {
+                            trackToPlay = e.Items.First();
+                            OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
+                        }
+                    });
                     if (_playbackService.Status != PlaybackStatus.Stopped)
                     {
                         // stop the playback
                     }
-                    trackToPlay = e.Items.First();
-                    OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
                     break;
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
                 case PlayListOperation.Append:
-                    matchingGeneratedGuids = AppendItems(e.Items);
 
-                    if (_playbackService.Status == PlaybackStatus.Stopped)
-                    {
-                        trackToPlay = e.Items.First();
+                    AppendItems(e.Items, matchingGeneratedGuids =>
+                                             {
+                                                 if (_playbackService.Status == PlaybackStatus.Stopped)
+                                                 {
+                                                     trackToPlay = e.Items.First();
+                                                     OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
+                                                 }
+                                             });
 
 
-                        OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
-                    }
                     
 
                     break;
