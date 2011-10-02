@@ -9,6 +9,7 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno
 {
+    using System;
     using System.Windows;
 
     using OpenSyno.Services;
@@ -94,7 +95,9 @@ namespace OpenSyno
             // We first want to populate a collection and then assign it to the bound property, otherwise, there will be just too many collection changed notiications.
             // we could also have disabled the binding and re-enabled, but hey, what's the gain ?
             var newTracks = new ObservableCollection<TrackViewModel>();
-            foreach(var track in tracks.Select(o => new TrackViewModel(o)))
+
+            // GUIDS will be generated later when / if inserted in the playqueue.
+            foreach(var track in tracks.Select(o => new TrackViewModel(Guid.Empty, o)))
             {                
                 newTracks.Add(track);
             }

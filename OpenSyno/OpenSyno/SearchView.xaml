@@ -81,7 +81,8 @@
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
             <shell:ApplicationBarIconButton IconUri="/icons/appbar.feature.settings.rest.png" Text="credentials" Click="CredentialsApplicationBarButtonClicked"/>
             <shell:ApplicationBarIconButton IconUri="/icons/appbar.questionmark.rest.png" Text="about" Click="AboutBoxApplicationBarButtonClicked"/>
-            <!--<shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="Button 2"/>
+            <shell:ApplicationBarIconButton IconUri="/icons/appbar.folder.rest.png" Text="Show queue" Click="PlayqueueApplicationBarButtonClicked"/>
+            <!--
             <shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
                 <shell:ApplicationBarMenuItem Text="MenuItem 2"/>

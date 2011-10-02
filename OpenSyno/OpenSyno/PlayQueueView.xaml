@@ -34,7 +34,7 @@
                         <ColumnDefinition Width="200" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Column="0" HorizontalAlignment="Center" Delay:LowProfileImageLoader.UriSource="{Binding CurrentArtwork}" Stretch="None" VerticalAlignment="Top" />
+                    <Image Grid.Column="0" HorizontalAlignment="Center" Delay:LowProfileImageLoader.UriSource="{Binding ActiveTrack.TrackInfo.AlbumArtUrl}" Stretch="None" VerticalAlignment="Top" />
                     <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
                     	<TextBlock Text="Volume"  />
                     	<Slider Margin="-18,0" Minimum="0" SmallChange="0.01" LargeChange="0.1" Maximum="1" HorizontalAlignment="Left" Value="{Binding Volume, Mode=TwoWay}" Height="130" Orientation="Vertical" />

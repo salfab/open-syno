@@ -53,6 +53,12 @@ namespace OpenSyno.ViewModels
             SearchContextChangedCommand = new DelegateCommand<string>(OnSearchContextChanged);
             DispatchSearchCommand = new DelegateCommand<string>(OnDispatchSearch);
             ClearKeywordCommand = new DelegateCommand(OnClearKeyword);
+            ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
+        }
+
+        private void OnShowPlayQueue()
+        {
+            _pageSwitchingService.NavigateToPlayQueue();
         }
 
         private void OnClearKeyword()
@@ -143,6 +149,8 @@ namespace OpenSyno.ViewModels
         }
 
         public ICommand ShowAboutBoxCommand { get; set; }
+
+        public ICommand ShowPlayQueueCommand { get; set; }
 
         private void OnShowAboutBox()
         {

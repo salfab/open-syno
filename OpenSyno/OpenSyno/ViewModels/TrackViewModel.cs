@@ -12,6 +12,9 @@
     {
         private bool _isSelected;
         private const string IsSelectedPropertyName = "IsSelected";
+
+        public Guid Guid { get; set; }
+
         [DataMember]
         public SynoTrack TrackInfo { get; set; }
 
@@ -29,13 +32,14 @@
             }
         }
 
-        public TrackViewModel(SynoTrack synoTrack)
+        public TrackViewModel(Guid guid, SynoTrack synoTrack)
         {
             if (synoTrack == null)
             {
                 throw new ArgumentNullException("synoTrack");
             }
 
+            Guid = guid;
             TrackInfo = synoTrack;
         }
     }

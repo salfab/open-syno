@@ -1,4 +1,6 @@
-﻿namespace Synology.AudioStationApi
+﻿using Newtonsoft.Json.Linq;
+
+namespace Synology.AudioStationApi
 {
     using System.Runtime.Serialization;
     using System;
@@ -44,7 +46,7 @@
             var client = new WebClient();
 
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
-            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", this.Host, this.Port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20"));
+            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", this.Host, this.Port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20").Replace("&", "%26"));
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.CookieContainer = new CookieContainer();
@@ -99,8 +101,6 @@
                     Scheme = useSsl ? "https" : "http"
                 }.Uri;
 
-            // uri = new Uri("https://ds509.hamilcar.ch:5001/webman/index.cgi");
-            // uri = new Uri("http://www.google.com/accounts/ServiceLogin?service=mail&passive=true&rm=false&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F%3Fui%3Dhtml%26zy%3Dl&bsv=llya694le36z&ss=1&scc=1&ltmpl=default&ltmplcache=2&from=login");
             client.DownloadStringCompleted += (sender, e) =>
                                                   {
                                                       if (e.Error != null)
@@ -117,12 +117,18 @@
                                                           string rawCookie = ((WebClient)sender).ResponseHeaders["Set-Cookie"];
                                                           if (rawCookie == null)
                                                           {
-                                                              throw new SynoLoginException("The login and the password don't match, please check your credentials", null);
+                                                              if (JObject.Parse(e.Result)["success"].Value<bool>() != true)
+                                                              {
+                                                                  throw new SynoLoginException("The login and the password don't match, please check your credentials", null);                                                                  
+                                                              }
                                                           }
-
-                                                          string cookie = rawCookie.Split(';').Where(s => s.StartsWith("id=")).Single();
-                                                          this.Token = cookie;
-                                                          callback(cookie);
+                                                          else
+                                                          {
+                                                              string cookie = rawCookie.Split(';').Where(s => s.StartsWith("id=")).Single();
+                                                              this.Token = cookie;
+                                                          }                                                          
+                                                          
+                                                          callback(this.Token);
                                                       }
 
                                                   };
