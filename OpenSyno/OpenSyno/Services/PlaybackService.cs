@@ -1,15 +1,11 @@
-﻿using Microsoft.Phone.Shell;
-using Newtonsoft.Json.Linq;
-using Ninject;
+﻿using Ninject;
+using OpenSyno.Common;
 using OpenSyno.Helpers;
 
 namespace OpenSyno.Services
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using System.IO;
     using System.IO.IsolatedStorage;
     using System.Linq;
@@ -17,9 +13,6 @@ namespace OpenSyno.Services
     using System.Runtime.Serialization;
     using System.Threading;
     using System.Windows;
-    using System.Windows.Threading;
-    using System.Xml.Serialization;
-
     using Microsoft.Phone.BackgroundAudio;
 
     using OpenSyno.BackgroundPlaybackAgent;
@@ -39,7 +32,7 @@ namespace OpenSyno.Services
 
         private Dictionary<Guid, SynoTrack> _tracksToGuidMapping;
 
-        private Dictionary<string, string> _asciiUriFixes;
+        private List<AsciiUriFix> _asciiUriFixes;
 
         private PlaybackStatus _status;
 
@@ -139,7 +132,23 @@ namespace OpenSyno.Services
             //PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
             this._tracksToGuidMapping = new Dictionary<Guid, SynoTrack>();
-            this._asciiUriFixes = new Dictionary<string, string>();
+
+            using (IsolatedStorageFileStream asciiUriFixes = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("AsciiUriFixes.xml", FileMode.OpenOrCreate))
+            {
+
+                DataContractSerializer dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
+                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+
+                try
+                {
+                    _asciiUriFixes = (List<AsciiUriFix>)dcs.ReadObject(asciiUriFixes);
+                }
+                catch (Exception e)
+                {
+                    // could not deserialize XML for playlist : let's build an empty list.
+                    _asciiUriFixes = new List<AsciiUriFix>();
+                }
+            }
 
             PlayqueueInterProcessCommunicationTransporter deserialization = null;
             using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
@@ -336,9 +345,9 @@ namespace OpenSyno.Services
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
             SynoTrack baseSynoTrack = _tracksToGuidMapping[guidOfTrackToPlay];
             AudioTrack audioTrack;
-            if (_asciiUriFixes.ContainsKey(baseSynoTrack.Res))
+            if (_asciiUriFixes.Any(fix => fix.Res == baseSynoTrack.Res))
             {
-                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, _asciiUriFixes[baseSynoTrack.Res]);                
+                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, _asciiUriFixes.Single(fix => fix.Res == baseSynoTrack.Res).Url);                
             }
             else
             {
@@ -385,10 +394,10 @@ namespace OpenSyno.Services
             {
                 Guid newGuid = Guid.NewGuid();
                 _tracksToGuidMapping.Add(newGuid, synoTrack);
-                var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Value.Res == fix.Key) && mapping.Value.Res.Any(c => c == '&' || c > 127)).Select(t => t.Value);
+                var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Value.Res == fix.Res) && mapping.Value.Res.Any(c => c == '&' || c > 127)).Select(t => t.Value);
                 foreach (var track in tracksToFix)
                 {
-                    _asciiUriFixes.Add(track.Res, null);
+                    _asciiUriFixes.Add(new AsciiUriFix(track.Res, null));
 
                     // query shorten URL
 
@@ -401,9 +410,15 @@ namespace OpenSyno.Services
                         {
                             var shortUrl = e.Result;
                             var res = (string)e.UserState;
-                            _asciiUriFixes[res] = shortUrl;
-                            if (!_asciiUriFixes.ContainsValue(null))
+                            _asciiUriFixes.Where(fix => fix.Res == res).Single().Url = shortUrl;
+                            if (!_asciiUriFixes.Any(fix => fix.Url == null))
                             {
+                                using (IsolatedStorageFileStream stream = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("AsciiUriFixes.xml", FileMode.Create))
+                                {                                    
+                                    var dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
+                                    dcs.WriteObject(stream, _asciiUriFixes);
+                                }
+
                                 callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Value)).ToDictionary(o => o.Value, o => o.Key));
                             }
                         };
@@ -487,6 +502,11 @@ namespace OpenSyno.Services
                 ea.RemovedItems = new[] { guidToTrackMapping };
                 this.OnTracksInQueueChanged(ea);
             }
+        }
+
+        public void SkipPrevious()
+        {
+            BackgroundAudioPlayer.Instance.SkipPrevious();
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)

@@ -104,7 +104,7 @@
             PlayNextCommand = new DelegateCommand(OnPlayNext);
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
-            PlayPreviousCommand = new DelegateCommand(OnPlayPrevious, () => false);
+            PlayPreviousCommand = new DelegateCommand(OnPlayPrevious);
             SavePlaylistCommand = new DelegateCommand(OnSavePlaylist);
         }
 
@@ -160,8 +160,7 @@
 
         private void OnPlayPrevious()
         {
-            //TrackViewModel previousTrack = _playbackService.GetPreviousTrack();
-            //OnPlay(previousTrack);
+            _playbackService.SkipPrevious();
         }
 
         /// <summary>

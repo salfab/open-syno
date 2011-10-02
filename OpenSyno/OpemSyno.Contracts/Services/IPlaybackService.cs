@@ -84,6 +84,7 @@ namespace OpenSyno.Services
         GuidToTrackMapping GetCurrentTrack();
 
         void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove);
+        void SkipPrevious();
     }
 
     public delegate void PlayqueueChangedEventHandler(object sender, PlayqueueChangedEventArgs args);

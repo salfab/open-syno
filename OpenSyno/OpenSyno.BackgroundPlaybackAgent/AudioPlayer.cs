@@ -25,6 +25,9 @@ namespace OpenSyno.BackgroundPlaybackAgent
 
         private IPlaybackService _playbackService;
         private IAudioTrackFactory _audioTrackFactory;
+        private List<AsciiUriFix> _asciiUriFixes;
+        private List<GuidToTrackMapping> _tracksToGuidMapping = new List<GuidToTrackMapping>();
+        private PlayqueueInterProcessCommunicationTransporter _playqueueInformation;
 
         /// <remarks>
         /// AudioPlayer instances can share the same process. 
@@ -34,6 +37,38 @@ namespace OpenSyno.BackgroundPlaybackAgent
         public AudioPlayer()
         {
             _audioTrackFactory = new AudioTrackFactory();
+            using (IsolatedStorageFileStream asciiUriFixes = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("AsciiUriFixes.xml", FileMode.OpenOrCreate))
+            {
+
+                DataContractSerializer dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
+                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+
+                try
+                {
+                    _asciiUriFixes = (List<AsciiUriFix>)dcs.ReadObject(asciiUriFixes);
+                }
+                catch (Exception e)
+                {
+                    // could not deserialize XML for playlist : let's build an empty list.
+                    _asciiUriFixes = new List<AsciiUriFix>();
+                }
+            }
+
+            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            {
+                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
+                var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+
+
+                _playqueueInformation = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
+
+                foreach (GuidToTrackMapping pair in _playqueueInformation.Mappings)
+                {
+                    _tracksToGuidMapping.Add(pair);
+                }
+
+            }
+
             if (!_classInitialized)
             {
                 _classInitialized = true;
@@ -41,7 +76,8 @@ namespace OpenSyno.BackgroundPlaybackAgent
                 Deployment.Current.Dispatcher.BeginInvoke(delegate
                 {
                     Application.Current.UnhandledException += AudioPlayer_UnhandledException;
-                });               
+                });
+
             }
         }
 
@@ -175,7 +211,20 @@ namespace OpenSyno.BackgroundPlaybackAgent
    
                     break;
                 case UserAction.SkipPrevious:
-                    AudioTrack previousTrack = GetPreviousTrack();
+                    Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> definePreviousTrackPredicate = (mappings, currentTrack) =>
+                    {
+                        var index = mappings.IndexOf(mappings.Single(o => o.Guid == new Guid(currentTrack.Tag)));
+                        index--;
+                        if (index < 0)
+                        {
+                            // no random, no repeat !
+                            return null;
+                        }
+                        return new GuidToTrackMapping { Guid = mappings[index].Guid, Track = mappings[index].Track };
+
+                    };
+
+                    AudioTrack previousTrack = GetPreviousTrack(track, definePreviousTrackPredicate);
                     if (previousTrack != null)
                     {
                         player.Track = previousTrack;
@@ -204,41 +253,29 @@ namespace OpenSyno.BackgroundPlaybackAgent
             {
                 throw new ArgumentNullException("defineNextTrackPredicate");
             }
-            var tracksToGuidMapping = new List<GuidToTrackMapping>();
 
-            PlayqueueInterProcessCommunicationTransporter deserialization = null;
-            using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
-            {
-                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
-                var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
 
-                try
-                {
-                    deserialization = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
-
-                    foreach (GuidToTrackMapping pair in deserialization.Mappings)
-                    {
-                        tracksToGuidMapping.Add(pair);
-                    }
-                }
-                catch (Exception e)
-                {
-                    // no more tracks
-                    return null; 
-                }
-            }
-            SynoTrack mappedTrack;
             if (audioTrack != null && !string.IsNullOrWhiteSpace(audioTrack.Tag))
             {
 
-                GuidToTrackMapping guidToTrackMapping = defineNextTrackPredicate(tracksToGuidMapping, audioTrack);
+                GuidToTrackMapping guidToTrackMapping = defineNextTrackPredicate(_tracksToGuidMapping, audioTrack);
 
                 if (guidToTrackMapping != null )
                 {
-
+                    AudioTrack track;
                     SynoTrack nextTrack = guidToTrackMapping.Track;
 
-                    AudioTrack track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, deserialization.Host, deserialization.Port, deserialization.Token);// new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
+                    // is there a fix we can apply ?
+                    if (_asciiUriFixes.Any(fix => fix.Res == nextTrack.Res))
+                    {
+                        track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, _playqueueInformation.Host, _playqueueInformation.Port, _playqueueInformation.Token, _asciiUriFixes.Single(fix => fix.Res == nextTrack.Res).Url);                        
+                    }
+                    else
+                    {
+                        track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, _playqueueInformation.Host, _playqueueInformation.Port, _playqueueInformation.Token);
+                        
+                    }
+                    // new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
                     // new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
 
                     return track;
@@ -262,13 +299,38 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// (c) MediaStreamSource (null)
         /// </remarks>
         /// <returns>an instance of AudioTrack, or null if previous track is not allowed</returns>
-        private AudioTrack GetPreviousTrack()
+        private AudioTrack GetPreviousTrack(AudioTrack audioTrack, Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> definePreviousTrackPredicate)
         {
-            // TODO: add logic to get the previous audio track
+            if (definePreviousTrackPredicate == null)
+            {
+                throw new ArgumentNullException("definePreviousTrackPredicate");
+            }
+
 
             AudioTrack track = null;
+            if (audioTrack != null && !string.IsNullOrWhiteSpace(audioTrack.Tag))
+            {
 
-            // specify the track
+                GuidToTrackMapping guidToTrackMapping = definePreviousTrackPredicate(_tracksToGuidMapping, audioTrack);
+
+                if (guidToTrackMapping != null)
+                {
+                    SynoTrack nextTrack = guidToTrackMapping.Track;
+
+                    // is there a fix we can apply ?
+                    if (_asciiUriFixes.Any(fix => fix.Res == nextTrack.Res))
+                    {
+                        track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, _playqueueInformation.Host, _playqueueInformation.Port, _playqueueInformation.Token, _asciiUriFixes.Single(fix => fix.Res == nextTrack.Res).Url);
+                    }
+                    else
+                    {
+                        track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, _playqueueInformation.Host, _playqueueInformation.Port, _playqueueInformation.Token);
+
+                    }
+                    // new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
+                    // new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);                    
+                }
+            }
 
             return track;
         }
