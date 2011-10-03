@@ -51,7 +51,7 @@
                             <Border Background="Orange">
                                 <TextBlock Text="Audio Station credentials"/>
                             </Border>
-                            <ExpanderView>
+                            <!--<ExpanderView>-->
                             <StackPanel Grid.Row="1">
                                 <TextBlock Margin="12,0" Text="User Name" />
                                 <TextBox VerticalAlignment="Top"  Text="{Binding UserName, Mode=TwoWay}">
@@ -103,7 +103,7 @@ Also, please read :" TextWrapping="Wrap" />
                                 <HyperlinkButton Content="http://wp.me/p1BE2Y-2c" NavigateUri="http://wp.me/p1BE2Y-2c" TargetName="_blank" />
                                 <!--<ProgressBar IsIndeterminate="True" />-->
                             </StackPanel>
-                            </ExpanderView>
+                            <!--</ExpanderView>-->
                         </Grid>
 
                         <Grid>

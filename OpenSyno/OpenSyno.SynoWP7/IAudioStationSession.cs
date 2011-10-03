@@ -31,6 +31,7 @@
         int Port { get; set; }
 
         [DataMember]
-        string Token { get; set; }
+        string Token { get; }
+
     }
 }

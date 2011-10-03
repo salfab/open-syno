@@ -413,12 +413,7 @@ namespace OpenSyno.Services
                             _asciiUriFixes.Where(fix => fix.Res == res).Single().Url = shortUrl;
                             if (!_asciiUriFixes.Any(fix => fix.Url == null))
                             {
-                                using (IsolatedStorageFileStream stream = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("AsciiUriFixes.xml", FileMode.Create))
-                                {                                    
-                                    var dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
-                                    dcs.WriteObject(stream, _asciiUriFixes);
-                                }
-
+                                SerializeAsciiUriFixes();
                                 callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Value)).ToDictionary(o => o.Value, o => o.Key));
                             }
                         };
@@ -436,6 +431,17 @@ namespace OpenSyno.Services
                 // FIXME : Urgent : replace NotifyCollectionChanged by a custom event that can propagate bulk collection changes ! (optimize writes on disk )
                 OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = new[] { new GuidToTrackMapping(newGuid, synoTrack) }, AddedItemsPosition = insertPosition + i });
                 i++;
+            }
+        }
+
+        private void SerializeAsciiUriFixes()
+        {
+            using (
+                IsolatedStorageFileStream stream = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(
+                    "AsciiUriFixes.xml", FileMode.Create))
+            {
+                var dcs = new DataContractSerializer(typeof (List<AsciiUriFix>));
+                dcs.WriteObject(stream, _asciiUriFixes);
             }
         }
 
@@ -507,6 +513,16 @@ namespace OpenSyno.Services
         public void SkipPrevious()
         {
             BackgroundAudioPlayer.Instance.SkipPrevious();
+        }
+
+        public void PurgeCachedTokens()
+        {
+            _asciiUriFixes.Clear();
+            foreach (var synoTrack in _tracksToGuidMapping)
+            {
+                
+            }
+            SerializeAsciiUriFixes();
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)

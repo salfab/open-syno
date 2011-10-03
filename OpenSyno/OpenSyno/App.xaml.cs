@@ -134,7 +134,23 @@ namespace OpenSyno
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            IoC.Container.Get<ISignInService>().SignIn();
+            var signInService = IoC.Container.Get<ISignInService>();
+            EventHandler<CheckTokenValidityCompletedEventArgs> completed = null;
+            completed = (s, ea) =>
+                            {
+
+                                // the modified closure here is on purpose.
+                                signInService.CheckTokenValidityCompleted -= completed;
+                                if (!ea.IsValid && ea.Error == null)
+                                {
+                                    signInService.SignIn();
+                                }
+                            };
+
+            signInService.CheckTokenValidityCompleted += completed;
+            signInService.CheckCachedTokenValidityAsync();
+            
+
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -318,10 +334,5 @@ namespace OpenSyno
         }
 
         #endregion
-    }
-
-    public class SynoTokenReceivedAggregatedEvent
-    {
-        public string Token { get; set; }
     }
 }
