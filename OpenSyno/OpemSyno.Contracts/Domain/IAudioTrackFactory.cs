@@ -8,5 +8,6 @@ namespace OpenSyno.Services
     public interface IAudioTrackFactory
     {
         AudioTrack Create(SynoTrack baseSynoTrack, Guid guid, string host, int port, string token);
+        AudioTrack Create(SynoTrack baseSynoTrack, Guid guid, string host, int port, string token, string urlOverride);
     }
 }

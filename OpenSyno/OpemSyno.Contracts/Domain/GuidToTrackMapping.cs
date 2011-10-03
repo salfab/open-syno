@@ -7,6 +7,9 @@
 
     using Synology.AudioStationApi;
 
+    /// <summary>
+    /// Encapsulates a synotrack and an unique identifier which will tell apart two different instances of the same syno track in a playqueue (2 same songs in a queue)
+    /// </summary>
     [DataContract]
     public class GuidToTrackMapping
     {

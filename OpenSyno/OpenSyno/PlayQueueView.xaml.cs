@@ -119,6 +119,8 @@ namespace OpenSyno
                 {
                     viewModel.SelectedTrack = (TrackViewModel)this.State[SelectedTrackKey];
                 }
+
+                viewModel.WakeUpFromTombstone();
             }
                        
             base.OnNavigatedTo(e);

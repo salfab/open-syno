@@ -70,6 +70,12 @@ namespace OpenSyno
             var viewModel = (SearchViewModel)DataContext;
             viewModel.ShowAboutBoxCommand.Execute(null);
         }
+
+        private void PlayqueueApplicationBarButtonClicked(object sender, EventArgs e)
+        {
+            var viewModel = (SearchViewModel)DataContext;
+            viewModel.ShowPlayQueueCommand.Execute(null);
+        }
     }
 
     public interface INavigatorService
