@@ -518,11 +518,52 @@ namespace OpenSyno.Services
         public void PurgeCachedTokens()
         {
             _asciiUriFixes.Clear();
-            foreach (var synoTrack in _tracksToGuidMapping)
+
+
+            DetectAffectedTracksAndBuildFix(_tracksToGuidMapping, );
+        }
+
+
+        /// <summary>
+        /// Detects the affected tracks and build a fix.
+        /// </summary>
+        /// <param name="potentiallyUnsafeMappings">The potentially unsafe mappings.</param>
+        private void DetectAffectedTracksAndBuildFix(List<GuidToTrackMapping> potentiallyUnsafeMappings, Action<Dictionary<SynoTrack, Guid>> callback)
+        { 
+            var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Track.Res == fix.Res) && mapping.Track.Res.Any(c => c == '&' || c > 127)).Select(t => t.Track);
+            foreach (var track in tracksToFix)
             {
-                
+                _asciiUriFixes.Add(new AsciiUriFix(track.Res, null));
+
+                // query shorten URL
+
+                // Use url-shortening service.
+                // http://t0.tv/api/shorten?u=<url>
+                WebClient webClient = new WebClient();
+
+
+                webClient.DownloadStringCompleted += (s, e) =>
+                {
+                    var shortUrl = e.Result;
+                    var res = (string)e.UserState;
+                    _asciiUriFixes.Where(fix => fix.Res == res).Single().Url = shortUrl;
+                    if (!_asciiUriFixes.Any(fix => fix.Url == null))
+                    {
+                        SerializeAsciiUriFixes();
+                        callback(_tracksToGuidMapping.Where(o => potentiallyUnsafeMappings.Any(x => x.Track == o.Track)).ToDictionary(o => o.Track, o => o.Guid));
+                    }
+                };
+                string url =
+                string.Format(
+                    "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+                    _audioStationSession.Host,
+                    _audioStationSession.Port,
+                    _audioStationSession.Token.Split('=')[1],
+                    HttpUtility.UrlEncode(track.Res).Replace("+", "%20"));
+
+                webClient.DownloadStringAsync(new Uri("http://tinyurl.com/api-create.php?url=" + HttpUtility.UrlEncode(url)), track.Res);
+
             }
-            SerializeAsciiUriFixes();
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
