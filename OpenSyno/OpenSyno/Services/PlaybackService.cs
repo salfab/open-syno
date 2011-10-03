@@ -30,7 +30,7 @@ namespace OpenSyno.Services
 
         private readonly IAudioTrackFactory _audioTrackFactory;
 
-        private Dictionary<Guid, SynoTrack> _tracksToGuidMapping;
+        private List<GuidToTrackMapping> _tracksToGuidMapping;
 
         private List<AsciiUriFix> _asciiUriFixes;
 
@@ -131,7 +131,7 @@ namespace OpenSyno.Services
             // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
             //PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
-            this._tracksToGuidMapping = new Dictionary<Guid, SynoTrack>();
+            this._tracksToGuidMapping = new List<GuidToTrackMapping>();
 
             using (IsolatedStorageFileStream asciiUriFixes = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("AsciiUriFixes.xml", FileMode.OpenOrCreate))
             {
@@ -163,7 +163,7 @@ namespace OpenSyno.Services
 
                     foreach (GuidToTrackMapping pair in deserialization.Mappings)
                     {
-                        this._tracksToGuidMapping.Add(pair.Guid, pair.Track);
+                        this._tracksToGuidMapping.Add(pair);
                     }
                 }
                 catch (Exception e)
@@ -248,9 +248,9 @@ namespace OpenSyno.Services
                     break;
                 case PlayState.Playing:
                     var guid = Guid.Parse(BackgroundAudioPlayer.Instance.Track.Tag);
-                    if (this._tracksToGuidMapping.ContainsKey(guid))
+                    if (_tracksToGuidMapping.Any(o=>o.Guid == guid))
                     {
-                        SynoTrack synoTrack = this._tracksToGuidMapping[guid];
+                        SynoTrack synoTrack = this._tracksToGuidMapping.Single(o=>o.Guid == guid).Track;
                         OnTrackStarted(new TrackStartedEventArgs { Guid = guid, Track = synoTrack });
                     }
                     break;
@@ -343,7 +343,7 @@ namespace OpenSyno.Services
             //        _audioStationSession.Port,
             //        _audioStationSession.Token.Split('=')[1],
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            SynoTrack baseSynoTrack = _tracksToGuidMapping[guidOfTrackToPlay];
+            SynoTrack baseSynoTrack = _tracksToGuidMapping.Single(o=>o.Guid == guidOfTrackToPlay).Track;
             AudioTrack audioTrack;
             if (_asciiUriFixes.Any(fix => fix.Res == baseSynoTrack.Res))
             {
@@ -393,8 +393,8 @@ namespace OpenSyno.Services
             foreach (var synoTrack in tracks)
             {
                 Guid newGuid = Guid.NewGuid();
-                _tracksToGuidMapping.Add(newGuid, synoTrack);
-                var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Value.Res == fix.Res) && mapping.Value.Res.Any(c => c == '&' || c > 127)).Select(t => t.Value);
+                _tracksToGuidMapping.Add(new GuidToTrackMapping(newGuid, synoTrack));
+                var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Track.Res == fix.Res) && mapping.Track.Res.Any(c => c == '&' || c > 127)).Select(t => t.Track);
                 foreach (var track in tracksToFix)
                 {
                     _asciiUriFixes.Add(new AsciiUriFix(track.Res, null));
@@ -419,7 +419,7 @@ namespace OpenSyno.Services
                                     dcs.WriteObject(stream, _asciiUriFixes);
                                 }
 
-                                callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Value)).ToDictionary(o => o.Value, o => o.Key));
+                                callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Track)).ToDictionary(o => o.Track, o => o.Guid));
                             }
                         };
                     string url =
@@ -464,7 +464,7 @@ namespace OpenSyno.Services
                     {
                         Host = _audioStationSession.Host,
                         Port = _audioStationSession.Port,
-                        Mappings = _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key, o.Value)).ToList(),
+                        Mappings = _tracksToGuidMapping,
                         Token = _audioStationSession.Token
                     };
                 dcs.WriteObject(playQueueFile, serialization);
@@ -473,7 +473,7 @@ namespace OpenSyno.Services
 
         public IEnumerable<GuidToTrackMapping> GetTracksInQueue()
         {
-            return _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key, o.Value));
+            return _tracksToGuidMapping;
         }
 
 
@@ -481,13 +481,13 @@ namespace OpenSyno.Services
         public GuidToTrackMapping GetCurrentTrack()
         {
             var audioTrack = BackgroundAudioPlayer.Instance.Track;
-            if (audioTrack == null || !_tracksToGuidMapping.ContainsKey(Guid.Parse(audioTrack.Tag)))
+            if (audioTrack == null || !_tracksToGuidMapping.Any(o=>o.Guid == Guid.Parse(audioTrack.Tag)))
             {
                 return null;
             }
 
             Guid guid = Guid.Parse(audioTrack.Tag);
-            return new GuidToTrackMapping(guid, _tracksToGuidMapping[guid]);
+            return new GuidToTrackMapping(guid, _tracksToGuidMapping.Single( o => o.Guid == guid).Track);
         }
 
         public void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove)
@@ -495,8 +495,8 @@ namespace OpenSyno.Services
             var guidsToRemove = tracksToRemove.ToArray();
             foreach (var guid in guidsToRemove)
             {
-                var guidToTrackMapping = new GuidToTrackMapping(guid, _tracksToGuidMapping[guid]);
-                _tracksToGuidMapping.Remove(guid);
+                var guidToTrackMapping = _tracksToGuidMapping.Single(o=>o.Guid == guid);
+                _tracksToGuidMapping.Remove(guidToTrackMapping);
 
                 PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
                 ea.RemovedItems = new[] { guidToTrackMapping };

@@ -126,6 +126,9 @@ namespace Synology.AudioStationApi
                                                           {
                                                               string cookie = rawCookie.Split(';').Where(s => s.StartsWith("id=")).Single();
                                                               this.Token = cookie;
+                                                              
+                                                              // Delete ascii urls patches
+                                                              
                                                           }                                                          
                                                           
                                                           callback(this.Token);
@@ -135,6 +138,7 @@ namespace Synology.AudioStationApi
 
             client.DownloadStringAsync(uri);
         }
+
 
         public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError)
         {
