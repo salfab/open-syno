@@ -268,7 +268,12 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     // is there a fix we can apply ?
                     if (_asciiUriFixes.Any(fix => fix.Res == nextTrack.Res))
                     {
-                        track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, _playqueueInformation.Host, _playqueueInformation.Port, _playqueueInformation.Token, _asciiUriFixes.Single(fix => fix.Res == nextTrack.Res).Url);                        
+                        AsciiUriFix asciiUriFix = this._asciiUriFixes.Single(fix => fix.Res == nextTrack.Res);
+                        if (asciiUriFix.Url == null)
+                        {
+                            throw new NotSupportedException("We knew this day will come eventually : we just imagined that this would not happen anytime soon, so being agile, we didn't implement it yet : we need to support the scenario where a track is started from the phone's UI instead of the app's. (AudioPlayer.cs::GetNextTrack()");
+                        }
+                        track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, _playqueueInformation.Host, _playqueueInformation.Port, _playqueueInformation.Token, asciiUriFix.Url);
                     }
                     else
                     {

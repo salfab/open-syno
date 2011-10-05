@@ -347,22 +347,21 @@ namespace OpenSyno.Services
             AudioTrack audioTrack;
             if (_asciiUriFixes.Any(fix => fix.Res == baseSynoTrack.Res))
             {
-                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, _asciiUriFixes.Single(fix => fix.Res == baseSynoTrack.Res).Url);                
+                AsciiUriFix asciiUriFix = this._asciiUriFixes.Single(fix => fix.Res == baseSynoTrack.Res);
+                asciiUriFix.CallbackWhenFisIsApplicable( fix =>
+                    {
+                        audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, asciiUriFix.Url);
+                        BackgroundAudioPlayer.Instance.Track = audioTrack;
+                        BackgroundAudioPlayer.Instance.Play();
+                    });
             }
             else
             {
                 audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+                BackgroundAudioPlayer.Instance.Track = audioTrack;
+                BackgroundAudioPlayer.Instance.Play();
             }
-            BackgroundAudioPlayer.Instance.Track = audioTrack;
-            //new AudioTrack(
-            //new Uri(url),
-            //trackToPlay.Title,
-            //trackToPlay.Artist,
-            //trackToPlay.Album,
-            //new Uri(trackToPlay.AlbumArtUrl),
-            //_tracksToPlayqueueGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single().ToString(),
-            //EnabledPlayerControls.All);
-            BackgroundAudioPlayer.Instance.Play();
+
         }
 
 
@@ -515,12 +514,12 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.SkipPrevious();
         }
 
-        public void PurgeCachedTokens()
+        public void InvalidateCachedTokens()
         {
             _asciiUriFixes.Clear();
 
 
-            DetectAffectedTracksAndBuildFix(_tracksToGuidMapping, );
+            DetectAffectedTracksAndBuildFix(_tracksToGuidMapping, mapping => SerializeAsciiUriFixes());
         }
 
 
@@ -548,8 +547,7 @@ namespace OpenSyno.Services
                     var res = (string)e.UserState;
                     _asciiUriFixes.Where(fix => fix.Res == res).Single().Url = shortUrl;
                     if (!_asciiUriFixes.Any(fix => fix.Url == null))
-                    {
-                        SerializeAsciiUriFixes();
+                    {                        
                         callback(_tracksToGuidMapping.Where(o => potentiallyUnsafeMappings.Any(x => x.Track == o.Track)).ToDictionary(o => o.Track, o => o.Guid));
                     }
                 };

@@ -70,7 +70,7 @@ namespace OpenSyno
             else
             {
                 // need to get a new token.
-                _playbackService.PurgeCachedTokens();
+                _playbackService.InvalidateCachedTokens();
                 _audioStationSession.Host = Host;
                 _audioStationSession.Port = Port;
                 try
@@ -128,7 +128,7 @@ namespace OpenSyno
             OnLoginAsyncCompleted(e.Token);
 
             // if we cannot 
-            // _playbackService.PurgeCachedTokens();
+            // _playbackService.InvalidateCachedTokens();
             return;
         }
 
