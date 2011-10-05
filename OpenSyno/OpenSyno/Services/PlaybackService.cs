@@ -1,23 +1,18 @@
-﻿using Microsoft.Phone.Shell;
-using Ninject;
+﻿using Ninject;
+using OpenSyno.Common;
 using OpenSyno.Helpers;
 
 namespace OpenSyno.Services
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using System.IO;
     using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Net;
+    using System.Runtime.Serialization;
     using System.Threading;
     using System.Windows;
-    using System.Windows.Threading;
-    using System.Xml.Serialization;
-
     using Microsoft.Phone.BackgroundAudio;
 
     using OpenSyno.BackgroundPlaybackAgent;
@@ -35,7 +30,9 @@ namespace OpenSyno.Services
 
         private readonly IAudioTrackFactory _audioTrackFactory;
 
-        private Dictionary<Guid, SynoTrack> _tracksToGuidMapping;
+        private List<GuidToTrackMapping> _tracksToGuidMapping;
+
+        private List<AsciiUriFix> _asciiUriFixes;
 
         private PlaybackStatus _status;
 
@@ -101,9 +98,8 @@ namespace OpenSyno.Services
         /// Plays the specified track. It must be present in the queue.
         /// </summary>
         /// <param name="trackToPlay">The track to play.</param>
-        public void PlayTrackInQueue(SynoTrack trackToPlay)
+        public void PlayTrackInQueue(Guid trackToPlay)
         {
-            PhoneApplicationService.Current.ApplicationIdleDetectionMode = IdleDetectionMode.Disabled;
             StreamTrack(trackToPlay);
             _status = PlaybackStatus.Buffering;
         }
@@ -135,28 +131,45 @@ namespace OpenSyno.Services
             // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
             //PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
-            this._tracksToGuidMapping = new Dictionary<Guid, SynoTrack>();
-            
+            this._tracksToGuidMapping = new List<GuidToTrackMapping>();
 
-            PlayqueueInterProcessCommunicationTransporter deserialization = null;
-            using(IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            using (IsolatedStorageFileStream asciiUriFixes = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("AsciiUriFixes.xml", FileMode.OpenOrCreate))
             {
-                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
-                var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+
+                DataContractSerializer dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
+                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
 
                 try
                 {
-                    deserialization = (PlayqueueInterProcessCommunicationTransporter)xs.Deserialize(playQueueFile);
+                    _asciiUriFixes = (List<AsciiUriFix>)dcs.ReadObject(asciiUriFixes);
+                }
+                catch (Exception e)
+                {
+                    // could not deserialize XML for playlist : let's build an empty list.
+                    _asciiUriFixes = new List<AsciiUriFix>();
+                }
+            }
+
+            PlayqueueInterProcessCommunicationTransporter deserialization = null;
+            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            {
+
+                DataContractSerializer dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+
+                try
+                {
+                    deserialization = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
 
                     foreach (GuidToTrackMapping pair in deserialization.Mappings)
                     {
-                        this._tracksToGuidMapping.Add(pair.Guid, pair.Track);
+                        this._tracksToGuidMapping.Add(pair);
                     }
                 }
                 catch (Exception e)
                 {
                     // could not deserialize XML for playlist : let's keep it empty.
-                    
+
                 }
             }
 
@@ -235,10 +248,10 @@ namespace OpenSyno.Services
                     break;
                 case PlayState.Playing:
                     var guid = Guid.Parse(BackgroundAudioPlayer.Instance.Track.Tag);
-                    if (this._tracksToGuidMapping.ContainsKey(guid))
+                    if (_tracksToGuidMapping.Any(o=>o.Guid == guid))
                     {
-                        SynoTrack synoTrack = this._tracksToGuidMapping[guid];
-                        OnTrackStarted(new TrackStartedEventArgs { Track = synoTrack });
+                        SynoTrack synoTrack = this._tracksToGuidMapping.Single(o=>o.Guid == guid).Track;
+                        OnTrackStarted(new TrackStartedEventArgs { Guid = guid, Track = synoTrack });
                     }
                     break;
                 case PlayState.BufferingStarted:
@@ -320,7 +333,7 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.Volume = volume;
         }
         #region audiorendering service
-        public void StreamTrack(SynoTrack trackToPlay)
+        public void StreamTrack(Guid guidOfTrackToPlay)
         {
             //// hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
             //string url =
@@ -330,7 +343,16 @@ namespace OpenSyno.Services
             //        _audioStationSession.Port,
             //        _audioStationSession.Token.Split('=')[1],
             //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            var audioTrack = _audioTrackFactory.Create(trackToPlay, _tracksToGuidMapping.Where(o => o.Value == trackToPlay).Select(o => o.Key).Single(), _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+            SynoTrack baseSynoTrack = _tracksToGuidMapping.Single(o=>o.Guid == guidOfTrackToPlay).Track;
+            AudioTrack audioTrack;
+            if (_asciiUriFixes.Any(fix => fix.Res == baseSynoTrack.Res))
+            {
+                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, _asciiUriFixes.Single(fix => fix.Res == baseSynoTrack.Res).Url);                
+            }
+            else
+            {
+                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+            }
             BackgroundAudioPlayer.Instance.Track = audioTrack;
             //new AudioTrack(
             //new Uri(url),
@@ -343,7 +365,7 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.Play();
         }
 
-        
+
 
         #endregion
 
@@ -357,9 +379,9 @@ namespace OpenSyno.Services
             //this._backgroundAudioRenderingService.SkipNext();
         }
 
-        public event NotifyCollectionChangedEventHandler PlayqueueChanged;
+        public event PlayqueueChangedEventHandler PlayqueueChanged;
 
-        public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition)
+        public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition, Action<Dictionary<SynoTrack, Guid>> callback)
         {
             if (insertPosition != _tracksToGuidMapping.Count())
             {
@@ -370,14 +392,60 @@ namespace OpenSyno.Services
             // FIXME : Be able to choose the position
             foreach (var synoTrack in tracks)
             {
-                _tracksToGuidMapping.Add(Guid.NewGuid(), synoTrack);    
+                Guid newGuid = Guid.NewGuid();
+                _tracksToGuidMapping.Add(new GuidToTrackMapping(newGuid, synoTrack));
+                var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Track.Res == fix.Res) && mapping.Track.Res.Any(c => c == '&' || c > 127)).Select(t => t.Track);
+                foreach (var track in tracksToFix)
+                {
+                    _asciiUriFixes.Add(new AsciiUriFix(track.Res, null));
+
+                    // query shorten URL
+
+                    // Use url-shortening service.
+                    // http://t0.tv/api/shorten?u=<url>
+                    WebClient webClient = new WebClient();
+
+
+                    webClient.DownloadStringCompleted += (s, e) =>
+                        {
+                            var shortUrl = e.Result;
+                            var res = (string)e.UserState;
+                            _asciiUriFixes.Where(fix => fix.Res == res).Single().Url = shortUrl;
+                            if (!_asciiUriFixes.Any(fix => fix.Url == null))
+                            {
+                                SerializeAsciiUriFixes();
+                                callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Track)).ToDictionary(o => o.Track, o => o.Guid));
+                            }
+                        };
+                    string url =
+                   string.Format(
+                       "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+                       _audioStationSession.Host,
+                       _audioStationSession.Port,
+                       _audioStationSession.Token.Split('=')[1],
+                       HttpUtility.UrlEncode(track.Res).Replace("+", "%20"));
+
+                    webClient.DownloadStringAsync(new Uri("http://tinyurl.com/api-create.php?url=" + HttpUtility.UrlEncode(url)), track.Res);
+
+                }
                 // FIXME : Urgent : replace NotifyCollectionChanged by a custom event that can propagate bulk collection changes ! (optimize writes on disk )
-                OnTracksInQueueChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, synoTrack, insertPosition+i));
+                OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = new[] { new GuidToTrackMapping(newGuid, synoTrack) }, AddedItemsPosition = insertPosition + i });
                 i++;
             }
         }
 
-        private void OnTracksInQueueChanged(NotifyCollectionChangedEventArgs eventArgs)
+        private void SerializeAsciiUriFixes()
+        {
+            using (
+                IsolatedStorageFileStream stream = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(
+                    "AsciiUriFixes.xml", FileMode.Create))
+            {
+                var dcs = new DataContractSerializer(typeof (List<AsciiUriFix>));
+                dcs.WriteObject(stream, _asciiUriFixes);
+            }
+        }
+
+        private void OnTracksInQueueChanged(PlayqueueChangedEventArgs eventArgs)
         {
             if (eventArgs == null)
             {
@@ -394,25 +462,108 @@ namespace OpenSyno.Services
 
         private void SerializePlayqueue()
         {
-            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
+            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
             {
-                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
-                var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+                var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
 
                 var serialization = new PlayqueueInterProcessCommunicationTransporter()
                     {
                         Host = _audioStationSession.Host,
                         Port = _audioStationSession.Port,
-                        Mappings = _tracksToGuidMapping.Select(o => new GuidToTrackMapping(o.Key, o.Value)).ToList(),
+                        Mappings = _tracksToGuidMapping,
                         Token = _audioStationSession.Token
                     };
-                    xs.Serialize(playQueueFile, serialization);
+                dcs.WriteObject(playQueueFile, serialization);
             }
         }
 
-        public IEnumerable<SynoTrack> GetTracksInQueue()
+        public IEnumerable<GuidToTrackMapping> GetTracksInQueue()
         {
-            return _tracksToGuidMapping.Values;
+            return _tracksToGuidMapping;
+        }
+
+
+
+        public GuidToTrackMapping GetCurrentTrack()
+        {
+            var audioTrack = BackgroundAudioPlayer.Instance.Track;
+            if (audioTrack == null || !_tracksToGuidMapping.Any(o=>o.Guid == Guid.Parse(audioTrack.Tag)))
+            {
+                return null;
+            }
+
+            Guid guid = Guid.Parse(audioTrack.Tag);
+            return new GuidToTrackMapping(guid, _tracksToGuidMapping.Single( o => o.Guid == guid).Track);
+        }
+
+        public void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove)
+        {
+            var guidsToRemove = tracksToRemove.ToArray();
+            foreach (var guid in guidsToRemove)
+            {
+                var guidToTrackMapping = _tracksToGuidMapping.Single(o=>o.Guid == guid);
+                _tracksToGuidMapping.Remove(guidToTrackMapping);
+
+                PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
+                ea.RemovedItems = new[] { guidToTrackMapping };
+                this.OnTracksInQueueChanged(ea);
+            }
+        }
+
+        public void SkipPrevious()
+        {
+            BackgroundAudioPlayer.Instance.SkipPrevious();
+        }
+
+        public void PurgeCachedTokens()
+        {
+            _asciiUriFixes.Clear();
+
+
+            DetectAffectedTracksAndBuildFix(_tracksToGuidMapping, );
+        }
+
+
+        /// <summary>
+        /// Detects the affected tracks and build a fix.
+        /// </summary>
+        /// <param name="potentiallyUnsafeMappings">The potentially unsafe mappings.</param>
+        private void DetectAffectedTracksAndBuildFix(List<GuidToTrackMapping> potentiallyUnsafeMappings, Action<Dictionary<SynoTrack, Guid>> callback)
+        { 
+            var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Track.Res == fix.Res) && mapping.Track.Res.Any(c => c == '&' || c > 127)).Select(t => t.Track);
+            foreach (var track in tracksToFix)
+            {
+                _asciiUriFixes.Add(new AsciiUriFix(track.Res, null));
+
+                // query shorten URL
+
+                // Use url-shortening service.
+                // http://t0.tv/api/shorten?u=<url>
+                WebClient webClient = new WebClient();
+
+
+                webClient.DownloadStringCompleted += (s, e) =>
+                {
+                    var shortUrl = e.Result;
+                    var res = (string)e.UserState;
+                    _asciiUriFixes.Where(fix => fix.Res == res).Single().Url = shortUrl;
+                    if (!_asciiUriFixes.Any(fix => fix.Url == null))
+                    {
+                        SerializeAsciiUriFixes();
+                        callback(_tracksToGuidMapping.Where(o => potentiallyUnsafeMappings.Any(x => x.Track == o.Track)).ToDictionary(o => o.Track, o => o.Guid));
+                    }
+                };
+                string url =
+                string.Format(
+                    "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+                    _audioStationSession.Host,
+                    _audioStationSession.Port,
+                    _audioStationSession.Token.Split('=')[1],
+                    HttpUtility.UrlEncode(track.Res).Replace("+", "%20"));
+
+                webClient.DownloadStringAsync(new Uri("http://tinyurl.com/api-create.php?url=" + HttpUtility.UrlEncode(url)), track.Res);
+
+            }
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)

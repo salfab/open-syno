@@ -134,7 +134,23 @@ namespace OpenSyno
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            IoC.Container.Get<ISignInService>().SignIn();
+            var signInService = IoC.Container.Get<ISignInService>();
+            EventHandler<CheckTokenValidityCompletedEventArgs> completed = null;
+            completed = (s, ea) =>
+                            {
+
+                                // the modified closure here is on purpose.
+                                signInService.CheckTokenValidityCompleted -= completed;
+                                if (!ea.IsValid && ea.Error == null)
+                                {
+                                    signInService.SignIn();
+                                }
+                            };
+
+            signInService.CheckTokenValidityCompleted += completed;
+            signInService.CheckCachedTokenValidityAsync();
+            
+
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -235,24 +251,28 @@ namespace OpenSyno
                                                           string exceptionName = e.GetType().Name;
                                                           if (helpDebug == MessageBoxResult.OK)
                                                           {
-                                                              var mailContent = new StringBuilder();
+                                                              var exceptionContent = new StringBuilder();
                                                               while (e != null)
                                                               {
-                                                                  mailContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
-                                                                  mailContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
-                                                                  mailContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
-                                                                  mailContent.AppendLine("Inner exception : \r\n");
+                                                                  exceptionContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
+                                                                  exceptionContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
+                                                                  exceptionContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
+                                                                  exceptionContent.AppendLine("Inner exception : \r\n");
                                                                   e = e.InnerException;
                                                               }
 
                                                               ILogService logService = IoC.Container.Get<ILogService>();
-                                                              logService.Error(mailContent.ToString());
+                                                              logService.Error(exceptionContent.ToString());
 
                                                               EmailComposeTask emailComposeTask = new EmailComposeTask();
                                                               emailComposeTask.To = "opensyno@seesharp.ch";
-                                                              emailComposeTask.Body = mailContent.ToString();
+                                                              emailComposeTask.Body = "Log : \r\n" + logService.GetLogFileSinceAppStart();
                                                               emailComposeTask.Subject = "Open syno Unhandled exception - " + exceptionName;
-                                                              emailComposeTask.Show();
+                                                              emailComposeTask.Show();  
+                                                              
+
+                                                              // Ugliest code I ever wrote, but somehow, it seems that if returning too quickly, the email task window doesn't even show up... race condition within the OS ?
+                                                              Thread.Sleep(1000);
                                                               mre.Set();
                                                           }
                                                       };
@@ -314,10 +334,5 @@ namespace OpenSyno
         }
 
         #endregion
-    }
-
-    public class SynoTokenReceivedAggregatedEvent
-    {
-        public string Token { get; set; }
     }
 }

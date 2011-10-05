@@ -40,8 +40,93 @@
             </controls:PanoramaItem>
 
             <!--Panorama item -->
-            <controls:PanoramaItem Header="Connection">
-                <Grid/>
+            <controls:PanoramaItem Header="Settings">
+                <ScrollViewer>
+                    <ItemsControl HorizontalContentAlignment="Stretch">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Border Background="Orange">
+                                <TextBlock Text="Audio Station credentials"/>
+                            </Border>
+                            <!--<ExpanderView>-->
+                            <StackPanel Grid.Row="1">
+                                <TextBlock Margin="12,0" Text="User Name" />
+                                <TextBox VerticalAlignment="Top"  Text="{Binding UserName, Mode=TwoWay}">
+                                    <TextBox.InputScope>
+                                        <InputScope>
+                                            <InputScopeName NameValue="Search" />
+                                        </InputScope>
+                                    </TextBox.InputScope>
+                                </TextBox>
+                                <TextBlock Margin="12,0" Text="Password" />
+                                <PasswordBox Password="{Binding Password, Mode=TwoWay}" >
+                                    <!--<TextBox.InputScope>
+                        <InputScope>
+                            <InputScopeName NameValue="Password" />
+                        </InputScope>
+                    </TextBox.InputScope>-->
+                                </PasswordBox>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Margin="10,0,0,0"  Text="Host" />
+                                    <TextBlock Margin="10,0,0,0" Text="Port" Grid.Column="1" />
+                                    <TextBox Grid.Row="1" Text="{Binding Host, Mode=TwoWay}">
+                                        <TextBox.InputScope>
+                                            <InputScope>
+                                                <InputScopeName NameValue="Url" />
+                                            </InputScope>
+                                        </TextBox.InputScope>
+                                    </TextBox>
+                                    <TextBox Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" Grid.Column="1" >
+                                        <TextBox.InputScope>
+                                            <InputScope>
+                                                <InputScopeName NameValue="Number" />
+                                            </InputScope>
+                                        </TextBox.InputScope>
+                                    </TextBox>
+                                </Grid>
+                                <CheckBox IsChecked="{Binding UseSsl, Mode=TwoWay}" Content="Use SSL encryption (only trusted CA*)" />
+                                <TextBlock Text="* Only SSL certificates issued by trusted certificate authorities are supported.
+A list of trusted CA is available at
+http://bit.ly/qODji5.                           
+Also, please read :" TextWrapping="Wrap" />
+                                <HyperlinkButton Content="http://wp.me/p1BE2Y-2c" NavigateUri="http://wp.me/p1BE2Y-2c" TargetName="_blank" />
+                                <!--<ProgressBar IsIndeterminate="True" />-->
+                            </StackPanel>
+                            <!--</ExpanderView>-->
+                        </Grid>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Border Background="Orange">
+                                <TextBlock>last.fm</TextBlock>
+                            </Border>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Border Background="Orange">
+                                <TextBlock>Facebook</TextBlock>
+                            </Border>
+                        </Grid>
+                    </ItemsControl>
+                </ScrollViewer>
             </controls:PanoramaItem>
 
             <!--Panorama item -->

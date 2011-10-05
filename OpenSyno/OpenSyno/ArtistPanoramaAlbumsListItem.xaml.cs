@@ -74,7 +74,17 @@ namespace OpenSyno
         private void OnShowAlbumDetail(AlbumViewModel albumViewModel)
         {
             // HACK : Sice we moved manually the "All Music" album at the end of the list (for ease of navigation), there's an offset which is compensated by the albums page. side effect is : we cannot jump to the all music item... either we'll have to special case the all music album, or we'll have to edit the "Albums" collection property so the All Music comes at the end of the list and place an offset of +1 when computing the item to jump to.
-            _panoramaItemSwitchingService.RequestActiveItemChange(Albums.IndexOf(albumViewModel));
+
+            var indexOf = this.Albums.IndexOf(albumViewModel);
+            if (indexOf == -1)
+            {
+                // FIXME : Because of our templates in the artist panorama items, ( ViewModelProxy ) the Albums collection is not properly refreshed after it has been loaded once.
+                // (blame it on silverlight 3 : no proper element name, no FindAncestor on bindings ; no dynamic resources...
+                // we'll have to design our template differently :(
+                // in the mean time, it will remain a known bug.
+                return;
+            }
+            _panoramaItemSwitchingService.RequestActiveItemChange(indexOf);
         }
 
         /// <summary>

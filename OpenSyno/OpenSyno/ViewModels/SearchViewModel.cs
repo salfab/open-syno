@@ -45,7 +45,7 @@ namespace OpenSyno.ViewModels
             // just in case the event has previously been fired : we set its default value to the current value.
             IsAppLoading = _signInService.IsSigningIn;
 
-            _eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Subscribe(OnSynoTokenReceived, false);
+            //_eventAggregator.GetEvent<CompositePresentationEvent<SynoTokenReceivedAggregatedEvent>>().Subscribe(OnSynoTokenReceived, false);
 
             StartSearchCommand = new DelegateCommand<string>(OnStartSearch);
             StartSearchAllCommand = new DelegateCommand<string>(OnStartSearchAll);
@@ -53,6 +53,12 @@ namespace OpenSyno.ViewModels
             SearchContextChangedCommand = new DelegateCommand<string>(OnSearchContextChanged);
             DispatchSearchCommand = new DelegateCommand<string>(OnDispatchSearch);
             ClearKeywordCommand = new DelegateCommand(OnClearKeyword);
+            ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
+        }
+
+        private void OnShowPlayQueue()
+        {
+            _pageSwitchingService.NavigateToPlayQueue();
         }
 
         private void OnClearKeyword()
@@ -88,15 +94,7 @@ namespace OpenSyno.ViewModels
 
         public ICommand DispatchSearchCommand { get; set; }
         public ICommand SearchContextChangedCommand { get; set; }
-        /// <summary>
-        /// Called when the syno token is received.
-        /// </summary>
-        /// <param name="payload">The payload.</param>
-        /// <remarks>This is the handler for the <see cref="SynoTokenReceivedAggregatedEvent"/> aggregated event.</remarks>
-        public void OnSynoTokenReceived(SynoTokenReceivedAggregatedEvent payload)
-        {
-            IsAppLoading = false;
-        }
+
 
 
         public ICommand StartSearchAllCommand { get; set; }
@@ -143,6 +141,8 @@ namespace OpenSyno.ViewModels
         }
 
         public ICommand ShowAboutBoxCommand { get; set; }
+
+        public ICommand ShowPlayQueueCommand { get; set; }
 
         private void OnShowAboutBox()
         {
