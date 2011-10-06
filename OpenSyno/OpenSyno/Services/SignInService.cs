@@ -7,18 +7,24 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno.Services
 {
+    using OpenSyno.Helpers;
+
     public class SignInService : ISignInService
     {
         private readonly IOpenSynoSettings _openSynoSettings;
         private readonly IEventAggregator _eventAggregator;
         private INotificationService _notificationService;
+
+        private ILogService _logService;
+
         public event EventHandler<SignInCompletedEventArgs> SignInCompleted;
 
-        public SignInService(IOpenSynoSettings openSynoSettings, IEventAggregator eventAggregator, INotificationService notificationService)
+        public SignInService(IOpenSynoSettings openSynoSettings, IEventAggregator eventAggregator, INotificationService notificationService, ILogService logService)
         {
             _openSynoSettings = openSynoSettings;
             _eventAggregator = eventAggregator;
             _notificationService = notificationService;
+            _logService = logService;
         }
 
         public event EventHandler<CheckTokenValidityCompletedEventArgs> CheckTokenValidityCompleted;
@@ -27,10 +33,12 @@ namespace OpenSyno.Services
         {
             if (_openSynoSettings.UserName == null || _openSynoSettings.Password == null || _openSynoSettings.Host == null)
             {
-                OnSignInCompleted(new SignInCompletedEventArgs { Token = string.Empty, IsBusy = false});
+                _logService.Trace("SignInService : Signing in - Empty credential parameters - Aborted");
+                OnSignInCompleted(new SignInCompletedEventArgs { Token = string.Empty, IsBusy = false });
             }
             else
             {
+                _logService.Trace("SignInService : Signing in");
                 // only if we are really going to try, not if no credentials are set.
                 IsSigningIn = true;
 
@@ -69,6 +77,7 @@ namespace OpenSyno.Services
                                                       {
                                                           jobject = JObject.Parse(e.Result);
                                                           var isValid = jobject["success"].Value<bool>();
+                                                          _logService.Trace("CheckCachedTokenValidityAsync : token is valid : " + isValid.ToString());
                                                           if (CheckTokenValidityCompleted != null)
                                                           {
                                                               CheckTokenValidityCompleted(this, new CheckTokenValidityCompletedEventArgs { IsValid = isValid, Token = token, Error = null });

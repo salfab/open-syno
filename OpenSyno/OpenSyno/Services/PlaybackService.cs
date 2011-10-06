@@ -514,8 +514,13 @@ namespace OpenSyno.Services
             BackgroundAudioPlayer.Instance.SkipPrevious();
         }
 
+        /// <summary>
+        /// Invalidates the cached tokens.
+        /// </summary>
+        /// <remarks>Used to make sure we purge the fix for the uri containing non-ascii7 characters. The current architecture relies on the fact that we only change the token if the cached token is outdated. fixes use url-shortening services and have their token enclosed, so it is necessary not to update the cached token indepedently from the cached uri fixes !</remarks>
         public void InvalidateCachedTokens()
         {
+            _logService.Trace("PlaybackService : Invalidating cached token");
             _asciiUriFixes.Clear();
 
 

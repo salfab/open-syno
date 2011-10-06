@@ -35,6 +35,7 @@ namespace OpenSyno
         /// </summary>
         public App()
         {
+            
             // Global handler for uncaught exceptions. 
             UnhandledException += Application_UnhandledException;
 
@@ -114,10 +115,18 @@ namespace OpenSyno
             IoC.Container.Bind<INotificationService>().ToConstant(_notificationService).InSingletonScope();
             
             IoC.Container.Bind<IPlaybackService>().To<PlaybackService>().InSingletonScope();
+
             //IoC.Container.Bind<IAudioRenderingService>().To<PlaybackService>().InSingletonScope();
 
             ActivateEagerTypes();
 
+            ResolvePrivateMembers();
+
+        }
+
+        private void ResolvePrivateMembers()
+        {
+            _playbackService = IoC.Container.Get<IPlaybackService>();
         }
 
         private void ActivateEagerTypes()
@@ -126,7 +135,7 @@ namespace OpenSyno
             IoC.Container.Get<SearchResultsViewModelFactory>();
             IoC.Container.Get<ArtistPanoramaViewModelFactory>();
             IoC.Container.Get<ISearchAllResultsViewModelFactory>();
-            IoC.Container.Get<PlayQueueViewModel>();
+            IoC.Container.Get<PlayQueueViewModel>();           
         }
 
 
@@ -144,6 +153,10 @@ namespace OpenSyno
                                 if (!ea.IsValid && ea.Error == null)
                                 {
                                     signInService.SignIn();
+                                }
+                                else
+                                {
+                                    _playbackService.InvalidateCachedTokens();                                    
                                 }
                             };
 
@@ -303,6 +316,8 @@ namespace OpenSyno
         private IOpenSynoSettings _openSynoSettings;
 
         private INotificationService _notificationService;
+
+        private IPlaybackService _playbackService;
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()

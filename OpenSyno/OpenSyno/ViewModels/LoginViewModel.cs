@@ -113,6 +113,7 @@ namespace OpenSyno
             _synoSettings.Host = Host;
             _synoSettings.Port = Port;
 
+            // FIXME : we should use the SignIn method of the signInService, so we don't duplicate the logic !
             _signInService.CheckTokenValidityCompleted += OnCheckTokenValidityCompleted;
 
 
