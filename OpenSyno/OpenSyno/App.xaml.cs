@@ -143,26 +143,29 @@ namespace OpenSyno
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            var signInService = IoC.Container.Get<ISignInService>();
+            this._signInService = IoC.Container.Get<ISignInService>();
+            this._signInService.SignInCompleted += this.OnSignInComplete;
             EventHandler<CheckTokenValidityCompletedEventArgs> completed = null;
             completed = (s, ea) =>
                             {
 
                                 // the modified closure here is on purpose.
-                                signInService.CheckTokenValidityCompleted -= completed;
+                                this._signInService.CheckTokenValidityCompleted -= completed;
                                 if (!ea.IsValid && ea.Error == null)
                                 {
-                                    signInService.SignIn();
-                                }
-                                else
-                                {
-                                    _playbackService.InvalidateCachedTokens();                                    
+                                    this._signInService.SignIn();
                                 }
                             };
 
-            signInService.CheckTokenValidityCompleted += completed;
-            signInService.CheckCachedTokenValidityAsync();
+            this._signInService.CheckTokenValidityCompleted += completed;
+            this._signInService.CheckCachedTokenValidityAsync();
             
+
+        }
+
+        private void OnSignInComplete(object sender, SignInCompletedEventArgs e)
+        {
+            _playbackService.InvalidateCachedTokens();
 
         }
 
@@ -318,6 +321,8 @@ namespace OpenSyno
         private INotificationService _notificationService;
 
         private IPlaybackService _playbackService;
+
+        private ISignInService _signInService;
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()
