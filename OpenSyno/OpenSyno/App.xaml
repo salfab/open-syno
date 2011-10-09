@@ -16,6 +16,7 @@
                 <ResourceDictionary Source="OpenSynoStyles.xaml"/>
                 <ResourceDictionary Source="PlayQueueStyles.xaml"/>
                 <ResourceDictionary Source="SearchViewTemplates.xaml"/>
+                <ResourceDictionary Source="ArtistViewTemplates.xaml"/>
     		</ResourceDictionary.MergedDictionaries>
             <Converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <Converters:BindingDebuggerConverter x:Key="BindingDebuggerConverter" />
