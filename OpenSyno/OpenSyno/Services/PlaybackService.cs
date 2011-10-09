@@ -238,7 +238,25 @@ namespace OpenSyno.Services
 
         private void BackgroundPlayerPlayStateChanged(object sender, EventArgs e)
         {
-            switch (BackgroundAudioPlayer.Instance.PlayerState)
+            PlayState playerState = BackgroundAudioPlayer.Instance.PlayerState;
+            _logService.Trace("Background player state changed : " + playerState);
+            Guid guid = Guid.Empty;
+            string source = string.Empty;
+
+            if (BackgroundAudioPlayer.Instance.Track != null)
+            {
+                guid = Guid.Parse(BackgroundAudioPlayer.Instance.Track.Tag);
+                source = BackgroundAudioPlayer.Instance.Track.Source.AbsoluteUri;
+                _logService.Trace("Current track guid : " + guid);
+                _logService.Trace("Current track source : '" + source + "'");
+            }
+            else
+            {
+                _logService.Trace("Current track is null");
+            }
+
+
+            switch (playerState)
             {
                 case PlayState.Unknown:
                     break;
@@ -247,11 +265,16 @@ namespace OpenSyno.Services
                 case PlayState.Paused:
                     break;
                 case PlayState.Playing:
-                    var guid = Guid.Parse(BackgroundAudioPlayer.Instance.Track.Tag);
                     if (_tracksToGuidMapping.Any(o=>o.Guid == guid))
                     {
                         SynoTrack synoTrack = this._tracksToGuidMapping.Single(o=>o.Guid == guid).Track;
+                        _logService.Error("Track matching the guid was found : " + synoTrack.Title);
                         OnTrackStarted(new TrackStartedEventArgs { Guid = guid, Track = synoTrack });
+                    }
+                    else
+                    {
+                        _logService.Error("No track matching the guid was found.");
+                        throw new ArgumentOutOfRangeException("No track matching the guid was found. Guid : " + guid);
                     }
                     break;
                 case PlayState.BufferingStarted:
@@ -335,6 +358,7 @@ namespace OpenSyno.Services
         #region audiorendering service
         public void StreamTrack(Guid guidOfTrackToPlay)
         {
+            _logService.Trace("Starting track streaming for track guid " + guidOfTrackToPlay);
             //// hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
             //string url =
             //    string.Format(
@@ -461,6 +485,7 @@ namespace OpenSyno.Services
 
         private void SerializePlayqueue()
         {
+            _logService.Trace("Serializing playqueue");
             using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
             {
                 var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
@@ -525,6 +550,7 @@ namespace OpenSyno.Services
 
 
             DetectAffectedTracksAndBuildFix(_tracksToGuidMapping, mapping => SerializeAsciiUriFixes());
+            SerializePlayqueue();
         }
 
 

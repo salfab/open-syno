@@ -252,8 +252,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
             if (defineNextTrackPredicate == null)
             {
                 throw new ArgumentNullException("defineNextTrackPredicate");
-            }
-
+            }            
 
             if (audioTrack != null && !string.IsNullOrWhiteSpace(audioTrack.Tag))
             {
