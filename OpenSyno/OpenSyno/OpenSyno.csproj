@@ -82,8 +82,8 @@
     <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArtistView.xaml.cs">
-      <DependentUpon>ArtistView.xaml</DependentUpon>
+    <Compile Include="ArtistDetailView.xaml.cs">
+      <DependentUpon>ArtistDetailView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behaviors\RadioButtonCheckedToCommandBehavior.cs" />
     <Compile Include="Converters\TypeTypeConverter.cs" />
@@ -115,7 +115,7 @@
     <Compile Include="ArtistPanoramaView.xaml.cs">
       <DependentUpon>ArtistPanoramaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\ArtistPanoramaViewModelFactory.xaml.cs" />
+    <Compile Include="ViewModels\ArtistPanoramaViewModelFactory.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\ItemsCountToBrushValueConverter.cs" />
     <Compile Include="Converters\TimeSpanToTimeCodeConverter.cs" />
@@ -130,8 +130,13 @@
     </Compile>
     <Compile Include="OpenSynoSettings.xaml.cs" />
     <Compile Include="ReadWriteMemoryStream.cs" />
+    <Compile Include="ViewModels\ArtistDetailViewModel.cs" />
+    <Compile Include="ViewModels\ArtistViewModel.cs" />
     <Compile Include="ViewModels\DashboardRecentViewModel.cs" />
-    <Compile Include="ViewModels\IUrlParameterToObjectsPlateHeater.cs" />
+    <Compile Include="ViewModels\ISearchResultItemViewModelFactory.cs" />
+    <Compile Include="Services\IUrlParameterToObjectsPlateHeater.cs" />
+    <Compile Include="ViewModels\SearchContext.cs" />
+    <Compile Include="ViewModels\SearchResultItemViewModelFactory.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />
     <Compile Include="ViewModels\ISearchResultsViewModel.cs" />
     <Compile Include="ViewModels\SearchResultsViewModel.cs" />
@@ -160,7 +165,7 @@
       <DependentUpon>SearchView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\PageSwitchingService.cs" />
-    <Compile Include="ViewModels\UrlParameterToObjectsPlateHeater.xaml.cs" />
+    <Compile Include="Services\UrlParameterToObjectsPlateHeater.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
   </ItemGroup>
@@ -246,7 +251,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ArtistView.xaml">
+    <Page Include="ArtistDetailView.xaml">
       <Generator>MSBuild:MarkupCompilePass1</Generator>
       <SubType>Designer</SubType>
     </Page>

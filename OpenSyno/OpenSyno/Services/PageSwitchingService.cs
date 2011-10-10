@@ -6,6 +6,9 @@ namespace OpenSyno.Services
     public class PageSwitchingService : IPageSwitchingService
     {
         private readonly IEventAggregator _eventAggregator;
+
+        private const string ArtistDetailUri = "/ArtistDetailView.xaml?artistTicket={0}";
+
         private const string SearchUri = "/SearchView.xaml";
 
         private const string SearchAllResultsUri = "/SearchAllResultsView.xaml?keyword={0}";
@@ -56,6 +59,11 @@ namespace OpenSyno.Services
         public void NavigateToPlayQueue()
         {
             NavigateToUri(new Uri(PlayQueueResultsUri, UriKind.RelativeOrAbsolute));                        
+        }
+
+        public void NavigateToArtistDetailView(string artistId)
+        {
+            NavigateToUri(new Uri(string.Format(ArtistDetailUri, artistId), UriKind.RelativeOrAbsolute));
         }
 
         private void NavigateToUri(Uri uri)

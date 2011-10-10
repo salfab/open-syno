@@ -1,4 +1,4 @@
-﻿namespace OpenSyno.ViewModels
+﻿namespace OpenSyno.Services
 {
     public interface IUrlParameterToObjectsPlateHeater
     {

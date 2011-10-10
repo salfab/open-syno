@@ -21,6 +21,8 @@ namespace OpenSyno
 
     using Microsoft.Phone.Tasks;
 
+    using OpemSyno.Contracts;
+
     public partial class App : Application
     {
      
@@ -104,6 +106,8 @@ namespace OpenSyno
             IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
+            IoC.Container.Bind<IArtistDetailViewModelFactory>().To<ArtistDetailViewModelFactory>().InSingletonScope();
+            
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();

@@ -10,5 +10,7 @@
         void NavigateToSearchAllResults(string keyword);
         void NavigateToSearch();
         void NavigateToPlayQueue();
+
+        void NavigateToArtistDetailView(string artistId);
     }
 }

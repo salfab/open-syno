@@ -52,11 +52,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\GuidToTrackMapping.cs" />
+    <Compile Include="Domain\IArtistViewModel.cs" />
     <Compile Include="Domain\IAudioTrackFactory.cs" />
     <Compile Include="EventArguments\MediaEndedEventArgs.cs" />
     <Compile Include="EventArguments\SearchResultsRetrievedAggregatedEvent.cs" />
     <Compile Include="EventArguments\SignInCompletedEventArgs.cs" />
     <Compile Include="EventArguments\TrackCurrentPositionChangedEventArgs.cs" />
+    <Compile Include="IArtistDetailViewModel.cs" />
+    <Compile Include="IArtistDetailViewModelFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CheckTokenValidityCompletedEventArgs.cs" />
     <Compile Include="Services\IAudioRenderingService.cs" />

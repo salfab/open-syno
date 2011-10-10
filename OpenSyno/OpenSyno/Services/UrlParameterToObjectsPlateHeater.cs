@@ -1,11 +1,6 @@
-﻿namespace OpenSyno
+﻿namespace OpenSyno.Services
 {
-    using System;
     using System.Collections.Generic;
-
-    using OpenSyno.ViewModels;
-
-    using Synology.AudioStationApi;
 
     public class UrlParameterToObjectsPlateHeater : IUrlParameterToObjectsPlateHeater
     {

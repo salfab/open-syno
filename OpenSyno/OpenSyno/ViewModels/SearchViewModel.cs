@@ -179,14 +179,4 @@ namespace OpenSyno.ViewModels
             _eventAggregator.GetEvent<CompositePresentationEvent<SearchResultsRetrievedAggregatedEvent>>().Publish(new SearchResultsRetrievedAggregatedEvent(results));
         }    
     }
-
-
-
-    public enum SearchContext
-    {
-        Artist, 
-        Track, 
-        Album, 
-        AllMusic
-    }
 }
