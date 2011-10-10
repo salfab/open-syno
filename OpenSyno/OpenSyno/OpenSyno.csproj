@@ -85,12 +85,13 @@
     <Compile Include="ArtistDetailView.xaml.cs">
       <DependentUpon>ArtistDetailView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ArtistDetailViewModelFactory.cs" />
     <Compile Include="Behaviors\RadioButtonCheckedToCommandBehavior.cs" />
     <Compile Include="Converters\TypeTypeConverter.cs" />
     <Compile Include="DashboardView.xaml.cs">
       <DependentUpon>DashboardView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="INotificationService.xaml.cs" />
+    <Compile Include="INotificationService.cs" />
     <Compile Include="NotificationService.xaml.cs" />
     <Compile Include="Playlist.xaml.cs" />
     <Compile Include="Services\LogService.cs" />
@@ -108,10 +109,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ArtistPanoramaAlbumDetailItem.xaml.cs" />
-    <Compile Include="ArtistPanoramaAlbumsListItem.xaml.cs" />
-    <Compile Include="ArtistPanoramaItem.xaml.cs" />
-    <Compile Include="ArtistPanoramaKind.cs" />
+    <Compile Include="ArtistPanoramaAlbumDetailItem.cs" />
+    <Compile Include="ArtistPanoramaAlbumsListItemViewModel.cs" />
+    <Compile Include="ArtistPanoramaItemViewModel.cs" />
+    <Compile Include="ArtistPanoramaItemKind.cs" />
     <Compile Include="ArtistPanoramaView.xaml.cs">
       <DependentUpon>ArtistPanoramaView.xaml</DependentUpon>
     </Compile>

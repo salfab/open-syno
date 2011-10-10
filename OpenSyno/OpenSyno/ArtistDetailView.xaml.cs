@@ -16,9 +16,6 @@ namespace OpenSyno
     using Ninject;
 
     using OpemSyno.Contracts;
-
-    using OpenSyno.ViewModels;
-
     using Synology.AudioStationApi;
 
     public partial class ArtistDetailView : PhoneApplicationPage
@@ -42,16 +39,6 @@ namespace OpenSyno
             
             DataContext = viewModelFactory.Create(artist);
 
-        }
-    }
-
-
-
-    public class ArtistDetailViewModelFactory : IArtistDetailViewModelFactory
-    {
-        public IArtistDetailViewModel Create(SynoItem artist)
-        {
-            return new ArtistDetailViewModel(artist);
         }
     }
 }

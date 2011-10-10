@@ -1,4 +1,6 @@
-﻿namespace OpenSyno.ViewModels
+﻿using System.Collections.Generic;
+
+namespace OpenSyno.ViewModels
 {
     using System.Collections.ObjectModel;
 
@@ -32,12 +34,14 @@
         }
 
         private ObservableCollection<SynoItem> _albums;
+        private readonly ISearchService _searchService;
 
-        public ArtistDetailViewModel(SynoItem artist)
+        public ArtistDetailViewModel(SynoItem artist, ISearchService searchService)
         {
             this.Albums = new ObservableCollection<SynoItem>();
             this.ArtistName = artist.Title;
             this.SimilarArtists = new ObservableCollection<IArtistViewModel>();
+            this._searchService = searchService;
             GetAlbumsAsync(artist);
             GetSimilarArtistsAsync(artist);
         }
@@ -49,7 +53,16 @@
 
         private void GetAlbumsAsync(SynoItem artist)
         {
-            // TODO : request albums.            
+            // TODO : request albums.    
+         
+            _searchService.GetAlbumsForArtist(artist, (a, b, c) =>
+                                                          {
+                                                              var albumsList = a;
+                                                              foreach (var album in albumsList)
+                                                              {
+                                                                  Albums.Add(album);
+                                                              }
+                                                          });
         }
 
         public ObservableCollection<SynoItem> Albums
