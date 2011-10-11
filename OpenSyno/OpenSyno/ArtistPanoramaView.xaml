@@ -18,7 +18,7 @@
 
     </phone:PhoneApplicationPage.Resources>
     <Grid x:Name="LayoutRoot">
-        <controls:Pivot Title="{Binding ArtistName, Mode=TwoWay}" ItemsSource="{Binding ArtistItems, Mode=TwoWay}" ItemTemplate="{StaticResource PanoramaItemTemplate}" HeaderTemplate="{StaticResource PanoramaHeaderTemplate}" SelectedIndex="{Binding CurrentArtistItemIndex, Mode=TwoWay}">
+        <controls:Pivot Title="{Binding ArtistName, Mode=TwoWay}" ItemsSource="{Binding ArtistAlbums}" HeaderTemplate="{StaticResource PanoramaHeaderTemplate}" SelectedIndex="{Binding CurrentArtistItemIndex}" ItemTemplate="{StaticResource AlbumDetailTemplate}">
             <controls:Pivot.Background>
                 <ImageBrush AlignmentX="Right" Stretch="UniformToFill" ImageSource="Untitled.png" Opacity=".5" />
             </controls:Pivot.Background>

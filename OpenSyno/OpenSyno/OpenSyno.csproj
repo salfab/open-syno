@@ -147,7 +147,6 @@
     <Compile Include="TiltEffect.cs" />
     <Compile Include="ViewModels\TrackViewModel.cs" />
     <Compile Include="ViewModels\ArtistPanoramaViewModel.cs" />
-    <Compile Include="Behaviors\ArtistPanoramaItemKindToStyleConverter.cs" />
     <Compile Include="Behaviors\ButtonClickToCommandBehavior.cs" />
     <Compile Include="Behaviors\EnterKeyUpToCommandBehavior.cs" />
     <Compile Include="Converters\BindingDebuggerConverter.cs" />

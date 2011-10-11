@@ -1,91 +1,49 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls" xmlns:controlsPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls" xmlns:Tilt="clr-namespace:Microsoft.Unsupported"
-    xmlns:local="clr-namespace:OpenSyno" xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance" xmlns:Helpers="clr-namespace:OpenSyno.Helpers">
-
-    <Behaviors:ArtistPanoramaItemKindToStyleConverter x:Key="ArtistPanoramaItemKindToStyleConverter" />
-
-    <Style TargetType="ContentControl" x:Key="AlbumsItemStyle">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Grid>
-                        <Grid.Resources>
-                            <!--Dirty hack to workaround the ElementName not being cross-DataTemplate on WP7 !-->
-                            <ContentControl x:Key="ViewModelProxy" Content="{Binding}" />
-                        </Grid.Resources>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <!--Use a value converter to template-select according to the Type. either Tracks ,Either Albums : Not both :)-->
-                        <ScrollViewer>
-                            <ItemsControl Grid.Row="0" ItemsSource="{Binding Albums, Mode=TwoWay}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button HorizontalContentAlignment="Left" HorizontalAlignment="Stretch" Behaviors:ButtonClickToCommandBehavior.Command="{Binding Source={StaticResource ViewModelProxy}, Path=Content.ShowAlbumDetailCommand, Converter={StaticResource BindingDebuggerConverter}}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="{Binding}" Style="{StaticResource StillButton}" BorderThickness="0" Padding="10,2" >
-                                            <TextBlock Text="{Binding Album.Title}" FontSize="23" FontFamily="Segoe WP" />
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Grid>
-
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors"
+    xmlns:Tilt="clr-namespace:Microsoft.Unsupported"
+    xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance">
 
 
-    <Style TargetType="ContentControl" x:Key="TracksItemStyle">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <ScrollViewer>
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/><!--
+
+
+    <DataTemplate x:Key="PanoramaHeaderTemplate">
+        <TextBlock Text="{Binding Header}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="AlbumDetailTemplate">
+        <ScrollViewer>
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <!--
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />-->
-                                </Grid.ColumnDefinitions><!--
+                    </Grid.ColumnDefinitions>
+                    <!--
                                 <Grid.RowDefinitions>
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>-->
-                                <Button Tilt:TiltEffect.IsTiltEnabled="True" Behaviors:ButtonClickToCommandBehavior.Command="{Binding SelectAllOrNoneCommand}" HorizontalAlignment="Left" VerticalAlignment="Top"  Style="{StaticResource StillButton}" BorderThickness="0" Padding="0" >
-                                    <Image Stretch="None" delay:LowProfileImageLoader.UriSource="{Binding AlbumItemInfo.AlbumArtUrl, Mode=OneTime}"/>
-                                </Button>
-                                <!--<Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayListOperationCommand}" Grid.Column="0" Grid.Row="1" Content="play" HorizontalAlignment="Left" />-->
-                                <!--<Button Grid.Column="1" Grid.Row="1" Content="play next" />-->
-                                <!--<Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayListOperationCommand}" Grid.Column="2" Grid.Row="1" Content="play last" />-->
-                            </Grid>
-                            <!--Use a value converter to template-select according to the Type. either Tracks ,Either ALbums : Not both :)-->
+                    <Button Tilt:TiltEffect.IsTiltEnabled="True" Behaviors:ButtonClickToCommandBehavior.Command="{Binding SelectAllOrNoneCommand}" HorizontalAlignment="Left" VerticalAlignment="Top"  Style="{StaticResource StillButton}" BorderThickness="0" Padding="0" >
+                        <Image Stretch="None" delay:LowProfileImageLoader.UriSource="{Binding AlbumItemInfo.AlbumArtUrl, Mode=OneTime}"/>
+                    </Button>
+                    <!--<Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayListOperationCommand}" Grid.Column="0" Grid.Row="1" Content="play" HorizontalAlignment="Left" />-->
+                    <!--<Button Grid.Column="1" Grid.Row="1" Content="play next" />-->
+                    <!--<Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayListOperationCommand}" Grid.Column="2" Grid.Row="1" Content="play last" />-->
+                </Grid>
+                <!--Use a value converter to template-select according to the Type. either Tracks ,Either ALbums : Not both :)-->
 
-                            <ItemsControl ItemsSource="{Binding Tracks, Mode=TwoWay}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding TrackInfo.Title}" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </ScrollViewer>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <DataTemplate x:Key="PanoramaItemTemplate">
-        <ContentControl x:Name="PanoramaPagePresenter"
-                        Behaviors:ArtistPanoramaItemKindToStyleConverter.PanoramaItemKind="{Binding PanoramaItemKind, Mode=TwoWay}"
-                        Behaviors:ArtistPanoramaItemKindToStyleConverter.TracksStyle="{StaticResource TracksItemStyle}"
-                        Behaviors:ArtistPanoramaItemKindToStyleConverter.AlbumsTemplate="{StaticResource AlbumsItemStyle}" />
-    </DataTemplate>
-    <DataTemplate x:Key="PanoramaHeaderTemplate">
-        <TextBlock Text="{Binding Header}"/>
+                <ItemsControl ItemsSource="{Binding Tracks, Mode=TwoWay}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding TrackInfo.Title}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
     </DataTemplate>
     <!-- Resource dictionary entries should be defined here. -->
 </ResourceDictionary>

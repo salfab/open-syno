@@ -6,6 +6,7 @@ using OpenSyno.Services;
 namespace OpenSyno
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.Phone.Controls;
 
@@ -57,7 +58,7 @@ namespace OpenSyno
 
             if (DataContext == null)
             {
-                var artistTicket = NavigationContext.QueryString["artistTicket"];
+                var artistTicket = NavigationContext.QueryString["artistTicket"];                
 
                 if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewCurrentArtist))
                 {
@@ -68,11 +69,7 @@ namespace OpenSyno
                     _artist = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(artistTicket);                    
                 }
 
-                int artistPanoramaViewActivePanelIndex = 0;
-                if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewCurrentArtist))
-                {
-                    artistPanoramaViewActivePanelIndex = (int)this.State[ArtistPanoramaViewActivePanelIndex];
-                }
+                
 
                 ArtistPanoramaViewModel artistPanoramaViewModel = IoC.Container.Get<ArtistPanoramaViewModelFactory>().Create(this._artist);
 
@@ -82,10 +79,10 @@ namespace OpenSyno
                     artistPanoramaViewModel.BuildArtistItems(_artistItems);
                 }
                 else
-                {
-                    artistPanoramaViewActivePanelIndex = 0;
+                {                    
                     // FIXME : make it look more like a humble object.
                     // FIXME big time : what the heck is it doing in the view ? is there no other way to handle the tombstoning  ???
+                    // there should be a parameterless BuildArtistItems  which would retrieve the artistItems itself.
                     var searchService = IoC.Container.Get<ISearchService>();
                     searchService.GetAlbumsForArtist(_artist, (a, b, c) =>
                         {
@@ -93,6 +90,20 @@ namespace OpenSyno
                             artistPanoramaViewModel.BuildArtistItems(a);
                         });
                 }
+
+                int artistPanoramaViewActivePanelIndex = 0;
+                if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewCurrentArtist))
+                {
+                    artistPanoramaViewActivePanelIndex = (int)this.State[ArtistPanoramaViewActivePanelIndex];
+                }
+                else
+                {
+                    var albumTicket = NavigationContext.QueryString["albumTicket"];
+
+                    var album = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(albumTicket);
+                    artistPanoramaViewActivePanelIndex = _artistItems.ToList().IndexOf(album);
+                }
+
                 DataContext = artistPanoramaViewModel;
                 artistPanoramaViewModel.CurrentArtistItemIndex = artistPanoramaViewActivePanelIndex;
                 this.InvalidateArrange();
