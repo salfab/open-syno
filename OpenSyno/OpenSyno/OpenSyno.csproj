@@ -82,6 +82,7 @@
     <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlbumViewModelFactory.xaml.cs" />
     <Compile Include="ArtistDetailView.xaml.cs">
       <DependentUpon>ArtistDetailView.xaml</DependentUpon>
     </Compile>

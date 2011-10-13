@@ -31,6 +31,8 @@ namespace OpenSyno
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             var navigator = IoC.Container.Get<INavigatorService>();
+            navigator.ActivateNavigationService(NavigationService, true);
+
             var viewModelFactory = IoC.Container.Get<IArtistDetailViewModelFactory>();
 
             string ticket = this.NavigationContext.QueryString["artistTicket"];

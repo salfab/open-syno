@@ -7,6 +7,8 @@ namespace OpenSyno.ViewModels
     using OpemSyno.Contracts;
     using OpemSyno.Contracts.Domain;
 
+    using OpenSyno.Services;
+
     using Synology.AudioStationApi;
 
     public class ArtistDetailViewModel : ViewModelBase, IArtistDetailViewModel
@@ -33,15 +35,24 @@ namespace OpenSyno.ViewModels
             }
         }
 
-        private ObservableCollection<SynoItem> _albums;
+        private ObservableCollection<IAlbumViewModel> _albums;
         private readonly ISearchService _searchService;
 
-        public ArtistDetailViewModel(SynoItem artist, ISearchService searchService)
+        private IAlbumViewModelFactory _albumViewModelFactory;
+
+        private INavigatorService _navigatorSevice;
+
+        private IPageSwitchingService _pageSwitchingService;
+
+        public ArtistDetailViewModel(SynoItem artist, ISearchService searchService, IAlbumViewModelFactory albumViewModelFactory, INavigatorService navigatorSevice, IPageSwitchingService pageSwitchingService)
         {
-            this.Albums = new ObservableCollection<SynoItem>();
+            this.Albums = new ObservableCollection<IAlbumViewModel>();
             this.ArtistName = artist.Title;
             this.SimilarArtists = new ObservableCollection<IArtistViewModel>();
             this._searchService = searchService;
+            _albumViewModelFactory = albumViewModelFactory;
+            _navigatorSevice = navigatorSevice;
+            _pageSwitchingService = pageSwitchingService;
             GetAlbumsAsync(artist);
             GetSimilarArtistsAsync(artist);
         }
@@ -60,12 +71,24 @@ namespace OpenSyno.ViewModels
                                                               var albumsList = a;
                                                               foreach (var album in albumsList)
                                                               {
-                                                                  Albums.Add(album);
+                                                                  IAlbumViewModel albumViewModel = _albumViewModelFactory.Create(album);
+                                                                  // TODO : Register Selected event and on event handler : Load the album's tracks and navigate to its index in the artist's albums panorama.
+                                                                  // Note : So far, the viewmodels are never removed from the list : that means we don't need to unregister that event. If this changes, 
+                                                                  // then it will be necessary to enregister the event for each view model removed from the collection.
+                                                                  albumViewModel.Selected += (s, e) =>
+                                                                      {
+                                                                          string albumId = ((AlbumViewModel)s).Album.ItemID;
+                                                                          _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(albumId, ((AlbumViewModel)s).Album);                                                                          
+                                                                          _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(artist.ItemID, artist);                                                                          
+                                                                          _pageSwitchingService.NavigateToArtistPanorama(artist.ItemID, albumId);
+                                                                          
+                                                                      };
+                                                                  Albums.Add(albumViewModel);
                                                               }
                                                           });
         }
 
-        public ObservableCollection<SynoItem> Albums
+        public ObservableCollection<IAlbumViewModel> Albums
         {
             get
             {

@@ -58,6 +58,8 @@
     <Compile Include="EventArguments\SearchResultsRetrievedAggregatedEvent.cs" />
     <Compile Include="EventArguments\SignInCompletedEventArgs.cs" />
     <Compile Include="EventArguments\TrackCurrentPositionChangedEventArgs.cs" />
+    <Compile Include="IAlbumViewModel.cs" />
+    <Compile Include="IAlbumViewModelFactory.cs" />
     <Compile Include="IArtistDetailViewModel.cs" />
     <Compile Include="IArtistDetailViewModelFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -10,7 +10,7 @@ namespace OpemSyno.Contracts
     {
         string ArtistName { get; set; }
 
-        ObservableCollection<SynoItem> Albums { get; set; }
+        ObservableCollection<IAlbumViewModel> Albums { get; set; }
 
         ObservableCollection<IArtistViewModel> SimilarArtists { get; set; }
     }
