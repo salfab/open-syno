@@ -3,12 +3,14 @@
     using System;
     using System.Runtime.Serialization;
 
+    using OpemSyno.Contracts;
+
     using OpenSyno.Services;
 
     using Synology.AudioStationApi;
 
     [DataContract]
-    public class TrackViewModel : ViewModelBase
+    public class TrackViewModel : ViewModelBase, ITrackViewModel
     {
         private bool _isSelected;
         private const string IsSelectedPropertyName = "IsSelected";

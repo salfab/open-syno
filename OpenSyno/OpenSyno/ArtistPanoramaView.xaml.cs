@@ -6,9 +6,14 @@ using OpenSyno.Services;
 namespace OpenSyno
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
 
     using Microsoft.Phone.Controls;
+    using Microsoft.Practices.Prism.Events;
+
+    using OpemSyno.Contracts;
+    using OpemSyno.Contracts.Domain;
 
     using OpenSyno.ViewModels;
 
@@ -23,6 +28,12 @@ namespace OpenSyno
 
         private IEnumerable<SynoItem> _artistItems;
 
+        private readonly ISearchService _searchService;
+
+        private readonly IEventAggregator _eventAggregator;
+
+        private readonly INotificationService notificationService;
+
         private const string ArtistPanoramaViewActivePanelIndex = "ArtistPanoramaViewActivePanelIndex";
 
         private const string ArtistPanoramaViewItems = "ArtistPanoramaViewItems";
@@ -30,8 +41,12 @@ namespace OpenSyno
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtistPanoramaView"/> class.
         /// </summary>
-        public ArtistPanoramaView()
+        public ArtistPanoramaView(ISearchService searchService, IEventAggregator eventAggregator, INotificationService notificationService)
         {
+            this._searchService = searchService;
+            _eventAggregator = eventAggregator;
+            this.notificationService = notificationService;
+            this.notificationService = notificationService;
             _newPageInstance = true;
             this.Loaded += OnArtistPanoramaViewLoaded;
             InitializeComponent();
@@ -99,9 +114,18 @@ namespace OpenSyno
                 else
                 {
                     var albumTicket = NavigationContext.QueryString["albumTicket"];
+                    var albumsListTicket = NavigationContext.QueryString["albumsListTicket"];
 
-                    var album = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(albumTicket);
-                    artistPanoramaViewActivePanelIndex = _artistItems.ToList().IndexOf(album);
+                    var album = (IAlbumViewModel)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(albumTicket);
+                    var albums = (IEnumerable<IAlbumViewModel>)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(albumTicket);
+                    var artistPanoramaAlbumDetailItems = albums.Select(a => new ArtistPanoramaAlbumDetailItem(a.Album, this._searchService,this._eventAggregator,this.notificationService));
+                    var artistItems = new ObservableCollection<ArtistPanoramaItemViewModel>();
+                    foreach (var item in artistPanoramaAlbumDetailItems)
+                    {
+                        artistItems.Add(item);
+                    }
+                    artistPanoramaViewModel.ArtistItems = artistItems;
+                    artistPanoramaViewActivePanelIndex = albums.ToList().IndexOf(album);
                 }
 
                 DataContext = artistPanoramaViewModel;

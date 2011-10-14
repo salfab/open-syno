@@ -2,7 +2,9 @@
 
 namespace OpenSyno.ViewModels
 {
+    using System;
     using System.Collections.ObjectModel;
+    using System.Linq;
 
     using OpemSyno.Contracts;
     using OpemSyno.Contracts.Domain;
@@ -53,7 +55,7 @@ namespace OpenSyno.ViewModels
             _albumViewModelFactory = albumViewModelFactory;
             _navigatorSevice = navigatorSevice;
             _pageSwitchingService = pageSwitchingService;
-            GetAlbumsAsync(artist);
+            this.PopulateAlbumsAsync(artist);
             GetSimilarArtistsAsync(artist);
         }
 
@@ -62,30 +64,53 @@ namespace OpenSyno.ViewModels
             // TODO : Look on last.fm
         }
 
-        private void GetAlbumsAsync(SynoItem artist)
+        private void PopulateAlbumsAsync(SynoItem artist)
         {
             // TODO : request albums.    
          
-            _searchService.GetAlbumsForArtist(artist, (a, b, c) =>
-                                                          {
-                                                              var albumsList = a;
-                                                              foreach (var album in albumsList)
-                                                              {
-                                                                  IAlbumViewModel albumViewModel = _albumViewModelFactory.Create(album);
-                                                                  // TODO : Register Selected event and on event handler : Load the album's tracks and navigate to its index in the artist's albums panorama.
-                                                                  // Note : So far, the viewmodels are never removed from the list : that means we don't need to unregister that event. If this changes, 
-                                                                  // then it will be necessary to enregister the event for each view model removed from the collection.
-                                                                  albumViewModel.Selected += (s, e) =>
-                                                                      {
-                                                                          string albumId = ((AlbumViewModel)s).Album.ItemID;
-                                                                          _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(albumId, ((AlbumViewModel)s).Album);                                                                          
-                                                                          _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(artist.ItemID, artist);                                                                          
-                                                                          _pageSwitchingService.NavigateToArtistPanorama(artist.ItemID, albumId);
-                                                                          
-                                                                      };
-                                                                  Albums.Add(albumViewModel);
-                                                              }
-                                                          });
+            _searchService.GetAlbumsForArtist(artist, GetAlbumsForArtistCallback);
+        }
+
+        private void GetAlbumsForArtistCallback(IEnumerable<SynoItem> albums, long totalAlbumsCount, SynoItem artist)
+        {
+            foreach (var album in albums)
+            {
+                IAlbumViewModel albumViewModel = _albumViewModelFactory.Create(album);
+
+                // prepare an empty track list
+                albumViewModel.Tracks = new ObservableCollection<ITrackViewModel>();
+                
+                // album is busy because its tracks are getting loaded.
+                albumViewModel.IsBusy = true;
+
+                _searchService.GetTracksForAlbum(album,(synoTracks,count, containingAlbum) =>
+                    {
+                        // Note - would it work, based on the synoitem instead of the ItemID ?
+                        // Note - we rely on the fact that there each album is only present once in the artists discography ( based on its ItemID ) otherwise, it crashes !
+                        var currentAlbumViewModel = Albums.Single(a => a.Album.ItemID == containingAlbum.ItemID);
+                        currentAlbumViewModel.Tracks.Clear();
+                        foreach (var track in synoTracks)
+                        {
+                            // track guid is empty for now : it will be filled when the track gets added to the playqueue
+                            currentAlbumViewModel.Tracks.Add(new TrackViewModel(Guid.Empty, track));
+                        }
+                        currentAlbumViewModel.IsBusy = false;
+
+                    });
+
+                // TODO : Register Selected event and on event handler : Load the album's tracks and navigate to its index in the artist's albums panorama.
+                // Note : So far, the viewmodels are never removed from the list : that means we don't need to unregister that event. If this changes, 
+                // then it will be necessary to enregister the event for each view model removed from the collection.
+                albumViewModel.Selected += (s, e) =>
+                {
+                    string albumId = ((AlbumViewModel)s).Album.ItemID;
+                    _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(albumId, s);
+                    _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(artist.ItemID, artist);
+                    _pageSwitchingService.NavigateToArtistPanorama(artist.ItemID, albumId);
+
+                };
+                Albums.Add(albumViewModel);
+            }
         }
 
         public ObservableCollection<IAlbumViewModel> Albums

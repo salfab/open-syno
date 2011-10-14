@@ -3,6 +3,7 @@
 namespace OpenSyno
 {
     using System;
+    using System.Collections.ObjectModel;
     using System.Windows.Input;
 
     using Microsoft.Practices.Prism.Commands;
@@ -27,8 +28,12 @@ namespace OpenSyno
 
         public event EventHandler Selected;
 
+        public ObservableCollection<ITrackViewModel> Tracks { get; set; }
+
         public SynoItem Album { get; set; }
 
-        public ICommand SelectedCommand { get; set; }        
+        public ICommand SelectedCommand { get; set; }
+
+        public bool IsBusy { get; set; }
     }
 }
