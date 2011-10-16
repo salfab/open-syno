@@ -2,11 +2,12 @@ namespace OpemSyno.Contracts
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Windows.Input;
 
     using Synology.AudioStationApi;
 
-    public interface IAlbumViewModel
+    public interface IAlbumViewModel : INotifyPropertyChanged
     {
         event EventHandler Selected;
 

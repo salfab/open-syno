@@ -10,7 +10,9 @@ namespace OpenSyno
 
     using OpemSyno.Contracts;
 
-    public class AlbumViewModel : IAlbumViewModel
+    using OpenSyno.ViewModels;
+
+    public class AlbumViewModel : ViewModelBase, IAlbumViewModel
     {
         public AlbumViewModel(SynoItem album)
         {

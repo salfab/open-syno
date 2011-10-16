@@ -106,7 +106,9 @@ namespace OpenSyno.ViewModels
                     string albumId = ((AlbumViewModel)s).Album.ItemID;
                     _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(albumId, s);
                     _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(artist.ItemID, artist);
-                    _pageSwitchingService.NavigateToArtistPanorama(artist.ItemID, albumId);
+                    Guid albumsListTicket = Guid.NewGuid();
+                    _navigatorSevice.UrlParameterToObjectsPlateHeater.RegisterObject(albumsListTicket.ToString(), this.Albums);
+                    _pageSwitchingService.NavigateToArtistPanorama(artist.ItemID, albumId, albumsListTicket.ToString());
 
                 };
                 Albums.Add(albumViewModel);

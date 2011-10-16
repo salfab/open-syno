@@ -23,6 +23,8 @@ namespace OpenSyno
 {
     using System.Windows.Navigation;
 
+    using OpemSyno.Contracts;
+
     public partial class SearchAllResultsView : PhoneApplicationPage
     {
         private string SearchAllMusicResults = "AllMusicSearchResultsTicket";
@@ -107,7 +109,7 @@ namespace OpenSyno
     public interface ISearchAllResultsViewModel
     {
         string Keyword { get; set; }
-        ObservableCollection<TrackViewModel> SearchResults { get; set; }
+        ObservableCollection<ITrackViewModel> SearchResults { get; set; }
     }
 
     public class SearchAllResultsViewModel : ISearchAllResultsViewModel
@@ -126,7 +128,7 @@ namespace OpenSyno
             ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
             PlayLastCommand = new DelegateCommand(OnPlayLast);
             Keyword = keyword;
-            SearchResults = new ObservableCollection<TrackViewModel>();
+            SearchResults = new ObservableCollection<ITrackViewModel>();
             foreach (var lastResult in lastResults)
             {
                 // GUIDS will be generated later when / if inserted in the playqueue.
@@ -136,11 +138,11 @@ namespace OpenSyno
 
         public string Keyword { get; set; }
         public ICommand PlayLastCommand { get; set; }
-        public ObservableCollection<TrackViewModel> SearchResults { get; set; }
+        public ObservableCollection<ITrackViewModel> SearchResults { get; set; }
         public ICommand ShowPlayQueueCommand { get; set; }
         private void OnPlayLast()
         {
-            var tracksToPlay = from track in SearchResults where track.IsSelected select track;
+            IEnumerable<ITrackViewModel> tracksToPlay = from track in SearchResults where track.IsSelected select track;
             _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(PlayListOperation.Append, tracksToPlay));
         }
 

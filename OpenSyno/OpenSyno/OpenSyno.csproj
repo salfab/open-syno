@@ -117,6 +117,7 @@
     <Compile Include="ArtistPanoramaView.xaml.cs">
       <DependentUpon>ArtistPanoramaView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\ArtistPanoramaAlbumDetailItemFactory.cs" />
     <Compile Include="ViewModels\ArtistPanoramaViewModelFactory.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\ItemsCountToBrushValueConverter.cs" />

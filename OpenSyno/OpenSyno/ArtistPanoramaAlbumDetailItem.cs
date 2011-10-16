@@ -12,10 +12,12 @@ namespace OpenSyno
     using System;
     using System.Windows;
 
+    using OpemSyno.Contracts;
+
     using OpenSyno.Services;
     using OpenSyno.ViewModels;
 
-    public class ArtistPanoramaAlbumDetailItem : ArtistPanoramaItemViewModel
+    public class ArtistPanoramaAlbumDetailItem : ArtistPanoramaItemViewModel, IArtistPanoramaAlbumDetailItem
     {
         private const string TracksPropertyName = "Tracks";
 
@@ -27,12 +29,12 @@ namespace OpenSyno
 
         public ICommand PlayListOperationCommand { get; set; }
 
-        private ObservableCollection<TrackViewModel> _tracks;
+        private ObservableCollection<ITrackViewModel> _tracks;
         private IEventAggregator _eventAggregator;
 
         private readonly INotificationService _notificationService;
 
-        public ObservableCollection<TrackViewModel> Tracks
+        public ObservableCollection<ITrackViewModel> Tracks
         {
             get
             {
@@ -53,7 +55,7 @@ namespace OpenSyno
             AlbumItemInfo = album;
             Header = album.Title;
 
-            Tracks = new ObservableCollection<TrackViewModel>();
+            Tracks = new ObservableCollection<ITrackViewModel>();
 
             IsBusy = true;
             
@@ -67,7 +69,7 @@ namespace OpenSyno
         private void OnPlayListOperation()
         {
             var operation = PlayListOperation.Append;
-            IEnumerable<TrackViewModel> selectedItems = Tracks.Where(o => o.IsSelected);
+            IEnumerable<ITrackViewModel> selectedItems = Tracks.Where(o => o.IsSelected);
             if (selectedItems.Count() < 1)
             {
                 _notificationService.Warning("Please, select at least one track to play.", "No track selected");
@@ -94,7 +96,7 @@ namespace OpenSyno
         {
             // We first want to populate a collection and then assign it to the bound property, otherwise, there will be just too many collection changed notiications.
             // we could also have disabled the binding and re-enabled, but hey, what's the gain ?
-            var newTracks = new ObservableCollection<TrackViewModel>();
+            var newTracks = new ObservableCollection<ITrackViewModel>();
 
             // GUIDS will be generated later when / if inserted in the playqueue.
             foreach(var track in tracks.Select(o => new TrackViewModel(Guid.Empty, o)))

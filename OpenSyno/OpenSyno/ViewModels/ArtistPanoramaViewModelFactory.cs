@@ -8,6 +8,8 @@ namespace OpenSyno
     using System;
     using System.Collections.Generic;
 
+    using OpemSyno.Contracts;
+
     public class ArtistPanoramaViewModelFactory
     {
         private readonly ISearchService _searchService;
@@ -27,17 +29,17 @@ namespace OpenSyno
             _eventAggregator = eventAggregator;            
         }
 
-        public ArtistPanoramaViewModel Create(SynoItem artist)
-        {
-            var artistPanoramaViewModel = new ArtistPanoramaViewModel(this._searchService, this._eventAggregator, this._pageSwitchingService, artist, this._notificationService);
-            return artistPanoramaViewModel;
-        }
-
         //public ArtistPanoramaViewModel Create(SynoItem artist, IEnumerable<SynoItem> artistItems)
         //{
         //    ArtistPanoramaViewModel artistPanoramaViewModel = new ArtistPanoramaViewModel(this._searchService, this._eventAggregator, this._pageSwitchingService, artist, this._notificationService);
         //    artistPanoramaViewModel.BuildArtistItems(artistItems);
         //    return artistPanoramaViewModel;
         //}
+        public ArtistPanoramaViewModel Create(SynoItem artist, IEnumerable<IAlbumViewModel> albumViewModels, int artistPanoramaViewActivePanelIndex)
+        {
+            
+            var artistPanoramaViewModel = new ArtistPanoramaViewModel(artist, albumViewModels,artistPanoramaViewActivePanelIndex, this._searchService, this._eventAggregator, this._pageSwitchingService, this._notificationService);
+            return artistPanoramaViewModel;
+        }
     }
 }

@@ -121,7 +121,7 @@ namespace OpenSyno
             IoC.Container.Bind<IPlaybackService>().To<PlaybackService>().InSingletonScope();
             IoC.Container.Bind<IAlbumViewModelFactory>().To<AlbumViewModelFactory>();
             //IoC.Container.Bind<IAudioRenderingService>().To<PlaybackService>().InSingletonScope();
-
+            IoC.Container.Bind<IArtistPanoramaAlbumDetailItemFactory>().To<ArtistPanoramaAlbumDetailItemFactory>();
             ActivateEagerTypes();
 
             ResolvePrivateMembers();

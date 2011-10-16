@@ -11,6 +11,8 @@
     using Microsoft.Practices.Prism.Commands;
     using Microsoft.Practices.Prism.Events;
 
+    using OpemSyno.Contracts;
+
     using OpenSyno.Contracts.Domain;
     using OpenSyno.Services;
 
@@ -70,9 +72,9 @@
 
             _playbackService = playbackService;
             _playQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => new TrackViewModel(o.Guid, o.Track)));
-            _playbackService.PlayqueueChanged += this.OnPlayqueueChanged;
-            //PlayQueueItems = new ObservableCollection<TrackViewModel>(_playbackService.PlayqueueItems.Select(synoTrack => new TrackViewModel(synoTrack)));
-            // PlayQueueItems.CollectionChanged += OnPlayQueueEdited;
+            _playbackService.PlayqueueChanged += this.OnPlayqueueChanged;            
+            
+            // FIXME : using aggregated event is not a great idea here : we'd rather use a service : that would be cleaner and easier to debug !
             eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             this._notificationService = notificationService;
             _openSynoSettings = openSynoSettings;
@@ -373,7 +375,7 @@
             }
         }
 
-        private void AppendItems(IEnumerable<TrackViewModel> items, Action<Dictionary<SynoTrack, Guid>> callback)
+        private void AppendItems(IEnumerable<ITrackViewModel> items, Action<Dictionary<SynoTrack, Guid>> callback)
         {
             var tracks = items.Select(o=>o.TrackInfo);
 
@@ -404,7 +406,7 @@
         /// <param name="e">The e.</param>
         private void OnPlayListOperation(PlayListOperationAggregatedEvent e)
         {
-            TrackViewModel trackToPlay;
+            ITrackViewModel trackToPlay;
 
             switch (e.Operation)
             {

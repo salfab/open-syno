@@ -3,7 +3,7 @@
     public interface IPageSwitchingService
     {
         void NavigateToSearchResults();
-        void NavigateToArtistPanorama(string artistId, string albumId);
+        void NavigateToArtistPanorama(string artistId, string albumId, string albumsListTicket);
         void NavigateToPreviousPage();
 
         void NavigateToAboutBox();

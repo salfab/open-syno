@@ -11,7 +11,7 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno.ViewModels
 {
-    using System.Windows.Navigation;
+    using OpemSyno.Contracts;
 
     using OpenSyno.Services;
 
@@ -22,7 +22,7 @@ namespace OpenSyno.ViewModels
 
         private readonly IPageSwitchingService _pageSwitchingService;
 
-        public ObservableCollection<ArtistPanoramaItemViewModel> ArtistItems { get; set; }
+        public ObservableCollection<IAlbumViewModel> ArtistAlbums { get; set; }
 
         private string _artistName;
         private const string ArtistNamePropertyName = "ArtistName";
@@ -32,47 +32,12 @@ namespace OpenSyno.ViewModels
 
         public ArtistPanoramaItemKind PanoramaItemKind { get; set; }
 
-        public ArtistPanoramaViewModel(ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, SynoItem artist, INotificationService notificationService)
+        private void OnPlayLast()
         {
-            if (searchService == null)
-            {
-                throw new ArgumentNullException("searchService");
-            }
+            IAlbumViewModel albumViewModel = ArtistAlbums[CurrentArtistItemIndex];
+            var tracksToPlay = albumViewModel.Tracks.Where(t => t.IsSelected);
+            _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(PlayListOperation.Append, tracksToPlay));                
 
-            if (eventAggregator == null)
-            {
-                throw new ArgumentNullException("eventAggregator");
-            }
-
-            if (pageSwitchingService == null)
-            {
-                throw new ArgumentNullException("pageSwitchingService");
-            }
-
-            if (artist == null)
-            {
-                throw new ArgumentNullException("artist");
-            }
-
-            _searchService = searchService;
-            this._notificationService = notificationService;
-
-            // TODO : Use IoC or Factory or whatever, but something to be able to inject our own implementation
-            _panoramaItemSwitchingService = new PanoramaItemSwitchingService();
-
-            _panoramaItemSwitchingService.ActiveItemChangeRequested += (s, e) => CurrentArtistItemIndex = e.NewItemIndex;
-            _eventAggregator = eventAggregator;
-            _pageSwitchingService = pageSwitchingService;
-            ArtistItems = new ObservableCollection<ArtistPanoramaItemViewModel>();
-            ArtistItems.CollectionChanged += StartMonitoringElements;
-            foreach (ArtistPanoramaItemViewModel artistItem in ArtistItems)
-            {
-                artistItem.PropertyChanged += UpdateBusyness;
-            }
-
-            ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
-            _artist = artist;
-            ArtistName = _artist.Title;
         }
 
         private void OnShowPlayQueue()
@@ -98,7 +63,7 @@ namespace OpenSyno.ViewModels
         {
             if (e.PropertyName == ArtistPanoramaItemViewModel.IsBusyPropertyName)
             {
-                IsBusy = ArtistItems.Any(o => o.IsBusy);
+                IsBusy = this.ArtistAlbums.Any(o => o.IsBusy);
             }
         }
 
@@ -111,6 +76,59 @@ namespace OpenSyno.ViewModels
         private readonly INotificationService _notificationService;
 
         private SynoItem _artist;
+
+        public ArtistPanoramaViewModel(SynoItem artist, IEnumerable<IAlbumViewModel> albums, int activePanelIndex, ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, INotificationService notificationService)
+        {
+            if (searchService == null)
+            {
+                throw new ArgumentNullException("searchService");
+            }
+
+            if (eventAggregator == null)
+            {
+                throw new ArgumentNullException("eventAggregator");
+            }
+
+            if (pageSwitchingService == null)
+            {
+                throw new ArgumentNullException("pageSwitchingService");
+            }
+
+            if (artist == null)
+            {
+                throw new ArgumentNullException("artist");
+            }
+            if (albums == null)
+            {
+                throw new ArgumentNullException("albums");
+            }
+
+            PlayLastCommand = new DelegateCommand(OnPlayLast);
+            CurrentArtistItemIndex = activePanelIndex;
+            _searchService = searchService;
+            this._notificationService = notificationService;
+
+            // TODO : Use IoC or Factory or whatever, but something to be able to inject our own implementation
+            _panoramaItemSwitchingService = new PanoramaItemSwitchingService();
+
+            _panoramaItemSwitchingService.ActiveItemChangeRequested += (s, e) => CurrentArtistItemIndex = e.NewItemIndex;
+            _eventAggregator = eventAggregator;
+            _pageSwitchingService = pageSwitchingService;
+            this.ArtistAlbums = new ObservableCollection<IAlbumViewModel>();
+            foreach (var albumViewModel in albums)
+            {
+                this.ArtistAlbums.Add(albumViewModel);
+            }
+            this.ArtistAlbums.CollectionChanged += StartMonitoringElements;
+            foreach (var album in this.ArtistAlbums)
+            {
+                album.PropertyChanged += UpdateBusyness;
+            }
+
+            ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
+            _artist = artist;
+            ArtistName = _artist.Title;
+        }
 
         public bool IsBusy
         {
@@ -158,32 +176,44 @@ namespace OpenSyno.ViewModels
 
         public ICommand ShowPlayQueueCommand { get; set; }
 
+        public ICommand PlayLastCommand { get; set; }
+
         public void BuildArtistItems(IEnumerable<SynoItem> albums)
         {
-            this.ArtistItems.Clear();            
+            this.ArtistAlbums.Clear();            
 
-            // add the page for the list of albums.
-            var albumsListPanelViewModel = new ArtistPanoramaAlbumsListItemViewModel(albums, _artist, this._pageSwitchingService, this._panoramaItemSwitchingService);
             
-            this.ArtistItems.Add(albumsListPanelViewModel);
+            // add the page for the list of albums.
+            //var albumsListPanelViewModel = new ArtistPanoramaAlbumsListItemViewModel(albums, _artist, this._pageSwitchingService, this._panoramaItemSwitchingService);
+            
+            //this.ArtistAlbums.Add(albumsListPanelViewModel);
 
             // the "all albums" items
             var allmusic = albums.Where(o => o.ItemID.StartsWith("musiclib_music_artist"));
 
             foreach (var album in albums.Except(allmusic))
             {
-                // Fixme : use a factory                
-                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, this._searchService, this._eventAggregator, this._notificationService);                
-                this.ArtistItems.Add(albumDetail);
+                // Fixme : use a factory      
+                
+                var albumDetail = new AlbumViewModel(album);
+                this.ArtistAlbums.Add(albumDetail);
             }
 
             foreach (var album in allmusic)
             {
                 // Fixme : use a factory
-                var albumDetail = new ArtistPanoramaAlbumDetailItem(album, this._searchService, this._eventAggregator, this._notificationService);
-                this.ArtistItems.Add(albumDetail);
+                var albumDetail = new AlbumViewModel(album);
+                this.ArtistAlbums.Add(albumDetail);
             }
 
+        }
+
+        public void QueryAndBuildArtistItems()
+        {
+            _searchService.GetAlbumsForArtist(_artist, (albums, b, c) =>
+            {                
+                BuildArtistItems(albums);
+            });
         }
     }
 }
