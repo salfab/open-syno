@@ -18,5 +18,7 @@ namespace OpemSyno.Contracts
         ICommand SelectedCommand { get; set; }
 
         bool IsBusy { get; set; }
+
+        ICommand SelectAllOrNoneCommand { get; set; }
     }
 }

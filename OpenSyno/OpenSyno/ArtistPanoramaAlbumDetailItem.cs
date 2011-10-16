@@ -25,8 +25,6 @@ namespace OpenSyno
 
         public SynoItem AlbumItemInfo { get; set; }
 
-        public ICommand SelectAllOrNoneCommand { get; set; }
-
         public ICommand PlayListOperationCommand { get; set; }
 
         private ObservableCollection<ITrackViewModel> _tracks;
@@ -62,7 +60,6 @@ namespace OpenSyno
             // TODO : List tracks of the album.
             _searchService.GetTracksForAlbum(album, GetTracksForAlbumCompleted);
 
-            SelectAllOrNoneCommand = new DelegateCommand(OnSelectAllOrNone);
             PlayListOperationCommand = new DelegateCommand(OnPlayListOperation);
         }
 
@@ -77,18 +74,6 @@ namespace OpenSyno
             else
             {
                 _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(operation, selectedItems));                
-            }
-        }
-
-        private void OnSelectAllOrNone()
-        {
-            if (Tracks.Count > 0)
-            {
-                var newSelectionState = !Tracks.First().IsSelected;
-                foreach (var track in Tracks)
-                {
-                    track.IsSelected = newSelectionState;
-                }
             }
         }
 
