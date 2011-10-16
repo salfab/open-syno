@@ -33,13 +33,17 @@ namespace OpenSyno
             var navigator = IoC.Container.Get<INavigatorService>();
             navigator.ActivateNavigationService(NavigationService, true);
 
-            var viewModelFactory = IoC.Container.Get<IArtistDetailViewModelFactory>();
+            if (DataContext == null)
+            {
+                var viewModelFactory = IoC.Container.Get<IArtistDetailViewModelFactory>();
 
-            string ticket = this.NavigationContext.QueryString["artistTicket"];
+                string ticket = this.NavigationContext.QueryString["artistTicket"];
 
-            SynoItem artist = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(ticket);
-            
-            DataContext = viewModelFactory.Create(artist);
+                SynoItem artist = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(ticket);
+
+                DataContext = viewModelFactory.Create(artist);
+            }
+          
 
         }
     }

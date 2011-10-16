@@ -27,8 +27,6 @@ namespace OpenSyno
 
         private IEnumerable<SynoItem> _artistItems;
 
-        private IArtistPanoramaAlbumDetailItemFactory artistPanoramaAlbumDetailItemFactory;
-
         private const string ArtistPanoramaViewActivePanelIndex = "ArtistPanoramaViewActivePanelIndex";
 
         private const string ArtistPanoramaViewItems = "ArtistPanoramaViewItems";
@@ -38,7 +36,6 @@ namespace OpenSyno
         /// </summary>
         public ArtistPanoramaView()
         {
-            artistPanoramaAlbumDetailItemFactory = IoC.Container.Get<IArtistPanoramaAlbumDetailItemFactory>();
             _newPageInstance = true;
             this.Loaded += OnArtistPanoramaViewLoaded;
             InitializeComponent();

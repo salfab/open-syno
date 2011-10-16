@@ -30,8 +30,6 @@ namespace OpenSyno.ViewModels
 
         private const string CurrentArtistItemIndexPropertyName = "CurrentArtistItemIndex";
 
-        public ArtistPanoramaItemKind PanoramaItemKind { get; set; }
-
         private void OnPlayLast()
         {
             IAlbumViewModel albumViewModel = ArtistAlbums[CurrentArtistItemIndex];
@@ -61,7 +59,8 @@ namespace OpenSyno.ViewModels
 
         private void UpdateBusyness(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == ArtistPanoramaItemViewModel.IsBusyPropertyName)
+            // FIXME : Remove magic strings
+            if (e.PropertyName == "IsBusy")
             {
                 IsBusy = this.ArtistAlbums.Any(o => o.IsBusy);
             }
@@ -144,7 +143,7 @@ namespace OpenSyno.ViewModels
         {
             if (e.NewItems != null)
             {
-                foreach (ArtistPanoramaItemViewModel artistItem in e.NewItems)
+                foreach (IAlbumViewModel artistItem in e.NewItems)
                 {
                     artistItem.PropertyChanged += UpdateBusyness;
                 } 
@@ -152,7 +151,7 @@ namespace OpenSyno.ViewModels
 
             if (e.OldItems != null)
             {
-                foreach (ArtistPanoramaItemViewModel artistItem in e.OldItems)
+                foreach (IAlbumViewModel artistItem in e.OldItems)
                 {
                     artistItem.PropertyChanged -= UpdateBusyness;
                 }
