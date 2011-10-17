@@ -447,8 +447,16 @@ namespace Synology.AudioStationApi
                     responseAr =>
                     {
                         // Just make sure we retrieve the right web request : no access to modified closure.                        
-                        var httpWebRequest = responseAr.AsyncState;                        
-                        var webResponse = webRequest.EndGetResponse(responseAr);
+                        var httpWebRequest = responseAr.AsyncState;                            
+                        WebResponse webResponse;
+                        try
+                        {
+                            webResponse = webRequest.EndGetResponse(responseAr);
+                        }
+                        catch (WebException exception)
+                        {
+                            throw new SynoNetworkException("The remote server did not respond to our request. Please, check that the sinal is strong enough and try again.", exception);                            
+                        }
                         var responseStream = webResponse.GetResponseStream();
                         var reader = new StreamReader(responseStream);
                         var content = reader.ReadToEnd();
