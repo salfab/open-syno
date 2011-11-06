@@ -48,7 +48,7 @@
         /// <param name="eventAggregator">The event aggregator.</param>
         /// <param name="playbackService">The playback service.</param>
         /// <param name="openSynoSettings"></param>
-        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings)
+        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings, ILogService logService)
         {
             if (eventAggregator == null)
             {
@@ -78,6 +78,7 @@
             eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             this._notificationService = notificationService;
             _openSynoSettings = openSynoSettings;
+            _logService = logService;
             _playbackService.TrackStarted += (o, e) =>
                                                  {
                                                      CurrentArtwork = new Uri(e.Track.AlbumArtUrl, UriKind.Absolute);
@@ -300,6 +301,7 @@
         private INotificationService _notificationService;
 
         private readonly IOpenSynoSettings _openSynoSettings;
+        private readonly ILogService _logService;
 
         private const string CurrentPlaybackPercentCompletePropertyName = "CurrentPlaybackPercentComplete";
 
@@ -432,12 +434,14 @@
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
                 case PlayListOperation.Append:
-
+                    _logService.Trace(string.Format("PlayQueueViewModel.OnPlayListOperation : Appending {0} tracks", e.Items.Count()));
                     AppendItems(e.Items, matchingGeneratedGuids =>
                                              {
+                                                 _logService.Trace(string.Format("Items appended : Current playback service status : {0}", _playbackService.Status));
                                                  if (_playbackService.Status == PlaybackStatus.Stopped)
                                                  {
                                                      trackToPlay = e.Items.First();
+                                                     _logService.Trace(string.Format("PlaybackStatus stopped - Starting playback of track {0}", trackToPlay.TrackInfo.Title));
                                                      OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
                                                  }
                                              });

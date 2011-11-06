@@ -412,12 +412,14 @@ namespace OpenSyno.Services
                 throw new NotSupportedException("Can only insert tracks at the end of the queue for now. sorry :(");
             }
             var i = 0;
+            bool isAnyFixNeeded = false;
             // FIXME : Be able to choose the position
             foreach (var synoTrack in tracks)
             {
                 Guid newGuid = Guid.NewGuid();
                 _tracksToGuidMapping.Add(new GuidToTrackMapping(newGuid, synoTrack));
                 var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Track.Res == fix.Res) && mapping.Track.Res.Any(c => c == '&' || c > 127)).Select(t => t.Track);
+                isAnyFixNeeded = tracksToFix.Count() > 0;
                 foreach (var track in tracksToFix)
                 {
                     _asciiUriFixes.Add(new AsciiUriFix(track.Res, null));
@@ -454,6 +456,12 @@ namespace OpenSyno.Services
                 // FIXME : Urgent : replace NotifyCollectionChanged by a custom event that can propagate bulk collection changes ! (optimize writes on disk )
                 OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = new[] { new GuidToTrackMapping(newGuid, synoTrack) }, AddedItemsPosition = insertPosition + i });
                 i++;
+            }
+
+            // if no fix was needed, the callback hasn't been called yet !
+            if (!isAnyFixNeeded)
+            {
+                callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Track)).ToDictionary(o => o.Track, o => o.Guid));
             }
         }
 
