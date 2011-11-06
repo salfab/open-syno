@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSyno.Common", "OpenSyno
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpemSyno.Contracts", "OpemSyno.Contracts\OpemSyno.Contracts.csproj", "{231AB4AB-1043-4856-9730-7C3418717EA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seesharp.LastFmApi.Mango", "Seesharp.LastFmApi.Mango\Seesharp.LastFmApi.Mango.csproj", "{8BBD684E-2D55-430D-96D5-48AA894CDAAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{231AB4AB-1043-4856-9730-7C3418717EA8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{231AB4AB-1043-4856-9730-7C3418717EA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{231AB4AB-1043-4856-9730-7C3418717EA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BBD684E-2D55-430D-96D5-48AA894CDAAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BBD684E-2D55-430D-96D5-48AA894CDAAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BBD684E-2D55-430D-96D5-48AA894CDAAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BBD684E-2D55-430D-96D5-48AA894CDAAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

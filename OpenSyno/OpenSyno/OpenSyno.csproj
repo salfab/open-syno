@@ -74,6 +74,9 @@
       <HintPath>..\3rd party\PhonePerformance\PhonePerformance.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Threading.Tasks.WP71">
+      <HintPath>..\packages\System.Threading.Tasks.2.1.2\lib\sl4-wp71\System.Threading.Tasks.WP71.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -234,6 +237,10 @@
     <ProjectReference Include="..\OpenSyno.SynoWP7\OpenSyno.SynoWP7.csproj">
       <Project>{16DA973A-2885-4E6E-89CD-5CA3825B3CA6}</Project>
       <Name>OpenSyno.SynoWP7</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Seesharp.LastFmApi.Mango\Seesharp.LastFmApi.Mango.csproj">
+      <Project>{8BBD684E-2D55-430D-96D5-48AA894CDAAC}</Project>
+      <Name>Seesharp.LastFmApi.Mango</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

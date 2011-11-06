@@ -41,18 +41,12 @@
             <!--Pivot item two-->
             <controls:PivotItem Header="similar artists">
                 <ScrollViewer>
-                    <ItemsControl ItemsSource="{Binding Albums}">
-                        <ItemsControl.Resources>
-                            <ItemsPanelTemplate x:Key="PanelTemplate">
-                                <toolkit:WrapPanel/>								
-                            </ItemsPanelTemplate>
-                        </ItemsControl.Resources>
-<!--						<ItemsControl.ItemTemplate>
-                            <StaticResource ResourceKey="ArtistViewAlbumTemplate"/>
-                        </ItemsControl.ItemTemplate> -->
-                        <ItemsControl.ItemsPanel>
-                            <StaticResource ResourceKey="PanelTemplate"/>
-                        </ItemsControl.ItemsPanel>
+                    <ItemsControl ItemsSource="{Binding SimilarArtists}">
+						<ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
             </controls:PivotItem>

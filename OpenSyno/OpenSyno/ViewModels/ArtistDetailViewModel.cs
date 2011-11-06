@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using Seesharp.LastFmApi.Mango;
 
 namespace OpenSyno.ViewModels
 {
@@ -62,6 +65,18 @@ namespace OpenSyno.ViewModels
         private void GetSimilarArtistsAsync(SynoItem artist)
         {
             // TODO : Look on last.fm
+            LastFmApi api = new LastFmApi();
+            var t = api.GetSimilarArtistsAsync(artist.Title);
+
+            t.ContinueWith(o =>
+                               {
+                                   SimilarArtists.Clear();
+                                   foreach (var lastFmArtist in o.Result)
+                                   {
+                                       // FIXME : USe a factory.
+                                       SimilarArtists.Add(new ArtistViewModel(lastFmArtist.Name, lastFmArtist.Mbid, lastFmArtist.Url, lastFmArtist.Match, lastFmArtist.Images));
+                                   }
+                               }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void PopulateAlbumsAsync(SynoItem artist)
