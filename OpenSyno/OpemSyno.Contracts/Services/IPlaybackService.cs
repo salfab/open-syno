@@ -6,6 +6,8 @@ namespace OpenSyno.Services
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
 
+    using Microsoft.Phone.BackgroundAudio;
+
     using OpenSyno.Contracts.Domain;
 
     using Synology.AudioStationApi;
@@ -33,7 +35,7 @@ namespace OpenSyno.Services
         ///// <value>The items in the playqueue.</value>
         //ObservableCollection<ISynoTrack> PlayqueueItems { get; }
 
-        PlaybackStatus Status { get; }
+        PlayState Status { get; }
 
         ///// <summary>
         ///// Clears the play queue.

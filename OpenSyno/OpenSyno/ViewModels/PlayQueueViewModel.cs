@@ -8,6 +8,7 @@
     using System.Linq;
     using System.Windows.Input;
 
+    using Microsoft.Phone.BackgroundAudio;
     using Microsoft.Practices.Prism.Commands;
     using Microsoft.Practices.Prism.Events;
 
@@ -420,13 +421,13 @@
 
                     AppendItems(e.Items, matchingGeneratedGuids =>
                     {
-                        if (_playbackService.Status == PlaybackStatus.Stopped)
+                        if (_playbackService.Status != PlayState.Playing)
                         {
                             trackToPlay = e.Items.First();
                             OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
                         }
                     });
-                    if (_playbackService.Status != PlaybackStatus.Stopped)
+                    if (_playbackService.Status != PlayState.Stopped)
                     {
                         // stop the playback
                     }
@@ -438,7 +439,7 @@
                     AppendItems(e.Items, matchingGeneratedGuids =>
                                              {
                                                  _logService.Trace(string.Format("Items appended : Current playback service status : {0}", _playbackService.Status));
-                                                 if (_playbackService.Status == PlaybackStatus.Stopped)
+                                                 if (_playbackService.Status != PlayState.Playing)
                                                  {
                                                      trackToPlay = e.Items.First();
                                                      _logService.Trace(string.Format("PlaybackStatus stopped - Starting playback of track {0}", trackToPlay.TrackInfo.Title));

@@ -34,8 +34,6 @@ namespace OpenSyno.Services
 
         private List<AsciiUriFix> _asciiUriFixes;
 
-        private PlaybackStatus _status;
-
         // HACK : remove this and use the duration of the media stream source
         /// <summary>
         /// the last started track
@@ -67,9 +65,14 @@ namespace OpenSyno.Services
         ///// <value>The items in the playqueue.</value>        
         //public ObservableCollection<ISynoTrack> PlayqueueItems { get; private set; }
 
-        public PlaybackStatus Status
+        
+
+        public PlayState Status
         {
-            get { return _status; }
+            get
+            {
+                return BackgroundAudioPlayer.Instance.PlayerState;
+            }
         }
 
         ///// <summary>
@@ -100,8 +103,7 @@ namespace OpenSyno.Services
         /// <param name="trackToPlay">The track to play.</param>
         public void PlayTrackInQueue(Guid trackToPlay)
         {
-            StreamTrack(trackToPlay);
-            _status = PlaybackStatus.Buffering;
+            StreamTrack(trackToPlay);            
         }
 
         protected void OnTrackStarted(TrackStartedEventArgs trackStartedEventArgs)
@@ -122,9 +124,7 @@ namespace OpenSyno.Services
         public PlaybackService(IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory)
         {
             _logService = IoC.Container.Get<ILogService>();
-
-            _status = PlaybackStatus.Stopped;
-
+                        
             _audioStationSession = audioStationSession;
             _audioTrackFactory = audioTrackFactory;
 
