@@ -17,6 +17,13 @@
 
         public Guid Guid { get; set; }
 
+        /// <summary>
+        /// Gets a guid which is the same across consecutive tracks that are part of the same album.
+        /// </summary>
+        /// <remarks>This property can be used to group tracks by album *ONLY* if they are adjacent in the playqueue.</remarks>
+        /// <value>The consecutive album identifier.</value>
+        public Guid ConsecutiveAlbumIdentifier { get; set; }
+
         [DataMember]
         public SynoTrack TrackInfo { get; set; }
 

@@ -103,13 +103,20 @@
 
             <!--Pivot item one-->
             <controls:PivotItem Header="play queue">
+                <controls:PivotItem.Resources>
+                    <CollectionViewSource x:Key="PlayQueueItemsViewSource" Source="{Binding PlayQueueItems, Mode=TwoWay}">
+                        <CollectionViewSource.GroupDescriptions>
+                            <PropertyGroupDescription PropertyName="ConsecutiveAlbumIdentifier" />
+                        </CollectionViewSource.GroupDescriptions>
+                    </CollectionViewSource>
+                </controls:PivotItem.Resources>
                 <Grid>  
                 	<Grid.RowDefinitions>
                 		<RowDefinition Height="Auto" />
 						<RowDefinition />           							
 					</Grid.RowDefinitions>             
 					<Button HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="{Binding ElementName=TracksList, Path=SelectedItems}" />
-            		<ListBox SelectionMode="Extended" Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay}" ItemContainerStyle="{StaticResource PlayQueueItemStyle}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" />                    
+                    <ListBox SelectionMode="Extended" Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding Source={StaticResource PlayQueueItemsViewSource}}" ItemContainerStyle="{StaticResource PlayQueueItemStyle}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" />                    
             	</Grid>                    
             </controls:PivotItem>
 
