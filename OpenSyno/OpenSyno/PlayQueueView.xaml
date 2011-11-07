@@ -6,7 +6,9 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Converters="clr-namespace:OpenSyno.Converters" xmlns:Delay="clr-namespace:Delay;assembly=PhonePerformance" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Converters="clr-namespace:OpenSyno.Converters" xmlns:Delay="clr-namespace:Delay;assembly=PhonePerformance"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:OpenSyno="clr-namespace:OpenSyno" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -110,14 +112,23 @@
                         </CollectionViewSource.GroupDescriptions>
                     </CollectionViewSource>
                 </controls:PivotItem.Resources>
-                <Grid>  
-                	<Grid.RowDefinitions>
+                <Grid>
+                  <Grid.Resources>
+                    <OpenSyno:TrackViewModelsToGroupsConverter x:Key="TrackViewModelsToGroupsConverter" />
+                  </Grid.Resources>
+                  <Grid.RowDefinitions>
                 		<RowDefinition Height="Auto" />
 						<RowDefinition />           							
 					</Grid.RowDefinitions>             
-					<Button HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" Behaviors:ButtonClickToCommandBehavior.CommandParameter="{Binding ElementName=TracksList, Path=SelectedItems}" />
-                    <ListBox SelectionMode="Extended" Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding Source={StaticResource PlayQueueItemsViewSource}}" ItemContainerStyle="{StaticResource PlayQueueItemStyle}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" />                    
-            	</Grid>                    
+					<Button HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" />
+                    <toolkit:LongListSelector  Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay, Converter={StaticResource TrackViewModelsToGroupsConverter}}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" >
+                        <toolkit:LongListSelector.GroupHeaderTemplate >
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </toolkit:LongListSelector.GroupHeaderTemplate>
+                    </toolkit:LongListSelector>
+                </Grid>                    
             </controls:PivotItem>
 
             <!--Pivot item two-->

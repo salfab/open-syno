@@ -92,17 +92,17 @@ namespace OpenSyno.ViewModels
                     return new List<Group<SearchResultItemViewModel>>();
                 }
 
-                // var artists = new List<Group<SearchResultItemViewModel>>(from artist in SearchResults.Where(o => o.ItemInfo.ItemPid == "musiclib_music_aa") group artist by artist.ItemInfo.Title.FirstOrDefault() into c select new Group<SearchResultItemViewModel>(char.IsLetter(c.Key) ? c.Key.ToString().ToLower() : "#", c));
+                // var artists = new List<Group<SearchResultItemViewModel>>(from artist in SearchResults.Where(o => o.ItemInfo.ItemPid == "musiclib_music_aa") group artist by artist.ItemInfo.HeaderContent.FirstOrDefault() into c select new Group<SearchResultItemViewModel>(char.IsLetter(c.Key) ? c.Key.ToString().ToLower() : "#", c));
                 var groups = from artist in SearchResults.Where(o => o.ItemInfo.ItemPid == "musiclib_music_aa") group artist by artist.ItemInfo.Title.FirstOrDefault();
                 var artists = new List<Group<SearchResultItemViewModel>>();
                 foreach (var group in groups)
                 {
                     char firstChar = group.Key.ToString().FirstOrDefault();
                     string groupName = char.IsLetter(firstChar) ? firstChar.ToString().ToLower() : "#";
-                    if (artists.Any(o => o.Title == groupName))
+                    if (artists.Any(o => o.HeaderContent == groupName))
                     {
                         // Add artist to group
-                        artists.First(o => o.Title == groupName).AddRange(group);
+                        artists.First(o => o.HeaderContent == groupName).AddRange(group);
                     }
                     else
                     {
@@ -121,7 +121,7 @@ namespace OpenSyno.ViewModels
                 //    group city by city.Country into c   
                 //        orderby c.Key     
                 //            select new Group<City>(c.Key, c);
-                IOrderedEnumerable<Group<SearchResultItemViewModel>> orderedEnumerable = artists.OrderBy(o => o.Title);
+                IOrderedEnumerable<Group<SearchResultItemViewModel>> orderedEnumerable = artists.OrderBy(o => o.HeaderContent);
                 return orderedEnumerable;
             }
         }
@@ -131,7 +131,7 @@ namespace OpenSyno.ViewModels
             for (int i = 97; i < 123; i++)
             {
                 var titleChar = (char)i;
-                if (!items.Any(o => o.Title.Equals(titleChar.ToString(), StringComparison.OrdinalIgnoreCase)))
+                if (!items.Any(o => ((string)o.HeaderContent).Equals(titleChar.ToString(), StringComparison.OrdinalIgnoreCase)))
                 {
                     items.Add(new Group<T>(titleChar.ToString(), new List<T>()));
                 }

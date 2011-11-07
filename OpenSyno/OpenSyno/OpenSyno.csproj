@@ -108,6 +108,7 @@
     <Compile Include="Helpers\ViewModelProxy.cs" />
     <Compile Include="Services\PanoramaItemSwitchingService.cs" />
     <Compile Include="Services\SignInService.cs" />
+    <Compile Include="TrackViewModelsToGroupsConverter.cs" />
     <Compile Include="ViewModels\AboutBoxViewModel.cs" />
     <Compile Include="AlbumViewModel.cs" />
     <Compile Include="App.xaml.cs">

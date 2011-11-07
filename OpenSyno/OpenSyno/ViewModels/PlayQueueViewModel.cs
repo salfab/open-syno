@@ -155,7 +155,8 @@
 
         private void OnRemoveTracksFromQueue(IEnumerable<object> tracks)
         {
-            
+            // FIXME : It seems that the check list box in the PlayQueueView doesn't discard the checked items after clicking remove.
+
             //for (int i = this.PlayQueueItems.Count - 1; i >= 0; i--)
             //{
             //    if (this.PlayQueueItems[i].IsSelected)
