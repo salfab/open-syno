@@ -496,6 +496,7 @@ namespace OpenSyno.Services
         private void SerializePlayqueue()
         {
             _logService.Trace("Serializing playqueue");
+            // TODO : Handle case where the background agent would be reading and the file cannot be written to !
             using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
             {
                 var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
