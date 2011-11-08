@@ -489,6 +489,8 @@ namespace OpenSyno.Services
             {
                 PlayqueueChanged(this, eventArgs);
             }
+
+
         }
 
         private void SerializePlayqueue()

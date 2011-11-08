@@ -145,6 +145,9 @@
                     this.PlayQueueItems.Add(new TrackViewModel(newItem.Guid, newItem.Track));
                 }
             }
+
+            // Hack : we want to make sure the converter Will be re-evaluated, so the easiest way is to trigger a propery changed.
+            OnPropertyChanged(PlayQueueItemsPropertyName);
         }
 
         private void OnSavePlaylist()
