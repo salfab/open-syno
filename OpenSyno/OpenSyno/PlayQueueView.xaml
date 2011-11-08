@@ -104,14 +104,7 @@
             </controls:PivotItem>
 
             <!--Pivot item one-->
-            <controls:PivotItem Header="play queue">
-                <controls:PivotItem.Resources>
-                    <CollectionViewSource x:Key="PlayQueueItemsViewSource" Source="{Binding PlayQueueItems, Mode=TwoWay}">
-                        <CollectionViewSource.GroupDescriptions>
-                            <PropertyGroupDescription PropertyName="ConsecutiveAlbumIdentifier" />
-                        </CollectionViewSource.GroupDescriptions>
-                    </CollectionViewSource>
-                </controls:PivotItem.Resources>
+            <controls:PivotItem Header="play queue">                
                 <Grid>
                   <Grid.Resources>
                     <OpenSyno:TrackViewModelsToGroupsConverter x:Key="TrackViewModelsToGroupsConverter" />
@@ -121,10 +114,10 @@
 						<RowDefinition />           							
 					</Grid.RowDefinitions>             
 					<Button HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" />
-                    <toolkit:LongListSelector  Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay, Converter={StaticResource TrackViewModelsToGroupsConverter}}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" >
+                    <toolkit:LongListSelector Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay, Converter={StaticResource TrackViewModelsToGroupsConverter}}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" >
                         <toolkit:LongListSelector.GroupHeaderTemplate >
                             <DataTemplate>
-                                <TextBlock Text="{Binding}" />
+                                <TextBlock Text="{Binding HeaderContent.TrackInfo.ItemPid}" />
                             </DataTemplate>
                         </toolkit:LongListSelector.GroupHeaderTemplate>
                     </toolkit:LongListSelector>
