@@ -72,22 +72,28 @@
 
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
+            Action consecutiveAlbumsIdPatcher = () =>
+            {
+                var previousAlbumGuid = Guid.Empty;
+                string previousAlbumId = null;
+                foreach (var trackViewModel in this.PlayQueueItems)
+                {
+                    if (previousAlbumId != trackViewModel.TrackInfo.ItemPid)
+                    {
+                        previousAlbumId = trackViewModel.TrackInfo.ItemPid;
+                        previousAlbumGuid = Guid.NewGuid();
+                    }
+                    trackViewModel.ConsecutiveAlbumIdentifier = previousAlbumGuid;
+                }
+            };
+
             _playbackService = playbackService;
             this.PlayQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => new TrackViewModel(o.Guid, o.Track)));
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
-                {
-                    var previousAlbumGuid = Guid.Empty;
-                    string previousAlbumId = null;
-                    foreach (var trackViewModel in this.PlayQueueItems)
-                    {
-                        if (previousAlbumId != trackViewModel.TrackInfo.ItemPid)
-                        {
-                            previousAlbumId = trackViewModel.TrackInfo.ItemPid;
-                            previousAlbumGuid = Guid.NewGuid();
-                        }
-                        trackViewModel.ConsecutiveAlbumIdentifier = previousAlbumGuid;
-                    }   
-                };
+                                                         {
+                                                             consecutiveAlbumsIdPatcher();
+                                                         };
+            consecutiveAlbumsIdPatcher();
             _playbackService.PlayqueueChanged += this.OnPlayqueueChanged;            
             
             // FIXME : using aggregated event is not a great idea here : we'd rather use a service : that would be cleaner and easier to debug !
