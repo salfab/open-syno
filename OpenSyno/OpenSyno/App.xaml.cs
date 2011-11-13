@@ -15,6 +15,7 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno
 {
+    using System.Net;
     using System.Text;
     using System.Threading;
     using System.Windows.Threading;
@@ -246,6 +247,11 @@ namespace OpenSyno
             catch (SynoLoginException exception)
             {
                 this._notificationService.Error(exception.Message, "Login error");
+                handled = true;
+            }
+            catch (WebException exception)
+            {
+                this._notificationService.Error(exception.Message, "Web error");
                 handled = true;
             }
             catch (SynoSearchException exception)

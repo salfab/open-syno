@@ -125,12 +125,23 @@
                     CurrentTrackPosition = e.Position;
                 };
 
-            PlayCommand = new DelegateCommand<TrackViewModel>(o => OnPlay(o.Guid), track => track != null);
+            PlayCommand = new DelegateCommand<TrackViewModel>(o => OnPlay(o), track => track != null);
             PlayNextCommand = new DelegateCommand(OnPlayNext);
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious);
             SavePlaylistCommand = new DelegateCommand(OnSavePlaylist);
+        }
+
+        private void OnPlay(TrackViewModel trackViewModel)
+        {
+            if (trackViewModel == null)
+            {
+                // TODO : Should we replace this with a "Play first" ?
+                _notificationService.Error("Please, select a track before hitting the play button.", "No track is selected");
+                return;
+            }
+            OnPlay(trackViewModel.Guid);
         }
 
         private void OnPlayqueueChanged(object sender, PlayqueueChangedEventArgs e)

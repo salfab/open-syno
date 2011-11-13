@@ -1,7 +1,9 @@
 ﻿namespace OpenSyno
 {
     using System;
+    using System.Threading;
     using System.Windows;
+    using System.Windows.Threading;
 
     public class NotificationService : INotificationService
     {
@@ -12,6 +14,11 @@
 
         public void Error(string message, string messageTitle)
         {
+
+            if (!Deployment.Current.Dispatcher.CheckAccess())
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(message, messageTitle, MessageBoxButton.OK));
+            }
             MessageBox.Show(message, messageTitle, MessageBoxButton.OK);
         }
 
