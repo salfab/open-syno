@@ -77,27 +77,33 @@ namespace OpenSyno.Converters
             WebClient wc = new WebClient();
 
             var fileName = Path.GetFileName(uriString);
+            bool fileExists;
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                if (userStore.FileExists(fileName))
+                fileExists = userStore.FileExists(fileName);
+            }
+            if (fileExists)
                 {
-
-                    using (var fs = userStore.OpenFile(fileName, FileMode.Open))
+                    using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
                     {
-                        var image = new BitmapImage();
-                        byte[] buffer = new byte[fs.Length];
-                        fs.BeginRead(
-                            buffer,
-                            0,
-                            (int)fs.Length,
-                            (ar) =>
-                                {
-                                    fs.EndRead(ar);
-                                    MemoryStream ms = new MemoryStream(buffer);
-                                    image.SetSource(ms);
-                                    ((Image)ar.AsyncState).Source = image;
-                                },
-                            d);
+
+                        using (var fs = userStore.OpenFile(fileName, FileMode.Open))
+                        {
+                            var image = new BitmapImage();
+                            byte[] buffer = new byte[fs.Length];
+                            fs.BeginRead(
+                                buffer,
+                                0,
+                                (int)fs.Length,
+                                ar =>
+                                    {
+                                        var readBytes = fs.EndRead(ar);
+                                        MemoryStream ms = new MemoryStream(buffer);
+                                        image.SetSource(ms);
+                                        ((Image)ar.AsyncState).Source = image;
+                                    },
+                                d);
+                        }
                     }
                 }
                 else
@@ -128,11 +134,23 @@ namespace OpenSyno.Converters
                                         Task<Uri> taskWriteToDisk = new Task<Uri>(
                                             stream =>
                                                 {
-                                                    using (var fs = userStore.CreateFile(fileName))
+                                                    try
                                                     {
-                                                        ms.Position = 0;
-                                                        ms.CopyTo(fs);
+                                                        using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+                                                        {
+                                                            using (var fs = userStore.CreateFile(fileName))
+                                                            {
+                                                                ms.Position = 0;
+                                                                ms.CopyTo(fs);
+                                                            }
+                                                        }
                                                     }
+                                                    catch (Exception ex)
+                                                    {
+                                                        
+                                                        throw;
+                                                    }
+  
                                                     return new Uri(fileName, UriKind.RelativeOrAbsolute);
                                                 },
                                             ea.Result);
@@ -161,7 +179,7 @@ namespace OpenSyno.Converters
                                 d);
                         };
                 }
-            }
+            
 
             Uri imageUri = new Uri(uriString, UriKind.RelativeOrAbsolute);
             wc.OpenReadAsync(imageUri, d);
