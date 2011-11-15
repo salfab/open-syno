@@ -24,6 +24,8 @@ namespace OpenSyno
 
     using OpemSyno.Contracts;
 
+    using OpenSyno.Converters;
+
     public partial class App : Application
     {
      
@@ -113,11 +115,25 @@ namespace OpenSyno
             IoC.Container.Bind<SearchResultsViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
             IoC.Container.Bind<ISearchResultItemViewModelFactory>().To<SearchResultItemViewModelFactory>().InSingletonScope();
+
             IoC.Container.Bind<IUrlParameterToObjectsPlateHeater>().To<UrlParameterToObjectsPlateHeater>().InSingletonScope();
             IoC.Container.Bind<IAudioTrackFactory>().To<AudioTrackFactory>().InSingletonScope();
             
             _notificationService = new NotificationService();
             IoC.Container.Bind<INotificationService>().ToConstant(_notificationService).InSingletonScope();
+            ImageCachingService imageCachingService;
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("ImageCachingService"))
+            {
+                imageCachingService = (ImageCachingService)IsolatedStorageSettings.ApplicationSettings["ImageCachingService"];
+            }
+            else
+            {
+                imageCachingService = new ImageCachingService();
+	        }
+
+            imageCachingService.SaveRequested += this.ImageCachingServiceSaveRequested;
+
+            IoC.Container.Bind<ImageCachingService>().ToConstant(imageCachingService).InSingletonScope();
             
             IoC.Container.Bind<IPlaybackService>().To<PlaybackService>().InSingletonScope();
             IoC.Container.Bind<IAlbumViewModelFactory>().To<AlbumViewModelFactory>();
@@ -362,5 +378,12 @@ namespace OpenSyno
         }
 
         #endregion
+
+
+        private void ImageCachingServiceSaveRequested(object sender, EventArgs e)
+        {
+            IsolatedStorageSettings.ApplicationSettings["ImageCachingService"] = sender;
+            IsolatedStorageSettings.ApplicationSettings.Save();
+        }
     }
 }

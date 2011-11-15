@@ -21,7 +21,10 @@
             <Converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <Converters:BindingDebuggerConverter x:Key="BindingDebuggerConverter" />
             <Converters:AlbumItemIdToCachedImageConverter x:Key="AlbumItemIdToCachedImageConverter" />
-            <Converters:ImageCachingService x:Key="ImageCachingService"/>
+            <!--
+            Moved to codebehind
+            <Converters:ImageCachingService SaveRequested="ImageCachingServiceSaveRequested"  x:Key="ImageCachingService"/>
+            -->
             <sys:String x:Key="AppName">OPEN SYNO</sys:String>
             <sys:String x:Key="LowercaseAppName">open syno</sys:String>
             <MediaElement x:Key="MediaElement" />

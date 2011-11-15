@@ -14,6 +14,8 @@ namespace OpenSyno.Converters
     using System.Windows.Data;
     using System.Windows.Media.Imaging;
 
+    using Ninject;
+
     public class AlbumItemIdToCachedImageConverter : IValueConverter
     {
         /// <summary>
@@ -26,7 +28,7 @@ namespace OpenSyno.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var albumItemId = (string)value;
-            var cachedImagesMapping = ((ImageCachingService)Application.Current.Resources["ImageCachingService"]).CachedImagesMappings.FirstOrDefault(o => o.ImageId == (string)value);
+            var cachedImagesMapping = IoC.Container.Get<ImageCachingService>().CachedImagesMappings.FirstOrDefault(o => o.ImageId == (string)value);
             if (cachedImagesMapping != null)
             {
                 return cachedImagesMapping;
@@ -56,6 +58,7 @@ namespace OpenSyno.Converters
         public ImageCachingService()
         {
             this.CachedImagesMappings = new List<CachedImagesMapping>();
+            this.MaxBindingsLimit = 100;
         }
         public static string GetSource(DependencyObject obj)
         {
@@ -67,123 +70,157 @@ namespace OpenSyno.Converters
             obj.SetValue(SourceProperty, value);
         }
 
+        public event EventHandler SaveRequested;
+
+        public void RequestSave(EventArgs e)
+        {
+            OnSaveRequested(e);
+        }
+
+        private void OnSaveRequested(EventArgs e)
+        {
+            EventHandler handler = this.SaveRequested;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
         // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.RegisterAttached("Source", typeof(string), typeof(ImageCachingService), new PropertyMetadata(null, OnSourcePropertyChanged));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.RegisterAttached("Source", typeof(string), typeof(ImageCachingService), new PropertyMetadata(null, OnSourcePropertyChanged));
 
         private static void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            var imageCachingService = IoC.Container.Get<ImageCachingService>();
             string uriString = (string)e.NewValue;
             WebClient wc = new WebClient();
 
             var fileName = Path.GetFileName(uriString);
-            bool fileExists;
-            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+            imageCachingService.TotalImageRequests++;
+            string albumCoverId = uriString;
+            var matchingMapping = imageCachingService.CachedImagesMappings.FirstOrDefault(o => o.ImageId == albumCoverId);
+            //using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+            //{
+            //    fileExists = userStore.FileExists(fileName);
+            //}
+            if (matchingMapping != null)
             {
-                fileExists = userStore.FileExists(fileName);
-            }
-            if (fileExists)
+                matchingMapping.TimesUsed++;
+                matchingMapping.LastTimeUsed = DateTime.Now;
+                using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+                    using (var fs = userStore.OpenFile(fileName, FileMode.Open))
                     {
-
-                        using (var fs = userStore.OpenFile(fileName, FileMode.Open))
-                        {
-                            var image = new BitmapImage();
-                            byte[] buffer = new byte[fs.Length];
-                            fs.BeginRead(
-                                buffer,
-                                0,
-                                (int)fs.Length,
-                                ar =>
-                                    {
-                                        var readBytes = fs.EndRead(ar);
-                                        MemoryStream ms = new MemoryStream(buffer);
-                                        image.SetSource(ms);
-                                        ((Image)ar.AsyncState).Source = image;
-                                    },
-                                d);
-                        }
+                        var image = new BitmapImage();
+                        byte[] buffer = new byte[fs.Length];
+                        fs.BeginRead(
+                            buffer,
+                            0,
+                            (int)fs.Length,
+                            ar =>
+                            {
+                                var readBytes = fs.EndRead(ar);
+                                MemoryStream ms = new MemoryStream(buffer);
+                                image.SetSource(ms);
+                                ((Image)ar.AsyncState).Source = image;
+                            },
+                            d);
                     }
                 }
-                else
-                {
-                    wc.OpenReadCompleted += (s, ea) =>
+            }
+            else
+            {
+                wc.OpenReadCompleted += (s, ea) =>
+                    {
+                        var image = new BitmapImage();
+
+                        if (wc.ResponseHeaders == null)
                         {
-                            var image = new BitmapImage();
+                            throw new WebException(
+                                "Could not retrieve album cover. Please check your internet connection.");
+                        }
 
-                            if (wc.ResponseHeaders == null)
+                        // download image to a local memory stream
+                        var contentLength = int.Parse(wc.ResponseHeaders["content-length"]);
+                        byte[] buffer = new byte[contentLength];
+                        ea.Result.BeginRead(
+                            buffer,
+                            0,
+                            contentLength,
+                            ar =>
                             {
-                                throw new WebException(
-                                    "Could not retrieve album cover. Please check your internet connection.");
-                            }
-
-                            // download image to a local memory stream
-                            var contentLength = int.Parse(wc.ResponseHeaders["content-length"]);
-                            byte[] buffer = new byte[contentLength];
-                            ea.Result.BeginRead(
-                                buffer,
-                                0,
-                                contentLength,
-                                ar =>
+                                var bytes = ea.Result.EndRead(ar);
+                                MemoryStream ms = new MemoryStream(buffer);
+                                image.SetSource(ms);
+                                ((Image)ea.UserState).Source = image;
+                                Task<Uri> taskWriteToDisk = new Task<Uri>(
+                                    stream =>
                                     {
-                                        var bytes = ea.Result.EndRead(ar);
-                                        MemoryStream ms = new MemoryStream(buffer);
-                                        image.SetSource(ms);
-                                        ((Image)ea.UserState).Source = image;
-                                        Task<Uri> taskWriteToDisk = new Task<Uri>(
-                                            stream =>
-                                                {
-                                                    try
-                                                    {
-                                                        using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
-                                                        {
-                                                            using (var fs = userStore.CreateFile(fileName))
-                                                            {
-                                                                ms.Position = 0;
-                                                                ms.CopyTo(fs);
-                                                            }
-                                                        }
-                                                    }
-                                                    catch (Exception ex)
-                                                    {
-                                                        
-                                                        throw;
-                                                    }
-  
-                                                    return new Uri(fileName, UriKind.RelativeOrAbsolute);
-                                                },
-                                            ea.Result);
-                                        taskWriteToDisk.Start();
-                                        taskWriteToDisk.ContinueWith(
-                                            taskUri =>
-                                                {
-                                                    Debug.WriteLine("Task write to disk : continue with (entering)");
-                                                    Uri pathInIsolatedStorage = taskUri.Result;
-                                                    var imageCachingService =
-                                                        (ImageCachingService)
-                                                        Application.Current.Resources["ImageCachingService"];
-                                                    CachedImagesMapping cachedImagesMapping = new CachedImagesMapping
-                                                        {
-                                                            FilePath = pathInIsolatedStorage,
-                                                            ImageId = uriString,
-                                                            LastTimeUsed = DateTime.Now,
-                                                            TimesUsed = 1
-                                                        };
-                                                    imageCachingService.CachedImagesMappings.Add(cachedImagesMapping);
-                                                    Debug.WriteLine("Task write to disk : continue with (leaving)");
+                                        try
+                                        {
+                                            IEnumerable<Uri> paths = null;
+                                            if (imageCachingService.CachedImagesMappings.Count >= imageCachingService.MaxBindingsLimit)
+                                            {
+                                                paths = from mapping in imageCachingService.CachedImagesMappings
+                                                        where mapping.LastTimeUsed < DateTime.Now.AddDays(-14)
+                                                        orderby mapping.TimesUsed descending
+                                                        select mapping.FilePath;
+                                            }
 
-                                                },
-                                            TaskScheduler.FromCurrentSynchronizationContext());
+                                            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+                                            {
+                                                if (paths != null && paths.Count() >= 1)
+                                                {
+                                                    userStore.DeleteFile(paths.First().AbsoluteUri);
+                                                }
+
+                                                using (var fs = userStore.CreateFile(fileName))
+                                                {
+                                                    ms.Position = 0;
+                                                    ms.CopyTo(fs);
+                                                }
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+
+                                            throw;
+                                        }
+
+                                        return new Uri(fileName, UriKind.RelativeOrAbsolute);
                                     },
-                                d);
-                        };
-                }
-            
+                                    ea.Result);
+                                taskWriteToDisk.Start();
+                                taskWriteToDisk.ContinueWith(
+                                    taskUri =>
+                                    {
+                                        Debug.WriteLine("Task write to disk : continue with (entering)");
+                                        Uri pathInIsolatedStorage = taskUri.Result;
+                                        
+                                        CachedImagesMapping cachedImagesMapping = new CachedImagesMapping
+                                            {
+                                                FilePath = pathInIsolatedStorage,
+                                                ImageId = uriString,
+                                                LastTimeUsed = DateTime.Now,
+                                                TimesUsed = 1
+                                            };
+                                        imageCachingService.CachedImagesMappings.Add(cachedImagesMapping);
+                                        imageCachingService.RequestSave(EventArgs.Empty);
+                                        Debug.WriteLine("Task write to disk : continue with (leaving)");
+
+                                    },
+                                    TaskScheduler.FromCurrentSynchronizationContext());
+                            },
+                            d);
+                    };
+            }
+
 
             Uri imageUri = new Uri(uriString, UriKind.RelativeOrAbsolute);
             wc.OpenReadAsync(imageUri, d);
         }
+
+        public int MaxBindingsLimit { get; set; }
 
         public List<CachedImagesMapping> CachedImagesMappings { get; set; }
 
