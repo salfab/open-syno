@@ -14,8 +14,8 @@
 
         public void Error(string message, string messageTitle)
         {
-
-            if (Deployment.Current.Dispatcher.CheckAccess())
+            var checkAccess = Deployment.Current.Dispatcher.CheckAccess();
+            if (!checkAccess)
             {
                 Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(message, messageTitle, MessageBoxButton.OK));
             }
