@@ -19,9 +19,9 @@
     </phone:PhoneApplicationPage.Resources>
     <Grid x:Name="LayoutRoot">
         <controls:Pivot Title="{Binding ArtistName, Mode=TwoWay}" ItemsSource="{Binding ArtistAlbums}" HeaderTemplate="{StaticResource PanoramaHeaderTemplate}" SelectedIndex="{Binding CurrentArtistItemIndex, Mode=TwoWay}" ItemTemplate="{StaticResource AlbumDetailTemplate}">
-            <controls:Pivot.Background>
+            <!--<controls:Pivot.Background>
                 <ImageBrush AlignmentX="Right" Stretch="UniformToFill" ImageSource="Untitled.png" Opacity=".5" />
-            </controls:Pivot.Background>
+            </controls:Pivot.Background>-->
         </controls:Pivot>
         <ProgressBar Style="{StaticResource PerformanceProgressBar}" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>

@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors"
     xmlns:Tilt="clr-namespace:Microsoft.Unsupported"
-    xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance">
+    xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance" xmlns:Behavior="clr-namespace:OpenSyno.Converters">
 
 
 
@@ -27,7 +27,7 @@
                                     <RowDefinition />
                                 </Grid.RowDefinitions>-->
                     <Button Tilt:TiltEffect.IsTiltEnabled="True" Behaviors:ButtonClickToCommandBehavior.Command="{Binding SelectAllOrNoneCommand}" HorizontalAlignment="Left" VerticalAlignment="Top"  Style="{StaticResource StillButton}" BorderThickness="0" Padding="0" >
-                        <Image Stretch="None" delay:LowProfileImageLoader.UriSource="{Binding Album.AlbumArtUrl, Mode=OneTime}"/>
+                        <Image Stretch="None" Behavior:ImageCachingService.Source="{Binding Album.AlbumArtUrl}"/>
                     </Button>
                     <!--<Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayListOperationCommand}" Grid.Column="0" Grid.Row="1" Content="play" HorizontalAlignment="Left" />-->
                     <!--<Button Grid.Column="1" Grid.Row="1" Content="play next" />-->

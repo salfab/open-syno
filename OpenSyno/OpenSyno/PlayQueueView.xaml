@@ -36,7 +36,7 @@
                         <ColumnDefinition Width="200" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Column="0" HorizontalAlignment="Center" Delay:LowProfileImageLoader.UriSource="{Binding ActiveTrack.TrackInfo.AlbumArtUrl}" Stretch="None" VerticalAlignment="Top" />
+                    <Image Grid.Column="0" HorizontalAlignment="Center" Converters:ImageCachingService.Source="{Binding ActiveTrack.TrackInfo.AlbumArtUrl}" Stretch="None" VerticalAlignment="Top" />
                     <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
                     	<TextBlock Text="Volume"  />
                     	<Slider Margin="-18,0" Minimum="0" SmallChange="0.01" LargeChange="0.1" Maximum="1" HorizontalAlignment="Left" Value="{Binding Volume, Mode=TwoWay}" Height="130" Orientation="Vertical" />
@@ -51,8 +51,8 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <TextBlock Margin="0,12,0,0" Text="{Binding CurrentTrackPosition, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
-                        <Slider Value="{Binding CurrentPlaybackPercentComplete, Mode=TwoWay}" Maximum="1" LargeChange="0.1" SmallChange="0.01" Grid.Column="1" />
-                        <ProgressBar Grid.Column="1" Opacity="0.5" IsHitTestVisible="False" Value="{Binding BufferedBytesCount, Mode=TwoWay}" Maximum="{Binding CurrentFileSize}" Margin="0,-12,0,0" />
+                        <Slider IsHitTestVisible="False" Value="{Binding CurrentPlaybackPercentComplete, Mode=TwoWay}" Maximum="1" LargeChange="0.1" SmallChange="0.01" Grid.Column="1" />
+                        <!--<ProgressBar Grid.Column="1" Opacity="0.5" IsHitTestVisible="False" Value="{Binding BufferedBytesCount, Mode=TwoWay}" Maximum="{Binding CurrentFileSize}" Margin="0,-12,0,0" />-->
                         <TextBlock HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Column="2" Text="{Binding ActiveTrack.TrackInfo.Duration, Converter={StaticResource TimeSpanToTimeCodeConverter}}" />
                     </Grid>
                     <Grid Grid.Row="4" Grid.ColumnSpan="2">
