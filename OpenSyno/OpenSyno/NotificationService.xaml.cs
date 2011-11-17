@@ -19,7 +19,10 @@
             {
                 Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(message, messageTitle, MessageBoxButton.OK));
             }
-            MessageBox.Show(message, messageTitle, MessageBoxButton.OK);
+            else
+            {
+                MessageBox.Show(message, messageTitle, MessageBoxButton.OK);
+            }
         }
 
         public MessageBoxResult WarningQuery(string warningMessage, string warningTitle, MessageBoxButton userResponseOptions)

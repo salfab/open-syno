@@ -17,13 +17,31 @@
 
     public class ImageCachingService
     {
-        private static List<Task<Uri>> _tasksWritingOnDisk;
+        private static List<Task<string>> _tasksWritingOnDisk;
         public ImageCachingService()
         {
-            _tasksWritingOnDisk = new List<Task<Uri>>();
+            _tasksWritingOnDisk = new List<Task<string>>();
             this.CachedImagesMappings = new List<CachedImagesMapping>();
             this.MaxBindingsLimit = 100;
+            internalIsolatedStorageAccessLock = new object();
         }
+
+
+
+        public static string GetImageId(DependencyObject obj)
+        {
+            return (string)obj.GetValue(ImageIdProperty);
+        }
+
+        public static void SetImageId(DependencyObject obj, string value)
+        {
+            obj.SetValue(ImageIdProperty, value);
+        }
+
+        // Using a DependencyProperty as the backing store for ImageId.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ImageIdProperty =
+            DependencyProperty.RegisterAttached("ImageId", typeof(string), typeof(ImageCachingService), new PropertyMetadata(null));        
+
         public static string GetSource(DependencyObject obj)
         {
             return (string)obj.GetValue(SourceProperty);
@@ -53,15 +71,32 @@
         // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SourceProperty = DependencyProperty.RegisterAttached("Source", typeof(string), typeof(ImageCachingService), new PropertyMetadata(null, OnSourcePropertyChanged));
 
+        private static object internalIsolatedStorageAccessLock;
+
         private static void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            string albumCoverId = GetImageId(d);
+            if (albumCoverId == null)
+            {
+                throw new ArgumentNullException("AlbumId", "The attached property 'AlbumIdProperty' must be set for an image to be cached.");
+            }
+
             var imageCachingService = IoC.Container.Get<ImageCachingService>();
             string uriString = (string)e.NewValue;
             WebClient wc = new WebClient();
 
-            var fileName = Path.GetFileName(uriString);
+            string fileName;
+            var imagesMapping = imageCachingService.CachedImagesMappings.FirstOrDefault(m => m.ImageId == albumCoverId);
+            if (imagesMapping != null)
+            {
+                fileName = imagesMapping.FilePath;
+            }
+            else
+            {
+                fileName = Path.GetFileName(uriString);
+            }
             imageCachingService.TotalImageRequests++;
-            string albumCoverId = uriString;
+
             var matchingMapping = imageCachingService.CachedImagesMappings.FirstOrDefault(o => o.ImageId == albumCoverId);
             //using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             //{
@@ -71,24 +106,31 @@
             {
                 matchingMapping.TimesUsed++;
                 matchingMapping.LastTimeUsed = DateTime.Now;
-                using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+                lock (internalIsolatedStorageAccessLock)
                 {
-                    using (var fs = userStore.OpenFile(fileName, FileMode.Open))
+                    using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
                     {
-                        var image = new BitmapImage();
-                        byte[] buffer = new byte[fs.Length];
-                        fs.BeginRead(
-                            buffer,
-                            0,
-                            (int)fs.Length,
-                            ar =>
-                                {
-                                    var readBytes = fs.EndRead(ar);
-                                    MemoryStream ms = new MemoryStream(buffer);
-                                    image.SetSource(ms);
-                                    ((Image)ar.AsyncState).Source = image;
-                                },
-                            d);
+                        if (!userStore.FileExists(fileName))
+                        {
+                            throw new NotImplementedException("Cache has been deleted. Automatic rebuild of a deleted cache is not yet implemented.");
+                        }
+                        using (var fs = userStore.OpenFile(fileName, FileMode.Open))
+                        {
+                            var image = new BitmapImage();
+                            byte[] buffer = new byte[fs.Length];
+                            fs.BeginRead(
+                                buffer,
+                                0,
+                                (int)fs.Length,
+                                ar =>
+                                    {
+                                        var readBytes = fs.EndRead(ar);
+                                        MemoryStream ms = new MemoryStream(buffer);
+                                        image.SetSource(ms);
+                                        ((Image)ar.AsyncState).Source = image;
+                                    },
+                                d);
+                        }
                     }
                 }
             }
@@ -117,12 +159,12 @@
                                     MemoryStream ms = new MemoryStream(buffer);
                                     image.SetSource(ms);
                                     ((Image)ea.UserState).Source = image;
-                                    Task<Uri> taskWriteToDisk = new Task<Uri>(
+                                    Task<string> taskWriteToDisk = new Task<string>(
                                         stream =>
                                             {
                                                 try
                                                 {
-                                                    IEnumerable<Uri> paths = null;
+                                                    IEnumerable<string> paths = null;
                                                     if (imageCachingService.CachedImagesMappings.Count >= imageCachingService.MaxBindingsLimit)
                                                     {
                                                         paths = from mapping in imageCachingService.CachedImagesMappings
@@ -130,18 +172,20 @@
                                                                 orderby mapping.TimesUsed descending
                                                                 select mapping.FilePath;
                                                     }
-
-                                                    using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+                                                    lock (internalIsolatedStorageAccessLock)
                                                     {
-                                                        if (paths != null && paths.Count() >= 1)
+                                                        using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
                                                         {
-                                                            userStore.DeleteFile(paths.First().AbsoluteUri);
-                                                        }
+                                                            if (paths != null && paths.Count() >= 1)
+                                                            {
+                                                                userStore.DeleteFile(paths.First());
+                                                            }
 
-                                                        using (var fs = userStore.CreateFile(fileName))
-                                                        {
-                                                            ms.Position = 0;
-                                                            ms.CopyTo(fs);
+                                                            using (var fs = userStore.CreateFile(fileName))
+                                                            {
+                                                                ms.Position = 0;
+                                                                ms.CopyTo(fs);
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -150,7 +194,7 @@
 
                                                     throw;
                                                 }
-                                                return new Uri(fileName, UriKind.RelativeOrAbsolute);
+                                                return fileName;
                                             },
                                         ea.Result);
                                     _tasksWritingOnDisk.Add(taskWriteToDisk);
@@ -158,12 +202,12 @@
                                     taskWriteToDisk.ContinueWith(
                                         taskUri =>
                                             {                                                
-                                                Uri pathInIsolatedStorage = taskUri.Result;
+                                                var pathInIsolatedStorage = taskUri.Result;
                                         
                                                 CachedImagesMapping cachedImagesMapping = new CachedImagesMapping
                                                     {
                                                         FilePath = pathInIsolatedStorage, 
-                                                        ImageId = uriString, 
+                                                        ImageId = albumCoverId, 
                                                         LastTimeUsed = DateTime.Now, 
                                                         TimesUsed = 1
                                                     };

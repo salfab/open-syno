@@ -52,6 +52,6 @@ namespace OpenSyno.Converters
 
         public DateTime LastTimeUsed { get; set; }
 
-        public Uri FilePath { get; set; }
+        public string FilePath { get; set; }
     }
 }

@@ -37,36 +37,44 @@ namespace OpenSyno.BackgroundPlaybackAgent
         public AudioPlayer()
         {
             _audioTrackFactory = new AudioTrackFactory();
-            using (IsolatedStorageFileStream asciiUriFixes = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("AsciiUriFixes.xml", FileMode.OpenOrCreate))
+            using (var userStoreForApplication = IsolatedStorageFile.GetUserStoreForApplication())
             {
-
-                DataContractSerializer dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
-                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
-
-                try
+                using (
+                    IsolatedStorageFileStream asciiUriFixes = userStoreForApplication.OpenFile(
+                        "AsciiUriFixes.xml", FileMode.OpenOrCreate))
                 {
-                    _asciiUriFixes = (List<AsciiUriFix>)dcs.ReadObject(asciiUriFixes);
-                }
-                catch (Exception e)
-                {
-                    // could not deserialize XML for playlist : let's build an empty list.
-                    _asciiUriFixes = new List<AsciiUriFix>();
-                }
-            }
 
-            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
-            {
-                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
-                var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+                    DataContractSerializer dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
+                    //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
 
-
-                _playqueueInformation = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
-
-                foreach (GuidToTrackMapping pair in _playqueueInformation.Mappings)
-                {
-                    _tracksToGuidMapping.Add(pair);
+                    try
+                    {
+                        _asciiUriFixes = (List<AsciiUriFix>)dcs.ReadObject(asciiUriFixes);
+                    }
+                    catch (Exception e)
+                    {
+                        // could not deserialize XML for playlist : let's build an empty list.
+                        _asciiUriFixes = new List<AsciiUriFix>();
+                    }
                 }
 
+                using (
+                    IsolatedStorageFileStream playQueueFile = userStoreForApplication.OpenFile(
+                        "playqueue.xml", FileMode.OpenOrCreate))
+                {
+                    // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
+                    var dcs = new DataContractSerializer(
+                        typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+
+
+                    _playqueueInformation = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
+
+                    foreach (GuidToTrackMapping pair in _playqueueInformation.Mappings)
+                    {
+                        _tracksToGuidMapping.Add(pair);
+                    }
+
+                }
             }
 
             if (!_classInitialized)

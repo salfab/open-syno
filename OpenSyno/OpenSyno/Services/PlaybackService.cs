@@ -133,43 +133,52 @@ namespace OpenSyno.Services
 
             this._tracksToGuidMapping = new List<GuidToTrackMapping>();
 
-            using (IsolatedStorageFileStream asciiUriFixes = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("AsciiUriFixes.xml", FileMode.OpenOrCreate))
+            using (var userStoreForApplication = IsolatedStorageFile.GetUserStoreForApplication())
             {
 
-                DataContractSerializer dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
-                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
-
-                try
+                using (
+                    IsolatedStorageFileStream asciiUriFixes = userStoreForApplication.OpenFile(
+                        "AsciiUriFixes.xml", FileMode.OpenOrCreate))
                 {
-                    _asciiUriFixes = (List<AsciiUriFix>)dcs.ReadObject(asciiUriFixes);
-                }
-                catch (Exception e)
-                {
-                    // could not deserialize XML for playlist : let's build an empty list.
-                    _asciiUriFixes = new List<AsciiUriFix>();
-                }
-            }
 
-            PlayqueueInterProcessCommunicationTransporter deserialization = null;
-            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.OpenOrCreate))
-            {
+                    DataContractSerializer dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
+                    //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
 
-                DataContractSerializer dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
-                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
-
-                try
-                {
-                    deserialization = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
-
-                    foreach (GuidToTrackMapping pair in deserialization.Mappings)
+                    try
                     {
-                        this._tracksToGuidMapping.Add(pair);
+                        _asciiUriFixes = (List<AsciiUriFix>)dcs.ReadObject(asciiUriFixes);
+                    }
+                    catch (Exception e)
+                    {
+                        // could not deserialize XML for playlist : let's build an empty list.
+                        _asciiUriFixes = new List<AsciiUriFix>();
                     }
                 }
-                catch (Exception e)
-                {
-                    // could not deserialize XML for playlist : let's keep it empty.
 
+                PlayqueueInterProcessCommunicationTransporter deserialization = null;
+                using (
+                    IsolatedStorageFileStream playQueueFile = userStoreForApplication.OpenFile(
+                        "playqueue.xml", FileMode.OpenOrCreate))
+                {
+
+                    DataContractSerializer dcs =
+                        new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+                    //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+
+                    try
+                    {
+                        deserialization = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
+
+                        foreach (GuidToTrackMapping pair in deserialization.Mappings)
+                        {
+                            this._tracksToGuidMapping.Add(pair);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // could not deserialize XML for playlist : let's keep it empty.
+
+                    }
                 }
             }
 
