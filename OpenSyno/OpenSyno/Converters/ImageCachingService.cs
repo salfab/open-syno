@@ -86,10 +86,12 @@
             WebClient wc = new WebClient();
 
             string fileName;
-            var imagesMapping = imageCachingService.CachedImagesMappings.FirstOrDefault(m => m.ImageId == albumCoverId);
-            if (imagesMapping != null)
+
+            var matchingMapping = imageCachingService.CachedImagesMappings.FirstOrDefault(o => o.ImageId == albumCoverId);
+
+            if (matchingMapping != null)
             {
-                fileName = imagesMapping.FilePath;
+                fileName = matchingMapping.FilePath;
             }
             else
             {
@@ -97,7 +99,6 @@
             }
             imageCachingService.TotalImageRequests++;
 
-            var matchingMapping = imageCachingService.CachedImagesMappings.FirstOrDefault(o => o.ImageId == albumCoverId);
             //using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             //{
             //    fileExists = userStore.FileExists(fileName);

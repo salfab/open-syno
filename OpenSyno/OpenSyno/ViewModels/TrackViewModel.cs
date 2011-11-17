@@ -15,6 +15,7 @@
         private bool _isSelected;
         private const string IsSelectedPropertyName = "IsSelected";
 
+        [DataMember]
         public Guid Guid { get; set; }
 
         /// <summary>
@@ -22,6 +23,7 @@
         /// </summary>
         /// <remarks>This property can be used to group tracks by album *ONLY* if they are adjacent in the playqueue.</remarks>
         /// <value>The consecutive album identifier.</value>
+        [DataMember]
         public Guid ConsecutiveAlbumIdentifier { get; set; }
 
         [DataMember]
