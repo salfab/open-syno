@@ -117,8 +117,8 @@
                     <toolkit:LongListSelector Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay, Converter={StaticResource TrackViewModelsToGroupsConverter}}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" >
                         <toolkit:LongListSelector.GroupHeaderTemplate >
                             <DataTemplate>
-                                <!--<Image Stretch="None" Source="{Binding HeaderContent.TrackInfo.ItemPid, Converter={StaticResource AlbumItemIdToCachedImageConverter}}" />-->
-                                <TextBlock Text="{Binding HeaderContent.TrackInfo.ItemPid}" />
+                                <Image HorizontalAlignment="Left" Stretch="None" Converters:ImageCachingService.ImageId="{Binding HeaderContent.TrackInfo.ItemPid}" Converters:ImageCachingService.Source="{Binding HeaderContent.TrackInfo.AlbumArtUrl}"  />
+                                <!--<TextBlock Text="{Binding HeaderContent.TrackInfo.ItemPid}" />-->
                             </DataTemplate>
                         </toolkit:LongListSelector.GroupHeaderTemplate>
                     </toolkit:LongListSelector>
