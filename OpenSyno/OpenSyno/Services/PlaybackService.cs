@@ -573,6 +573,19 @@ namespace OpenSyno.Services
             SerializePlayqueue();
         }
 
+        public void ClearTracksInQueue()
+        {
+            _asciiUriFixes.Clear();
+            var mappingsCopy = _tracksToGuidMapping.ToArray();
+            _tracksToGuidMapping.Clear();
+            OnTracksInQueueChanged(new PlayqueueChangedEventArgs { RemovedItems = mappingsCopy });
+
+        }
+
+        public int GetTracksCountInQueue()
+        {
+            return _tracksToGuidMapping.Count();
+        }
 
         /// <summary>
         /// Detects the affected tracks and build a fix.

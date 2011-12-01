@@ -122,5 +122,11 @@ namespace OpenSyno
             viewModel.PlayLastCommand.Execute(null);
 
         }
+
+        private void Play(object sender, EventArgs e)
+        {
+            var viewModel = (ArtistPanoramaViewModel)DataContext;
+            viewModel.PlayCommand.Execute(null);
+        }
     }
 }

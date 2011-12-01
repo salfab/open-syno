@@ -3,6 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Windows.Input;
+
+    using Microsoft.Practices.Prism.Commands;
 
     using OpenSyno.ViewModels;
 
@@ -48,5 +51,23 @@
                 Items.Add(artist);
             }
         }
+    }
+
+    public class AlbumGroupViewModel<T> : Group<T> where T : TrackViewModel
+    {
+        public AlbumGroupViewModel(object headerContent, IEnumerable<T> items) 
+            : base(headerContent, items)
+        {
+            SelectAllAlbumTracksCommand = new DelegateCommand(() =>
+                {
+                    bool newSelectedValue = !this.Items.First().IsSelected;
+                    foreach (T item in this.Items)
+                    {
+                        item.IsSelected = newSelectedValue;
+                    }
+                });
+        }
+
+        public ICommand SelectAllAlbumTracksCommand { get; set; }
     }
 }

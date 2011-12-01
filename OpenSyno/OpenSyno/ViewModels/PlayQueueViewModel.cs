@@ -60,16 +60,17 @@
             {
                 throw new ArgumentNullException("playbackService");
             }
+
             if (notificationService == null)
             {
                 throw new ArgumentNullException("notificationService");
             }
+
             if (openSynoSettings == null)
             {
                 throw new ArgumentNullException("openSynoSettings");
             }
             
-
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
             Action consecutiveAlbumsIdPatcher = () =>
@@ -131,6 +132,17 @@
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious);
             SavePlaylistCommand = new DelegateCommand(OnSavePlaylist);
+            SelectAllAlbumTracksCommand = new DelegateCommand<Guid>(OnSelectAllAlbumTracks);
+        }
+
+        private void OnSelectAllAlbumTracks(Guid consecutiveAlbumId)
+        {
+            var tracksFromAlbum = this.PlayQueueItems.Where(trackViewModel => trackViewModel.ConsecutiveAlbumIdentifier == consecutiveAlbumId);
+            bool currentValue = tracksFromAlbum.First().IsSelected;
+            foreach (var trackViewModel in tracksFromAlbum)
+            {
+                trackViewModel.IsSelected = currentValue;
+            }
         }
 
         private void OnPlay(TrackViewModel trackViewModel)
@@ -269,7 +281,7 @@
 
         #region Properties
 
-        
+        public ICommand SelectAllAlbumTracksCommand { get; set; }
 
         public double Volume
         {
@@ -418,6 +430,7 @@
         {
             var tracks = items.Select(o=>o.TrackInfo);
 
+            // int insertPosition = _playbackService.GetTracksCountInQueue();
             int insertPosition = PlayQueueItems.Count();
 
             _playbackService.InsertTracksToQueue(tracks, insertPosition, callback);
@@ -450,23 +463,18 @@
             switch (e.Operation)
             {
                 case PlayListOperation.ClearAndPlay:
-                    PlayQueueItems.Clear();
+                    ClearItems();
+                    
                     // test lines below before uncommenting
                     //_playbackService.ClearPlayQueue();
                     //_playbackService.InsertTracksToQueue(e.Items.Select(o => o.TrackInfo), 0);
 
                     AppendItems(e.Items, matchingGeneratedGuids =>
                     {
-                        if (_playbackService.Status != PlayState.Playing)
-                        {
-                            trackToPlay = e.Items.First();
-                            OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
-                        }
-                    });
-                    if (_playbackService.Status != PlayState.Stopped)
-                    {
-                        // stop the playback
-                    }
+                        trackToPlay = e.Items.First();
+                        _logService.Trace(string.Format("Play queue cleared : Starting playback of track {0}", trackToPlay.TrackInfo.Title));
+                        OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
+                    });                    
                     break;
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
@@ -490,6 +498,11 @@
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private void ClearItems()
+        {
+            _playbackService.ClearTracksInQueue();
         }
 
         #endregion

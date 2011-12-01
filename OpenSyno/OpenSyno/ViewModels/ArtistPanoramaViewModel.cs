@@ -103,6 +103,7 @@ namespace OpenSyno.ViewModels
             }
 
             PlayLastCommand = new DelegateCommand(OnPlayLast);
+            PlayCommand = new DelegateCommand(OnPlay);
             CurrentArtistItemIndex = activePanelIndex;
             _searchService = searchService;
             this._notificationService = notificationService;
@@ -118,6 +119,7 @@ namespace OpenSyno.ViewModels
             {
                 this.ArtistAlbums.Add(albumViewModel);
             }
+
             this.ArtistAlbums.CollectionChanged += StartMonitoringElements;
             foreach (var album in this.ArtistAlbums)
             {
@@ -127,6 +129,13 @@ namespace OpenSyno.ViewModels
             ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
             _artist = artist;
             ArtistName = _artist.Title;
+        }
+
+        private void OnPlay()
+        {
+            IAlbumViewModel albumViewModel = ArtistAlbums[CurrentArtistItemIndex];
+            var tracksToPlay = albumViewModel.Tracks.Where(t => t.IsSelected);
+            _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(PlayListOperation.ClearAndPlay, tracksToPlay));                
         }
 
         public bool IsBusy
@@ -176,6 +185,8 @@ namespace OpenSyno.ViewModels
         public ICommand ShowPlayQueueCommand { get; set; }
 
         public ICommand PlayLastCommand { get; set; }
+
+        public ICommand PlayCommand { get; private set; }
 
         public void BuildArtistItems(IEnumerable<SynoItem> albums)
         {

@@ -88,6 +88,10 @@ namespace OpenSyno.Services
         void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove);
         void SkipPrevious();
         void InvalidateCachedTokens();
+
+        void ClearTracksInQueue();
+
+        int GetTracksCountInQueue();
     }
 
     public delegate void PlayqueueChangedEventHandler(object sender, PlayqueueChangedEventArgs args);

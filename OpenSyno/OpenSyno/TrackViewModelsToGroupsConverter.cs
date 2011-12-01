@@ -21,15 +21,12 @@ namespace OpenSyno
             // var artists = new List<Group<SearchResultItemViewModel>>(from artist in SearchResults.Where(o => o.ItemInfo.ItemPid == "musiclib_music_aa") group artist by artist.ItemInfo.HeaderContent.FirstOrDefault() into c select new Group<SearchResultItemViewModel>(char.IsLetter(c.Key) ? c.Key.ToString().ToLower() : "#", c));
             var groups = from track in typedValue group track by track.ConsecutiveAlbumIdentifier ;
 
-            var groupedTracks = new List<Group<TrackViewModel>>();
+            var groupedTracks = new List<AlbumGroupViewModel<TrackViewModel>>();
             foreach (var group in groups)
             {                          
                 // Add a new group
-                groupedTracks.Add(new Group<TrackViewModel>(typedValue.First(o=>o.ConsecutiveAlbumIdentifier == group.Key), group));
-                
-            }
-
-           
+                groupedTracks.Add(new AlbumGroupViewModel<TrackViewModel>(typedValue.First(o => o.ConsecutiveAlbumIdentifier == group.Key), group));                
+            }           
 
             //var tempArtists = from a in SearchResults.Where(o => o.Class == "Artist") select a;
 
