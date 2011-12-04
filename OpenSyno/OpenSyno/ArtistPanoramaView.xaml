@@ -30,8 +30,8 @@
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="False">
             <shell:ApplicationBarIconButton IconUri="/icons/appbar.folder.rest.png" Text="show play queue" Click="ShowPlayQueue"/>
-            <shell:ApplicationBarIconButton IconUri="/icons/appbar.transport.play.rest.png" Text="Add to queue" Click="PlayLast"/>
-            <shell:ApplicationBarIconButton IconUri="/icons/appbar.share.rest.png" Text="Play" Click="Play"/>
+            <shell:ApplicationBarIconButton Text="Add to queue" Click="PlayLast" IconUri="/icons/appbar.play.addto.png"/>
+            <shell:ApplicationBarIconButton IconUri="/icons/appbar.transport.play.rest.png" Text="Play" Click="Play"/>
             <!--
 			<shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="MenuItem 1"/>

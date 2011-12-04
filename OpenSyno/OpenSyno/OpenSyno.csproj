@@ -202,6 +202,9 @@
     <Resource Include="appbar.transport.ff.rest.png" />
     <Resource Include="appbar.transport.pause.rest.png" />
     <Resource Include="appbar.transport.rew.rest.png" />
+    <Content Include="icons\appbar.play.addto.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Untitled.png" />
     <Resource Include="11-18-04.jpg" />
     <Resource Include="appbar.basecircle.rest.png" />
