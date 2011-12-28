@@ -470,7 +470,14 @@ namespace OpenSyno.Services
             // if no fix was needed, the callback hasn't been called yet !
             if (!isAnyFixNeeded)
             {
-                callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Track)).ToDictionary(o => o.Track, o => o.Guid));
+                Dictionary<SynoTrack, Guid> dictionary = new Dictionary<SynoTrack, Guid>();
+
+                foreach (var track in tracks)
+                {
+                    dictionary.Add(track, _tracksToGuidMapping.Where(o=>o.Track == track).First().Guid );
+                }
+              
+                callback(dictionary);
             }
         }
 
