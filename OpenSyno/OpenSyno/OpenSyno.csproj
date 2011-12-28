@@ -97,7 +97,6 @@
     <Compile Include="DashboardView.xaml.cs">
       <DependentUpon>DashboardView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="INotificationService.cs" />
     <Compile Include="NotificationService.xaml.cs" />
     <Compile Include="Playlist.xaml.cs" />
     <Compile Include="Services\LogService.cs" />

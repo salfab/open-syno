@@ -1,6 +1,5 @@
-﻿namespace OpenSyno
+﻿namespace OpemSyno.Contracts
 {
-    using System;
     using System.Windows;
 
     public interface INotificationService

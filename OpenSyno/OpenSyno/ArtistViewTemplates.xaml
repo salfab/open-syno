@@ -2,8 +2,8 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Behavior="clr-namespace:OpenSyno.Converters">
 	<DataTemplate x:Key="ArtistViewAlbumTemplate">
-        <Button Command="{Binding SelectedCommand}" BorderThickness="0" Padding="0" Width="227" Margin="-12,0,0,-12">
-		    <Grid >
+        <Button Command="{Binding SelectedCommand}" BorderThickness="0" Padding="0" Width="227" Margin="-12,0,0,-12" VerticalAlignment="Bottom">
+		    <Grid>
                 <Image Behavior:ImageCachingService.ImageId="{Binding Album.ItemID}" Behavior:ImageCachingService.Source="{Binding Album.AlbumArtUrl}" />
                 <Border HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{StaticResource PhoneTextBoxBrush}">
                     <TextBlock Margin="5,2,5,2" Text="{Binding Album.Title}" Foreground="{StaticResource PhoneTextBoxForegroundBrush}" />

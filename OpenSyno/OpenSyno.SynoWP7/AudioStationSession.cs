@@ -181,7 +181,7 @@ namespace Synology.AudioStationApi
                         {
                             if (count > limit)
                             {
-                                MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                             }
                             callback(tracks);
                         }
@@ -191,7 +191,7 @@ namespace Synology.AudioStationApi
                             {
                                 if (count > limit)
                                 {
-                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                 }
                                 callback(tracks);
                             });
@@ -232,17 +232,17 @@ namespace Synology.AudioStationApi
                             {
                                 throw new SynoSearchException("Error connecting to search engine", null);
                                 // FIXME : Use an error handling service
-                                var action = new Action(() =>MessageBox.Show("Error connecting to search engine", "Connection error",MessageBoxButton.OK));   
+                                //var action = new Action(() =>MessageBox.Show("Error connecting to search engine", "Connection error",MessageBoxButton.OK));   
 
-                                if (Deployment.Current.CheckAccess())
-                                {
-                                    action();
-                                }
-                                else
-                                {
-                                    Deployment.Current.Dispatcher.BeginInvoke(action);
-                                }
-                                return;
+                                //if (Deployment.Current.CheckAccess())
+                                //{
+                                //    action();
+                                //}
+                                //else
+                                //{
+                                //    Deployment.Current.Dispatcher.BeginInvoke(action);
+                                //}
+                                //return;
                             }
                             var webResponse = webRequest.EndGetResponse(responseAr);
                             var responseStream = webResponse.GetResponseStream();
@@ -261,7 +261,7 @@ namespace Synology.AudioStationApi
                                 if (count > limit)
                                 {
                                     // FIXME : Use an error handling service
-                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                 }
                                 callback(artists);
                             }
@@ -272,7 +272,7 @@ namespace Synology.AudioStationApi
                                         if (count > limit)
                                         {
                                             // FIXME : Use an error handling service
-                                            MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                            // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                         }
                                         callback(artists);
                                     });
@@ -389,7 +389,8 @@ namespace Synology.AudioStationApi
                         {
                             if (count > limit)
                             {
-                                MessageBox.Show(string.Format("number of available albums ({0}) exceeds supported limit ({1})", count, limit));
+                                // FIXME : Use an error handling service
+                                // MessageBox.Show(string.Format("number of available albums ({0}) exceeds supported limit ({1})", count, limit));
                             }
                             callback(albums, count, artist);
                         }
@@ -399,7 +400,8 @@ namespace Synology.AudioStationApi
                             {
                                 if (count > limit)
                                 {
-                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    // FIXME : Use an error handling service
+                                    // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                 }
                                 callback(albums, count, artist);
                             });
@@ -472,7 +474,8 @@ namespace Synology.AudioStationApi
                         {
                             if (total > limit)
                             {
-                                MessageBox.Show(string.Format("number of available albums ({0}) exceeds supported limit ({1})", total, limit));
+                                // FIXME : Use an error handling service
+                                // MessageBox.Show(string.Format("number of available albums ({0}) exceeds supported limit ({1})", total, limit));
                             }
                             callback(tracks, total, album);
                         }
@@ -482,7 +485,8 @@ namespace Synology.AudioStationApi
                             {
                                 if (total > limit)
                                 {
-                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", total, limit));
+                                    // FIXME : Use an error handling service
+                                    // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", total, limit));
                                 }
                                 callback(tracks, total, album);
                             });

@@ -7,6 +7,9 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno.Services
 {
+    using OpemSyno.Contracts;
+
+    using OpenSyno.Common;
     using OpenSyno.Helpers;
 
     public class SignInService : ISignInService

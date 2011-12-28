@@ -1,9 +1,8 @@
 ﻿namespace OpenSyno
 {
-    using System;
-    using System.Threading;
     using System.Windows;
-    using System.Windows.Threading;
+
+    using OpemSyno.Contracts;
 
     public class NotificationService : INotificationService
     {

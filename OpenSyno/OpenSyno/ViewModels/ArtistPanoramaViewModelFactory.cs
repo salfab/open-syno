@@ -10,6 +10,8 @@ namespace OpenSyno
 
     using OpemSyno.Contracts;
 
+    using OpenSyno.Common;
+
     public class ArtistPanoramaViewModelFactory
     {
         private readonly ISearchService _searchService;

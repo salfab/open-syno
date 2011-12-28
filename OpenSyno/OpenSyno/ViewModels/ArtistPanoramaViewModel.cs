@@ -13,6 +13,7 @@ namespace OpenSyno.ViewModels
 {
     using OpemSyno.Contracts;
 
+    using OpenSyno.Common;
     using OpenSyno.Services;
 
     public class ArtistPanoramaViewModel : ViewModelBase

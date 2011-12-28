@@ -51,7 +51,7 @@ namespace OpenSyno.Common
 
         public event EventHandler LoadingComplete;
 
-        public void CallbackWhenFisIsApplicable(Action<AsciiUriFix> callback)
+        public void CallbackWhenFixIsApplicable(Action<AsciiUriFix> callback)
         {
             // FIXME : Beware the race conditions !
 

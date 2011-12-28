@@ -14,6 +14,7 @@
 
     using OpemSyno.Contracts;
 
+    using OpenSyno.Common;
     using OpenSyno.Contracts.Domain;
     using OpenSyno.Services;
 

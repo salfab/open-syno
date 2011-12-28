@@ -282,9 +282,9 @@ namespace OpenSyno.Services
                     }
                     else
                     {
-                        _logService.Error("No track matching the guid was found.");
-                        throw new ArgumentOutOfRangeException("No track matching the guid was found. Guid : " + guid);
+                        _logService.Trace("No track matching the guid was found. The play queue might have been deleted while a track was playing. The current track could not be identified.");
                     }
+
                     break;
                 case PlayState.BufferingStarted:
                     break;
@@ -362,7 +362,10 @@ namespace OpenSyno.Services
 
         public void SetVolume(double volume)
         {
-            BackgroundAudioPlayer.Instance.Volume = volume;
+            if (BackgroundAudioPlayer.Instance.Volume != volume)
+            {
+                BackgroundAudioPlayer.Instance.Volume = volume;
+            }            
         }
         #region audiorendering service
         public void StreamTrack(Guid guidOfTrackToPlay)
@@ -381,7 +384,7 @@ namespace OpenSyno.Services
             if (_asciiUriFixes.Any(fix => fix.Res == baseSynoTrack.Res))
             {
                 AsciiUriFix asciiUriFix = this._asciiUriFixes.Single(fix => fix.Res == baseSynoTrack.Res);
-                asciiUriFix.CallbackWhenFisIsApplicable( fix =>
+                asciiUriFix.CallbackWhenFixIsApplicable( fix =>
                     {
                         audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, asciiUriFix.Url);
                         BackgroundAudioPlayer.Instance.Track = audioTrack;
