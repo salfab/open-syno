@@ -43,6 +43,9 @@
   <ItemGroup>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Threading.Tasks.WP71">
+      <HintPath>..\packages\System.Threading.Tasks.2.1.2\lib\sl4-wp71\System.Threading.Tasks.WP71.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -81,6 +84,9 @@
       <Project>{16DA973A-2885-4E6E-89CD-5CA3825B3CA6}</Project>
       <Name>OpenSyno.SynoWP7</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
