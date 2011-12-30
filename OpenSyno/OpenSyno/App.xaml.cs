@@ -279,13 +279,13 @@ namespace OpenSyno
             {
                 if (handled == false)
                 {
-                    System.Threading.ManualResetEvent mre = new ManualResetEvent(false);
+                    ManualResetEvent mre = new ManualResetEvent(false);
 
                     Action errorFeedback = () =>
                                                       {
                                                           var helpDebug =
                        MessageBox.Show(
-                           "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us anonymous information. Would you like to do so ?",
+                           "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us an e-mail pre-filled with information about the crash. Would you like to do so ?",
                            "Ooops !",
                            MessageBoxButton.OKCancel);
                                                           string exceptionName = e.GetType().Name;
