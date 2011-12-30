@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Threading.Tasks;
 
     public class RemoteFileMockAudioStationSession : IAudioStationSession
     {
@@ -135,6 +136,11 @@
             {
                 throw new NotImplementedException();
             }
+        }
+
+        public Task<IEnumerable<SynoItem>> SearchAlbums(string album)
+        {
+            throw new NotImplementedException();
         }
     }
 }

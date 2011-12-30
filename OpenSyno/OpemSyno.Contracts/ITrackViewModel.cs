@@ -2,6 +2,7 @@ namespace OpemSyno.Contracts
 {
     using System;
     using System.Runtime.Serialization;
+    using System.Windows.Input;
 
     using Synology.AudioStationApi;
 
@@ -14,5 +15,7 @@ namespace OpemSyno.Contracts
 
         [DataMember]
         bool IsSelected { get; set; }
+
+        ICommand NavigateToContainingAlbumCommand { get; set; }
     }
 }

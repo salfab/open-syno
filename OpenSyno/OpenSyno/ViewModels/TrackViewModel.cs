@@ -1,7 +1,13 @@
 ﻿namespace OpenSyno.ViewModels
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.Serialization;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
+    using Microsoft.Practices.Prism.Commands;
 
     using OpemSyno.Contracts;
 
@@ -13,6 +19,9 @@
     public class TrackViewModel : ViewModelBase, ITrackViewModel
     {
         private bool _isSelected;
+
+        private readonly IAudioStationSession _session;
+
         private const string IsSelectedPropertyName = "IsSelected";
 
         [DataMember]
@@ -43,15 +52,44 @@
             }
         }
 
-        public TrackViewModel(Guid guid, SynoTrack synoTrack)
+        public TrackViewModel(Guid guid, SynoTrack synoTrack, IAudioStationSession session)
         {
             if (synoTrack == null)
             {
                 throw new ArgumentNullException("synoTrack");
             }
 
+            if (session == null)
+            {
+                throw new ArgumentNullException("session");
+            }
+
             Guid = guid;
             TrackInfo = synoTrack;
+
+            NavigateToContainingAlbumCommand = new DelegateCommand(OnNavigateToContainingAlbum);
+
+            this._session = session;
         }
+
+        private void OnNavigateToContainingAlbum()
+        {                        
+            Task<IEnumerable<SynoItem>> itemsTask = this._session.SearchAlbums(this.TrackInfo.Album);
+            itemsTask.ContinueWith(
+                task =>
+                    {
+                        var album = task.Result.SingleOrDefault(a => a.Title == TrackInfo.Album);
+
+                        // TODO : check also that the artist name match !! otherwise, two albums might have the same name and still be two different albums.
+                        if (album == null)
+                        {
+                            throw new NotSupportedException("we could not find strictly one perfect match for album names. This is not supported yet, but we'll work on it ;)");
+                        }
+                    },
+                TaskScheduler.FromCurrentSynchronizationContext());
+
+        }
+
+        public ICommand NavigateToContainingAlbumCommand { get; set; }
     }
 }

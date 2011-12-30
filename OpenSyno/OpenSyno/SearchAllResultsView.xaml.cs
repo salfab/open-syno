@@ -77,6 +77,11 @@ namespace OpenSyno
                 DataContext = IoC.Container.Get<ISearchAllResultsViewModelFactory>().Create(keyword, _searchResults);
             }
         }
+
+        private void Button_TextInput(object sender, TextCompositionEventArgs e)
+        {
+
+        }
     }
 
     public interface ISearchAllResultsViewModelFactory
@@ -112,11 +117,13 @@ namespace OpenSyno
         ObservableCollection<ITrackViewModel> SearchResults { get; set; }
     }
 
+
     public class SearchAllResultsViewModel : ISearchAllResultsViewModel
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
 
+        public ICommand NavigateToContainingAlbumCommand { get; set; }
 
         public SearchAllResultsViewModel(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, string keyword, IEnumerable<SynoTrack> lastResults)
         {
@@ -135,6 +142,7 @@ namespace OpenSyno
                 SearchResults.Add(new TrackViewModel(Guid.Empty, lastResult));
             }
         }
+
 
         public string Keyword { get; set; }
         public ICommand PlayLastCommand { get; set; }

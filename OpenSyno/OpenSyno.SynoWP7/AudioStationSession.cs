@@ -9,6 +9,7 @@ namespace Synology.AudioStationApi
     using System.IO;
     using System.Linq;
     using System.Net;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using OpenSyno.SynoWP7;
@@ -24,6 +25,97 @@ namespace Synology.AudioStationApi
 
         [DataMember]
         public string Token { get; set; }
+
+        public Task<IEnumerable<SynoItem>> SearchAlbums(string album)
+        {      
+      
+            TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
+            
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+
+            HttpWebRequest request = BuildRequest(url);
+
+            int limit = 100;
+            string postString = string.Format(@"action=search&target=musiclib_root&server=musiclib_root&category=all&keyword={0}&start=0&limit={1}", album, limit);
+            byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+            var requestStreamAr = request.BeginGetRequestStream(ar =>
+            {
+              
+            }, null);
+
+
+
+            var getRequestStreamTask = Task.Factory.FromAsync(
+                requestStreamAr,
+                ar =>
+                    {
+                        // Just make sure we retrieve the right web request : no access to modified closure.
+                        HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
+
+                        var requestStream = webRequest.EndGetRequestStream(ar);
+                        requestStream.Write(postBytes, 0, postBytes.Length);
+                        requestStream.Close();
+
+                        var getResponseAr = request.BeginGetResponse(
+                            responseAr =>
+                                {                                 
+                                }, 
+                            webRequest);
+
+                        var getResponseTask = Task.Factory.FromAsync(getResponseAr, 
+                            responseAr
+                            =>
+                            {
+                                   // Just make sure we retrieve the right web request : no access to modified closure.                        
+                                    var httpWebRequest = responseAr.AsyncState;
+
+                                    var webResponse = webRequest.EndGetResponse(responseAr);
+                                    var responseStream = webResponse.GetResponseStream();
+                                    var reader = new StreamReader(responseStream);
+                                    var content = reader.ReadToEnd();
+
+                                    long count;
+                                    IEnumerable<SynoItem> tracks;
+                                    SynologyJsonDeserializationHelper.ParseSynologyAlbums(
+                                        content, out tracks, out count, urlBase);
+
+                                    var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                                    if (isOnUiThread)
+                                    {
+                                        if (count > limit)
+                                        {
+                                            // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                        }
+
+                                        tcs.SetResult(tracks);
+
+                                        // callback(tracks);
+                                    }
+                                    else
+                                    {
+                                        Deployment.Current.Dispatcher.BeginInvoke(
+                                            () =>
+                                                {
+                                                    if (count > limit)
+                                                    {
+                                                        // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                                    }
+                                                    tcs.SetResult(tracks);
+                                                });
+                                    }
+                            }, 
+                            TaskCreationOptions.None, 
+                            TaskScheduler.FromCurrentSynchronizationContext());
+
+
+                    },
+                TaskCreationOptions.None,
+                TaskScheduler.FromCurrentSynchronizationContext());
+
+            return tcs.Task;
+        }
 
         /// <summary>
         /// Gets the remote file network stream.

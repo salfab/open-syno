@@ -35,12 +35,17 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
                             <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}">
                                 <StackPanel>
                                     <TextBlock Text="{Binding TrackInfo.Title}" />
                                     <TextBlock Foreground="{StaticResource PhoneSubtleBrush}" Grid.Row="1" Text="{Binding TrackInfo.Artist}" />
                                 </StackPanel>
                             </CheckBox>
+                            <Button Grid.Column="1" Content="&gt;" Command="{Binding NavigateToContainingAlbumCommand}" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
