@@ -48,9 +48,11 @@ namespace OpenSyno.ViewModels
         private INavigatorService _navigatorSevice;
 
         private IPageSwitchingService _pageSwitchingService;
+        private readonly ITrackViewModelFactory _trackViewModelFactory;
 
-        public ArtistDetailViewModel(SynoItem artist, ISearchService searchService, IAlbumViewModelFactory albumViewModelFactory, INavigatorService navigatorSevice, IPageSwitchingService pageSwitchingService)
+        public ArtistDetailViewModel(SynoItem artist, ISearchService searchService, IAlbumViewModelFactory albumViewModelFactory, INavigatorService navigatorSevice, IPageSwitchingService pageSwitchingService, ITrackViewModelFactory trackViewModelFactory)
         {
+            if (trackViewModelFactory == null) throw new ArgumentNullException("trackViewModelFactory");
             this.Albums = new ObservableCollection<IAlbumViewModel>();
             this.ArtistName = artist.Title;
             this.SimilarArtists = new ObservableCollection<IArtistViewModel>();
@@ -58,6 +60,7 @@ namespace OpenSyno.ViewModels
             _albumViewModelFactory = albumViewModelFactory;
             _navigatorSevice = navigatorSevice;
             _pageSwitchingService = pageSwitchingService;
+            _trackViewModelFactory = trackViewModelFactory;
             this.PopulateAlbumsAsync(artist);
             GetSimilarArtistsAsync(artist);
         }
@@ -107,7 +110,7 @@ namespace OpenSyno.ViewModels
                         foreach (var track in synoTracks)
                         {
                             // track guid is empty for now : it will be filled when the track gets added to the playqueue
-                            currentAlbumViewModel.Tracks.Add(new TrackViewModel(Guid.Empty, track));
+                            currentAlbumViewModel.Tracks.Add(this._trackViewModelFactory.Create(Guid.Empty, track, this._pageSwitchingService));
                         }
                         currentAlbumViewModel.IsBusy = false;
 

@@ -1,4 +1,5 @@
 ﻿using Ninject;
+using OpemSyno.Contracts;
 
 namespace OpenSyno
 {
@@ -112,7 +113,7 @@ namespace OpenSyno
 
                 if (this.State.ContainsKey(PlayQueueItemsKey))
                 {
-                    viewModel.PlayQueueItems = (ObservableCollection<TrackViewModel>)this.State[PlayQueueItemsKey];
+                    viewModel.PlayQueueItems = (ObservableCollection<ITrackViewModel>)this.State[PlayQueueItemsKey];
                 }
 
                 if (this.State.ContainsKey(SelectedTrackKey))

@@ -93,19 +93,21 @@ namespace OpenSyno
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
+        private readonly ITrackViewModelFactory _trackViewModelFactory;
 
-        public SearchAllResultsViewModelFactory(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
-        {            
+        public SearchAllResultsViewModelFactory(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, ITrackViewModelFactory trackViewModelFactory)
+        {
+            if (trackViewModelFactory == null) throw new ArgumentNullException("trackViewModelFactory");
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
-
+            _trackViewModelFactory = trackViewModelFactory;
         }
 
         #region Implementation of ISearchAllResultsViewModelFactory
 
         public ISearchAllResultsViewModel Create(string keyword, IEnumerable<SynoTrack> searchResults)
         {
-            return new SearchAllResultsViewModel(_eventAggregator, _pageSwitchingService, keyword, searchResults);
+            return new SearchAllResultsViewModel(_eventAggregator, _pageSwitchingService, keyword, searchResults, this._trackViewModelFactory);
         }
 
         #endregion
@@ -122,16 +124,19 @@ namespace OpenSyno
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
+        private readonly ITrackViewModelFactory _trackViewModelFactory;
 
         public ICommand NavigateToContainingAlbumCommand { get; set; }
 
-        public SearchAllResultsViewModel(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, string keyword, IEnumerable<SynoTrack> lastResults)
+        public SearchAllResultsViewModel(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, string keyword, IEnumerable<SynoTrack> lastResults, ITrackViewModelFactory trackViewModelFactory)
         {
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
+            _trackViewModelFactory = trackViewModelFactory;
             if (pageSwitchingService == null) throw new ArgumentNullException("pageSwitchingService");
             if (keyword == null) throw new ArgumentNullException("keyword");
             if (lastResults == null) throw new ArgumentNullException("lastResults");
+            if (trackViewModelFactory == null) throw new ArgumentNullException("trackViewModelFactory");
             ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
             PlayLastCommand = new DelegateCommand(OnPlayLast);
             Keyword = keyword;
@@ -139,7 +144,7 @@ namespace OpenSyno
             foreach (var lastResult in lastResults)
             {
                 // GUIDS will be generated later when / if inserted in the playqueue.
-                SearchResults.Add(new TrackViewModel(Guid.Empty, lastResult));
+                SearchResults.Add(this._trackViewModelFactory.Create(Guid.Empty, lastResult, this._pageSwitchingService));
             }
         }
 

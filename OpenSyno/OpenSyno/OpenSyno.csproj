@@ -109,6 +109,7 @@
     <Compile Include="Helpers\ViewModelProxy.cs" />
     <Compile Include="Services\PanoramaItemSwitchingService.cs" />
     <Compile Include="Services\SignInService.cs" />
+    <Compile Include="TrackViewModelFactory.xaml.cs" />
     <Compile Include="TrackViewModelsToGroupsConverter.cs" />
     <Compile Include="ViewModels\AboutBoxViewModel.cs" />
     <Compile Include="AlbumViewModel.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="ViewModels\DashboardRecentViewModel.cs" />
     <Compile Include="ViewModels\ISearchResultItemViewModelFactory.cs" />
     <Compile Include="Services\IUrlParameterToObjectsPlateHeater.cs" />
+    <Compile Include="ViewModels\ITrackViewModelFactory.cs" />
     <Compile Include="ViewModels\SearchContext.cs" />
     <Compile Include="ViewModels\SearchResultItemViewModelFactory.cs" />
     <Compile Include="ViewModels\SearchResultsViewModelFactory.cs" />

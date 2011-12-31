@@ -35,5 +35,7 @@
         string Token { get; }
 
         Task<IEnumerable<SynoItem>> SearchAlbums(string album);
+        Task<IEnumerable<SynoItem>> SearchArtistAsync(string artistName);
+        Task<IEnumerable<SynoItem>> GetAlbumsForArtistAsync(SynoItem artist);
     }
 }

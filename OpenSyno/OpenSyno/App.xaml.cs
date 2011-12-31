@@ -110,6 +110,7 @@ namespace OpenSyno
             IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<IArtistDetailViewModelFactory>().To<ArtistDetailViewModelFactory>().InSingletonScope();
+            IoC.Container.Bind<ITrackViewModelFactory>().To<TrackViewModelFactory>();
             
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModel>().ToSelf().InSingletonScope();

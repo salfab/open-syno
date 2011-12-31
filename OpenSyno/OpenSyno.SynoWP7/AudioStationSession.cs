@@ -26,6 +26,169 @@ namespace Synology.AudioStationApi
         [DataMember]
         public string Token { get; set; }
 
+        public Task<IEnumerable<SynoItem>> SearchArtistAsync(string artistName)
+        {
+
+            TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
+
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+
+            HttpWebRequest request = BuildRequest(url);
+
+            int limit = 100;
+            string postString = string.Format(@"sort=title&dir=ASC&action=browse&target=musiclib_music_aa&server=musiclib_music_aa&category=&keyword={0}&start=0&limit={1}", artistName, limit);
+                       
+            byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+            var requestStreamAr = request.BeginGetRequestStream(ar =>
+            {
+                // Just make sure we retrieve the right web request : no access to modified closure.
+                HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
+
+                var requestStream = webRequest.EndGetRequestStream(ar);
+                requestStream.Write(postBytes, 0, postBytes.Length);
+                requestStream.Close();
+
+                var getResponseAr = webRequest.BeginGetResponse(
+                    responseAr =>
+                    {
+                        // Just make sure we retrieve the right web request : no access to modified closure.                        
+                        var httpWebRequest = responseAr.AsyncState;
+
+                        var webResponse = webRequest.EndGetResponse(responseAr);
+                        var responseStream = webResponse.GetResponseStream();
+                        var reader = new StreamReader(responseStream);
+                        var content = reader.ReadToEnd();
+
+                        long count;
+                        IEnumerable<SynoItem> tracks;
+                        SynologyJsonDeserializationHelper.ParseSynologyAlbums(
+                            content, out tracks, out count, urlBase);
+
+                        var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                        if (isOnUiThread)
+                        {
+                            if (count > limit)
+                            {
+                                // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                            }
+
+                            tcs.SetResult(tracks);
+
+                            // callback(tracks);
+                        }
+                        else
+                        {
+                            Deployment.Current.Dispatcher.BeginInvoke(
+                                () =>
+                                {
+                                    if (count > limit)
+                                    {
+                                        // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    }
+                                    tcs.SetResult(tracks);
+                                });
+                        }
+                    },
+                    webRequest);
+
+
+
+
+            }, request);
+
+
+
+            //var getRequestStreamTask = Task.Factory.FromAsync(
+            //    requestStreamAr,
+            //    ar =>
+            //        ,
+            //    TaskCreationOptions.None,
+            //    TaskScheduler.FromCurrentSynchronizationContext());
+
+            return tcs.Task;
+        }
+
+        public Task<IEnumerable<SynoItem>> GetAlbumsForArtistAsync(SynoItem artist)
+        {
+            TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
+
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+
+            HttpWebRequest request = BuildRequest(url);
+
+            int limit = 100;
+            string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(artist.ItemID), limit);
+
+            byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+            var requestStreamAr = request.BeginGetRequestStream(ar =>
+            {
+                // Just make sure we retrieve the right web request : no access to modified closure.
+                HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
+
+                var requestStream = webRequest.EndGetRequestStream(ar);
+                requestStream.Write(postBytes, 0, postBytes.Length);
+                requestStream.Close();
+
+                var getResponseAr = webRequest.BeginGetResponse(
+                    responseAr =>
+                    {
+                        // Just make sure we retrieve the right web request : no access to modified closure.                        
+                        var httpWebRequest = responseAr.AsyncState;
+
+                        var webResponse = webRequest.EndGetResponse(responseAr);
+                        var responseStream = webResponse.GetResponseStream();
+                        var reader = new StreamReader(responseStream);
+                        var content = reader.ReadToEnd();
+
+                        long count;
+                        IEnumerable<SynoItem> tracks;
+                        SynologyJsonDeserializationHelper.ParseSynologyAlbums(
+                            content, out tracks, out count, urlBase);
+
+                        var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                        if (isOnUiThread)
+                        {
+                            if (count > limit)
+                            {
+                                // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                            }
+
+                            tcs.SetResult(tracks);
+
+                            // callback(tracks);
+                        }
+                        else
+                        {
+                            Deployment.Current.Dispatcher.BeginInvoke(
+                                () =>
+                                {
+                                    if (count > limit)
+                                    {
+                                        // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    }
+                                    tcs.SetResult(tracks);
+                                });
+                        }
+                    },
+                    webRequest);
+            }, request);
+
+
+
+            //var getRequestStreamTask = Task.Factory.FromAsync(
+            //    requestStreamAr,
+            //    ar =>
+            //        ,
+            //    TaskCreationOptions.None,
+            //    TaskScheduler.FromCurrentSynchronizationContext());
+
+            return tcs.Task;
+        }
+
         public Task<IEnumerable<SynoItem>> SearchAlbums(string album)
         {      
       
@@ -37,20 +200,11 @@ namespace Synology.AudioStationApi
             HttpWebRequest request = BuildRequest(url);
 
             int limit = 100;
-            string postString = string.Format(@"action=search&target=musiclib_root&server=musiclib_root&category=all&keyword={0}&start=0&limit={1}", album, limit);
+            string postString = string.Format(@"action=search&target=musiclib_music_aa&server=musiclib_root&keyword={0}&start=0&limit={1}", album, limit);
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 
             var requestStreamAr = request.BeginGetRequestStream(ar =>
             {
-              
-            }, null);
-
-
-
-            var getRequestStreamTask = Task.Factory.FromAsync(
-                requestStreamAr,
-                ar =>
-                    {
                         // Just make sure we retrieve the right web request : no access to modified closure.
                         HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
 
@@ -58,16 +212,9 @@ namespace Synology.AudioStationApi
                         requestStream.Write(postBytes, 0, postBytes.Length);
                         requestStream.Close();
 
-                        var getResponseAr = request.BeginGetResponse(
+                        var getResponseAr = webRequest.BeginGetResponse(
                             responseAr =>
-                                {                                 
-                                }, 
-                            webRequest);
-
-                        var getResponseTask = Task.Factory.FromAsync(getResponseAr, 
-                            responseAr
-                            =>
-                            {
+                                {
                                    // Just make sure we retrieve the right web request : no access to modified closure.                        
                                     var httpWebRequest = responseAr.AsyncState;
 
@@ -106,13 +253,21 @@ namespace Synology.AudioStationApi
                                                 });
                                     }
                             }, 
-                            TaskCreationOptions.None, 
-                            TaskScheduler.FromCurrentSynchronizationContext());
+                            webRequest);
+
+                      
 
 
-                    },
-                TaskCreationOptions.None,
-                TaskScheduler.FromCurrentSynchronizationContext());
+            }, request);
+
+
+
+            //var getRequestStreamTask = Task.Factory.FromAsync(
+            //    requestStreamAr,
+            //    ar =>
+            //        ,
+            //    TaskCreationOptions.None,
+            //    TaskScheduler.FromCurrentSynchronizationContext());
 
             return tcs.Task;
         }

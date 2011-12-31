@@ -142,5 +142,15 @@
         {
             throw new NotImplementedException();
         }
+
+        public Task<IEnumerable<SynoItem>> SearchArtistAsync(string artistName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<SynoItem>> GetAlbumsForArtistAsync(SynoItem artist)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

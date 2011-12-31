@@ -34,11 +34,11 @@
 
 
 
-        private TrackViewModel _activeTrack;
+        private ITrackViewModel _activeTrack;
 
         private Uri _currentArtwork;
 
-        private ObservableCollection<TrackViewModel> _playQueueItems;
+        private ObservableCollection<ITrackViewModel> _playQueueItems;
 
         #endregion
 
@@ -50,7 +50,7 @@
         /// <param name="eventAggregator">The event aggregator.</param>
         /// <param name="playbackService">The playback service.</param>
         /// <param name="openSynoSettings"></param>
-        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings, ILogService logService)
+        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings, ILogService logService, ITrackViewModelFactory trackViewModelFactory, IPageSwitchingService pageSwitchingService)
         {
             if (eventAggregator == null)
             {
@@ -71,7 +71,9 @@
             {
                 throw new ArgumentNullException("openSynoSettings");
             }
-            
+            if (trackViewModelFactory == null) throw new ArgumentNullException("trackViewModelFactory");
+            if (pageSwitchingService == null) throw new ArgumentNullException("pageSwitchingService");
+
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
             Action consecutiveAlbumsIdPatcher = () =>
@@ -90,7 +92,7 @@
             };
 
             _playbackService = playbackService;
-            this.PlayQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => new TrackViewModel(o.Guid, o.Track)));
+            this.PlayQueueItems = new ObservableCollection<ITrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
                                                          {
                                                              consecutiveAlbumsIdPatcher();
@@ -103,10 +105,12 @@
             this._notificationService = notificationService;
             _openSynoSettings = openSynoSettings;
             _logService = logService;
+            _trackViewModelFactory = trackViewModelFactory;
+            _pageSwitchingService = pageSwitchingService;
             _playbackService.TrackStarted += (o, e) =>
                                                  {
                                                      CurrentArtwork = new Uri(e.Track.AlbumArtUrl, UriKind.Absolute);
-                                                     this.ActiveTrack = new TrackViewModel(e.Guid, e.Track);
+                                                     this.ActiveTrack = this._trackViewModelFactory.Create(e.Guid, e.Track, this._pageSwitchingService);
                                                  };
 
             _playbackService.BufferingProgressUpdated += (o, e) =>
@@ -172,7 +176,7 @@
             {
                 foreach (GuidToTrackMapping newItem in e.AddedItems)
                 {
-                    this.PlayQueueItems.Add(new TrackViewModel(newItem.Guid, newItem.Track));
+                    this.PlayQueueItems.Add(this._trackViewModelFactory.Create(newItem.Guid, newItem.Track, this._pageSwitchingService));
                 }
             }
 
@@ -298,7 +302,7 @@
             }
         }
 
-        public TrackViewModel ActiveTrack
+        public ITrackViewModel ActiveTrack
         {
             get { return _activeTrack; }
             set
@@ -345,13 +349,15 @@
 
         private TrackViewModel _selectedTrack;
 
-        private string SelectedTrackPropertyName = "SelectedTrack";
+        private const string SelectedTrackPropertyName = "SelectedTrack";
         private DateTime _lastBufferProgressUpdate;
 
-        private INotificationService _notificationService;
+        private readonly INotificationService _notificationService;
 
         private readonly IOpenSynoSettings _openSynoSettings;
         private readonly ILogService _logService;
+        private readonly ITrackViewModelFactory _trackViewModelFactory;
+        private readonly IPageSwitchingService _pageSwitchingService;
 
         private const string CurrentPlaybackPercentCompletePropertyName = "CurrentPlaybackPercentComplete";
 
@@ -400,7 +406,7 @@
 
         public ICommand PlayCommand { get; set; }
 
-        public ObservableCollection<TrackViewModel> PlayQueueItems
+        public ObservableCollection<ITrackViewModel> PlayQueueItems
         {
             get
             {
@@ -423,7 +429,7 @@
             var currentTrack = this._playbackService.GetCurrentTrack();
             if (currentTrack != null)
             {
-                this.ActiveTrack = new TrackViewModel(currentTrack.Guid, currentTrack.Track);
+                this.ActiveTrack = this._trackViewModelFactory.Create(currentTrack.Guid, currentTrack.Track, this._pageSwitchingService);
             }
         }
 

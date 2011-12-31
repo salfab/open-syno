@@ -1,4 +1,8 @@
-﻿namespace OpenSyno.ViewModels
+﻿using System.Collections;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+
+namespace OpenSyno.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -21,6 +25,9 @@
         private bool _isSelected;
 
         private readonly IAudioStationSession _session;
+        private readonly IPageSwitchingService _pageSwitchingService;
+        private readonly IUrlParameterToObjectsPlateHeater _urlParameterToObjectsPlateHeater;
+        private readonly IAlbumViewModelFactory _albumViewModelFactory;
 
         private const string IsSelectedPropertyName = "IsSelected";
 
@@ -52,7 +59,7 @@
             }
         }
 
-        public TrackViewModel(Guid guid, SynoTrack synoTrack, IAudioStationSession session)
+        public TrackViewModel(Guid guid, SynoTrack synoTrack, IPageSwitchingService pageSwitchingService, IAlbumViewModelFactory albumViewModelFactory, IAudioStationSession session, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater)
         {
             if (synoTrack == null)
             {
@@ -63,6 +70,7 @@
             {
                 throw new ArgumentNullException("session");
             }
+            if (albumViewModelFactory == null) throw new ArgumentNullException("albumViewModelFactory");
 
             Guid = guid;
             TrackInfo = synoTrack;
@@ -70,21 +78,64 @@
             NavigateToContainingAlbumCommand = new DelegateCommand(OnNavigateToContainingAlbum);
 
             this._session = session;
+            this._urlParameterToObjectsPlateHeater = urlParameterToObjectsPlateHeater;
+            _albumViewModelFactory = albumViewModelFactory;
+            _albumViewModelFactory = albumViewModelFactory;
+            _pageSwitchingService = pageSwitchingService;
         }
 
         private void OnNavigateToContainingAlbum()
         {                        
-            Task<IEnumerable<SynoItem>> itemsTask = this._session.SearchAlbums(this.TrackInfo.Album);
-            itemsTask.ContinueWith(
+            Task<IEnumerable<SynoItem>> searchArtistsTask = this._session.SearchArtistAsync(this.TrackInfo.Artist);
+            searchArtistsTask.ContinueWith(
                 task =>
                     {
-                        var album = task.Result.SingleOrDefault(a => a.Title == TrackInfo.Album);
+                        var artist = task.Result.SingleOrDefault(a => a.Title == TrackInfo.Artist);
 
                         // TODO : check also that the artist name match !! otherwise, two albums might have the same name and still be two different albums.
-                        if (album == null)
+                        if (artist == null)
                         {
-                            throw new NotSupportedException("we could not find strictly one perfect match for album names. This is not supported yet, but we'll work on it ;)");
+                            throw new NotSupportedException("we could not find strictly one perfect match for artist names. Maybe there are multiple artists with the same name in your library which might mean your library is corrupted.");
                         }
+
+                        Task<IEnumerable<SynoItem>> searchAlbumsTask = this._session.GetAlbumsForArtistAsync(artist);
+                        searchAlbumsTask.ContinueWith(t =>
+                                                          {
+                                                              var albums = t.Result;
+                                                              var album = albums.SingleOrDefault(o => o.Title == this.TrackInfo.Album);
+                                                              if (album == null)
+                                                              {
+                                                                    throw new NotSupportedException("we could not find strictly one perfect match for albums names. Maybe there are multiple albums with the same name for the same artist in your library which might mean your library is corrupted.");                                                                  
+                                                              }
+
+                                                              var albumsListTicket = Guid.NewGuid().ToString();
+                                                              
+                                                              // TODO : move those registrations within the page switching service.
+
+                                                              // the artist whose page to show,
+                                                              this._urlParameterToObjectsPlateHeater.RegisterObject(artist.ItemID, artist);
+                                                              
+
+
+                                                              List<IAlbumViewModel> albumViewModels = new List<IAlbumViewModel>();
+                                                                                                                            
+                                                              foreach (var item in albums)
+                                                              {
+                                                                  IAlbumViewModel viewModel = this._albumViewModelFactory.Create(item);                                                                  
+                                                                  albumViewModels.Add(viewModel);
+                                                              }
+
+                                                              // the album shown by default.
+                                                              IAlbumViewModel defaultAlbumViewModel = albumViewModels.Single(o=>o.Album == album);
+
+                                                              this._urlParameterToObjectsPlateHeater.RegisterObject(album.ItemID, defaultAlbumViewModel);
+
+                                                              // the albums list.
+                                                              this._urlParameterToObjectsPlateHeater.RegisterObject(albumsListTicket, albumViewModels);
+
+                                                              this._pageSwitchingService.NavigateToArtistPanorama(artist.ItemID,album.ItemID, albumsListTicket);
+                                                          }, TaskScheduler.FromCurrentSynchronizationContext());                        
+
                     },
                 TaskScheduler.FromCurrentSynchronizationContext());
 
