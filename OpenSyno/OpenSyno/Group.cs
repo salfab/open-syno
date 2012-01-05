@@ -7,6 +7,8 @@
 
     using Microsoft.Practices.Prism.Commands;
 
+    using OpemSyno.Contracts;
+
     using OpenSyno.ViewModels;
 
     public class Group<T> : IEnumerable<T>
@@ -53,7 +55,7 @@
         }
     }
 
-    public class AlbumGroupViewModel<T> : Group<T> where T : TrackViewModel
+    public class AlbumGroupViewModel<T> : Group<T> where T : ITrackViewModel
     {
         public AlbumGroupViewModel(object headerContent, IEnumerable<T> items) 
             : base(headerContent, items)
