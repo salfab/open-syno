@@ -152,5 +152,10 @@
         {
             throw new NotImplementedException();
         }
+
+        public Task<IEnumerable<SynoTrack>> GetTracksForAlbumAsync(SynoItem album)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

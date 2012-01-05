@@ -12,6 +12,7 @@ namespace OpenSyno
         private readonly IUrlParameterToObjectsPlateHeater _urlParameterToObjectsPlateHeater;
         private readonly IAlbumViewModelFactory _albumViewModelFactory;
 
+
         public TrackViewModelFactory(IAudioStationSession session, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater, IAlbumViewModelFactory albumViewModelFactory)
         {
             if (session == null) throw new ArgumentNullException("session");
@@ -25,7 +26,7 @@ namespace OpenSyno
 
         public ITrackViewModel Create(Guid guid, SynoTrack track, IPageSwitchingService pageSwitchingService)
         {
-            return new TrackViewModel(guid, track, pageSwitchingService, _albumViewModelFactory, _session, _urlParameterToObjectsPlateHeater);
+            return new TrackViewModel(guid, track, pageSwitchingService, _albumViewModelFactory, _session, _urlParameterToObjectsPlateHeater, this);
         }
     }
 }

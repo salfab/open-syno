@@ -6,6 +6,7 @@ namespace OpenSyno.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Runtime.Serialization;
     using System.Threading.Tasks;
@@ -28,6 +29,8 @@ namespace OpenSyno.ViewModels
         private readonly IPageSwitchingService _pageSwitchingService;
         private readonly IUrlParameterToObjectsPlateHeater _urlParameterToObjectsPlateHeater;
         private readonly IAlbumViewModelFactory _albumViewModelFactory;
+
+        private ITrackViewModelFactory _trackViewModelFactory;
 
         private const string IsSelectedPropertyName = "IsSelected";
 
@@ -59,7 +62,7 @@ namespace OpenSyno.ViewModels
             }
         }
 
-        public TrackViewModel(Guid guid, SynoTrack synoTrack, IPageSwitchingService pageSwitchingService, IAlbumViewModelFactory albumViewModelFactory, IAudioStationSession session, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater)
+        public TrackViewModel(Guid guid, SynoTrack synoTrack, IPageSwitchingService pageSwitchingService, IAlbumViewModelFactory albumViewModelFactory, IAudioStationSession session, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater, ITrackViewModelFactory trackViewModelFactory)
         {
             if (synoTrack == null)
             {
@@ -70,6 +73,8 @@ namespace OpenSyno.ViewModels
             {
                 throw new ArgumentNullException("session");
             }
+            _trackViewModelFactory = trackViewModelFactory;
+
             if (albumViewModelFactory == null) throw new ArgumentNullException("albumViewModelFactory");
 
             Guid = guid;
@@ -123,10 +128,14 @@ namespace OpenSyno.ViewModels
                                                               {
                                                                   IAlbumViewModel viewModel = this._albumViewModelFactory.Create(item);                                                                  
                                                                   albumViewModels.Add(viewModel);
+
+                                                                  // populate the tracks for each album.
+                                                                  Task<IEnumerable<SynoTrack>> getTracksForAlbumTask = _session.GetTracksForAlbumAsync(item);
+                                                                  getTracksForAlbumTask.ContinueWith(tracks => albumViewModels.Single(o => o.Album == tracks.AsyncState).Tracks = new ObservableCollection<ITrackViewModel>(getTracksForAlbumTask.Result.Select(track => this._trackViewModelFactory.Create(Guid.NewGuid(), track, _pageSwitchingService))));
                                                               }
 
                                                               // the album shown by default.
-                                                              IAlbumViewModel defaultAlbumViewModel = albumViewModels.Single(o=>o.Album == album);
+                                                              IAlbumViewModel defaultAlbumViewModel = albumViewModels.Single(o => o.Album == album);
 
                                                               this._urlParameterToObjectsPlateHeater.RegisterObject(album.ItemID, defaultAlbumViewModel);
 
