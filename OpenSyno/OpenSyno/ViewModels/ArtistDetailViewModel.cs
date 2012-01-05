@@ -96,7 +96,7 @@ namespace OpenSyno.ViewModels
                 IAlbumViewModel albumViewModel = _albumViewModelFactory.Create(album);
 
                 // prepare an empty track list
-                albumViewModel.Tracks = new ObservableCollection<ITrackViewModel>();
+                albumViewModel.Tracks.Clear();
                 
                 // album is busy because its tracks are getting loaded.
                 albumViewModel.IsBusy = true;

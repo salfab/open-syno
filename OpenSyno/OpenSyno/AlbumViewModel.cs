@@ -18,6 +18,7 @@ namespace OpenSyno
         public AlbumViewModel(SynoItem album)
         {
             this.Album = album;
+            this.Tracks = new ObservableCollection<ITrackViewModel>();
             SelectedCommand = new DelegateCommand(OnSelected);
             SelectAllOrNoneCommand = new DelegateCommand(OnSelectAllOrNone);
         }

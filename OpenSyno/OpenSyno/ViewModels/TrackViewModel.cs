@@ -131,7 +131,15 @@ namespace OpenSyno.ViewModels
 
                                                                   // populate the tracks for each album.
                                                                   Task<IEnumerable<SynoTrack>> getTracksForAlbumTask = _session.GetTracksForAlbumAsync(item);
-                                                                  getTracksForAlbumTask.ContinueWith(tracks => albumViewModels.Single(o => o.Album == tracks.AsyncState).Tracks = new ObservableCollection<ITrackViewModel>(getTracksForAlbumTask.Result.Select(track => this._trackViewModelFactory.Create(Guid.NewGuid(), track, _pageSwitchingService))));
+                                                                  getTracksForAlbumTask.ContinueWith(tracks =>
+                                                                      {
+                                                                          var albumViewModel = albumViewModels.Single(o => o.Album == tracks.AsyncState);
+                                                                          albumViewModel.Tracks.Clear();
+                                                                          foreach (var synoTrack in getTracksForAlbumTask.Result)
+                                                                          {
+                                                                              albumViewModel.Tracks.Add(this._trackViewModelFactory.Create(Guid.NewGuid(), synoTrack, _pageSwitchingService));
+                                                                          }
+                                                                      });
                                                               }
 
                                                               // the album shown by default.
