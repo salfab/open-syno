@@ -5,7 +5,7 @@
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" xmlns:Tilt="clr-namespace:Microsoft.Unsupported" FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
@@ -27,10 +27,10 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <ListBox ItemsSource="{Binding SearchResults}">
+            <ListBox ItemsSource="{Binding SearchResults}" HorizontalContentAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid Tilt:TiltEffect.IsTiltEnabled="True">
                             <Grid.RowDefinitions>
                                 <RowDefinition />
                                 <RowDefinition />
@@ -39,16 +39,21 @@
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding TrackInfo.Title}" />
-                                    <TextBlock Foreground="{StaticResource PhoneSubtleBrush}" Grid.Row="1" Text="{Binding TrackInfo.Artist}" />
+                            <CheckBox HorizontalAlignment="Stretch" IsChecked="{Binding IsSelected, Mode=TwoWay}">
+                                <StackPanel>                                
+                                    <TextBlock HorizontalAlignment="Stretch" Text="{Binding TrackInfo.Title}" />
+                                    <TextBlock HorizontalAlignment="Stretch" Foreground="{StaticResource PhoneSubtleBrush}" Text="{Binding TrackInfo.Artist}" />
                                 </StackPanel>
                             </CheckBox>
-                            <Button Grid.Column="1" Content="&gt;" Command="{Binding NavigateToContainingAlbumCommand}" />
+                            <Button Grid.Column="1" Content="&gt;" Command="{Binding NavigateToContainingAlbumCommand}" Style="{StaticResource StillButton}" Margin="-12" BorderThickness="0" />                            
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
             </ListBox>
         </Grid>
     </Grid>

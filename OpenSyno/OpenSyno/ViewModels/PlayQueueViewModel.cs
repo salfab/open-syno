@@ -71,8 +71,18 @@
             {
                 throw new ArgumentNullException("openSynoSettings");
             }
-            if (trackViewModelFactory == null) throw new ArgumentNullException("trackViewModelFactory");
-            if (pageSwitchingService == null) throw new ArgumentNullException("pageSwitchingService");
+
+            if (trackViewModelFactory == null)
+            {
+                throw new ArgumentNullException("trackViewModelFactory");
+            }
+
+            if (pageSwitchingService == null)
+            {
+                throw new ArgumentNullException("pageSwitchingService");
+            }
+
+            _trackViewModelFactory = trackViewModelFactory;
 
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
@@ -105,7 +115,6 @@
             this._notificationService = notificationService;
             _openSynoSettings = openSynoSettings;
             _logService = logService;
-            _trackViewModelFactory = trackViewModelFactory;
             _pageSwitchingService = pageSwitchingService;
             _playbackService.TrackStarted += (o, e) =>
                                                  {
