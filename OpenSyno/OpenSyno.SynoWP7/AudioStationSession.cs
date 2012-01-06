@@ -226,6 +226,8 @@ namespace Synology.AudioStationApi
                         long count;
                         IEnumerable<SynoTrack> tracks;
                         SynologyJsonDeserializationHelper.ParseSynologyTracks(content, out tracks, out count, urlBase);
+                        
+                        tracks = tracks.OrderBy(o => o.Track);
 
                         var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
                         if (isOnUiThread)
