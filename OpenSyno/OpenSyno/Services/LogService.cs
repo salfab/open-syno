@@ -1,4 +1,4 @@
-﻿namespace OpenSyno.Helpers
+﻿namespace OpenSyno.Services
 {
     using System;
     using System.Collections.Generic;
@@ -10,6 +10,7 @@
         private IsolatedStorageFileStream _logFile;
         private StreamWriter _writer;
         private Dictionary<string,bool> _conditionalTracingActivations = new Dictionary<string, bool>();
+        private long _positionAtLaunch;
 
         public IsolatedStorageLogService()
         {
@@ -19,6 +20,7 @@
             {
                 _logFile = userStore.OpenFile("logfile.log", FileMode.Append, FileAccess.Write, FileShare.Read );                
             }
+            _positionAtLaunch = _logFile.Position;
             _writer = new StreamWriter(_logFile);
             _writer.AutoFlush = true;
         }
@@ -75,7 +77,12 @@
             }
         }
 
-        public string GetLogFile()
+        public string GetLogFileSinceAppStart()
+        {
+            return GetLogFileFromPosition(_positionAtLaunch);
+        }
+
+        private string GetLogFileFromPosition(long startPosition)
         {
             string log = string.Empty;
             if (IsEnabled)
@@ -88,11 +95,17 @@
                     using (var logFile = userStore.OpenFile("logfile.log", FileMode.Open, FileAccess.Read))
                     {
                         var reader = new StreamReader(logFile);
+                        reader.BaseStream.Position = startPosition;
                         log = reader.ReadToEnd();
                     }
                 }
             }
-            return log;            
+            return log; 
+        }
+
+        public string GetLogFile()
+        {
+            return GetLogFileFromPosition(0);                       
         }
 
         public void ClearLog()
@@ -119,5 +132,6 @@
         void ActivateConditionalTracing(string key);
         void DeactivateConditionalTracing(string key);
         void ConditionalTrace(string message, string conditionKey);
+        string GetLogFileSinceAppStart();
     }
 }

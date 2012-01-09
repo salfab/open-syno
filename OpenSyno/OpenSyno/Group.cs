@@ -3,24 +3,29 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Windows.Input;
+
+    using Microsoft.Practices.Prism.Commands;
+
+    using OpemSyno.Contracts;
 
     using OpenSyno.ViewModels;
 
     public class Group<T> : IEnumerable<T>
     {
-        public Group(string name, IEnumerable<T> items)
+        public Group(object headerContent, IEnumerable<T> items)
         {
-            this.Title = name;
+            this.HeaderContent = headerContent;
             this.Items = new List<T>(items);
         }
 
         public override bool Equals(object obj)
         {
             Group<T> that = obj as Group<T>;
-            return (that != null) && (Title.Equals(that.Title));
+            return (that != null) && (HeaderContent.Equals(that.HeaderContent));
         }
 
-        public string Title { get; set; }
+        public object HeaderContent { get; set; }
         public IList<T> Items { get; set; }
 
         #region IEnumerable<T> Members
@@ -48,5 +53,23 @@
                 Items.Add(artist);
             }
         }
+    }
+
+    public class AlbumGroupViewModel<T> : Group<T> where T : ITrackViewModel
+    {
+        public AlbumGroupViewModel(object headerContent, IEnumerable<T> items) 
+            : base(headerContent, items)
+        {
+            SelectAllAlbumTracksCommand = new DelegateCommand(() =>
+                {
+                    bool newSelectedValue = !this.Items.First().IsSelected;
+                    foreach (T item in this.Items)
+                    {
+                        item.IsSelected = newSelectedValue;
+                    }
+                });
+        }
+
+        public ICommand SelectAllAlbumTracksCommand { get; set; }
     }
 }

@@ -1,7 +1,8 @@
 ﻿namespace OpenSyno
 {
-    using System;
     using System.Windows;
+
+    using OpemSyno.Contracts;
 
     public class NotificationService : INotificationService
     {
@@ -12,7 +13,15 @@
 
         public void Error(string message, string messageTitle)
         {
-            MessageBox.Show(message, messageTitle, MessageBoxButton.OK);
+            var checkAccess = Deployment.Current.Dispatcher.CheckAccess();
+            if (!checkAccess)
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(message, messageTitle, MessageBoxButton.OK));
+            }
+            else
+            {
+                MessageBox.Show(message, messageTitle, MessageBoxButton.OK);
+            }
         }
 
         public MessageBoxResult WarningQuery(string warningMessage, string warningTitle, MessageBoxButton userResponseOptions)

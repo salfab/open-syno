@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using OpenSyno.SynoWP7;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Synology.AudioStationApi
 {
     using System.Runtime.Serialization;
-    using System.Windows.Threading;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
+    using System.Windows;
+
+    using OpenSyno.SynoWP7;
 
     [DataContract]
     public class AudioStationSession : IAudioStationSession
@@ -23,6 +25,336 @@ namespace Synology.AudioStationApi
 
         [DataMember]
         public string Token { get; set; }
+
+        public Task<IEnumerable<SynoItem>> SearchArtistAsync(string artistName)
+        {
+
+            TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
+
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+
+            HttpWebRequest request = BuildRequest(url);
+
+            int limit = 100;
+            string postString = string.Format(@"sort=title&dir=ASC&action=browse&target=musiclib_music_aa&server=musiclib_music_aa&category=&keyword={0}&start=0&limit={1}", artistName, limit);
+                       
+            byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+            var requestStreamAr = request.BeginGetRequestStream(ar =>
+            {
+                // Just make sure we retrieve the right web request : no access to modified closure.
+                HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
+
+                var requestStream = webRequest.EndGetRequestStream(ar);
+                requestStream.Write(postBytes, 0, postBytes.Length);
+                requestStream.Close();
+
+                var getResponseAr = webRequest.BeginGetResponse(
+                    responseAr =>
+                    {
+                        // Just make sure we retrieve the right web request : no access to modified closure.                        
+                        var httpWebRequest = responseAr.AsyncState;
+
+                        var webResponse = webRequest.EndGetResponse(responseAr);
+                        var responseStream = webResponse.GetResponseStream();
+                        var reader = new StreamReader(responseStream);
+                        var content = reader.ReadToEnd();
+
+                        long count;
+                        IEnumerable<SynoItem> tracks;
+                        SynologyJsonDeserializationHelper.ParseSynologyAlbums(
+                            content, out tracks, out count, urlBase);
+
+                        var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                        if (isOnUiThread)
+                        {
+                            if (count > limit)
+                            {
+                                // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                            }
+
+                            tcs.SetResult(tracks);
+
+                            // callback(tracks);
+                        }
+                        else
+                        {
+                            Deployment.Current.Dispatcher.BeginInvoke(
+                                () =>
+                                {
+                                    if (count > limit)
+                                    {
+                                        // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    }
+                                    tcs.SetResult(tracks);
+                                });
+                        }
+                    },
+                    webRequest);
+
+
+
+
+            }, request);
+
+
+
+            //var getRequestStreamTask = Task.Factory.FromAsync(
+            //    requestStreamAr,
+            //    ar =>
+            //        ,
+            //    TaskCreationOptions.None,
+            //    TaskScheduler.FromCurrentSynchronizationContext());
+
+            return tcs.Task;
+        }
+
+        public Task<IEnumerable<SynoItem>> GetAlbumsForArtistAsync(SynoItem artist)
+        {
+            var tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
+
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+
+            HttpWebRequest request = BuildRequest(url);
+
+            int limit = 100;
+            string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(artist.ItemID), limit);
+
+            byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+            var requestStreamAr = request.BeginGetRequestStream(ar =>
+            {
+                // Just make sure we retrieve the right web request : no access to modified closure.
+                HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
+
+                var requestStream = webRequest.EndGetRequestStream(ar);
+                requestStream.Write(postBytes, 0, postBytes.Length);
+                requestStream.Close();
+
+                var getResponseAr = webRequest.BeginGetResponse(
+                    responseAr =>
+                    {
+                        // Just make sure we retrieve the right web request : no access to modified closure.                        
+                        var httpWebRequest = responseAr.AsyncState;
+
+                        var webResponse = webRequest.EndGetResponse(responseAr);
+                        var responseStream = webResponse.GetResponseStream();
+                        var reader = new StreamReader(responseStream);
+                        var content = reader.ReadToEnd();
+
+                        long count;
+                        IEnumerable<SynoItem> albums;
+                        SynologyJsonDeserializationHelper.ParseSynologyAlbums(content, out albums, out count, urlBase);
+
+                        var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                        if (isOnUiThread)
+                        {
+                            if (count > limit)
+                            {
+                                // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                            }
+
+                            tcs.SetResult(albums);
+
+                            // callback(tracks);
+                        }
+                        else
+                        {
+                            Deployment.Current.Dispatcher.BeginInvoke(
+                                () =>
+                                {
+                                    if (count > limit)
+                                    {
+                                        // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    }
+                                    tcs.SetResult(albums);
+                                });
+                        }
+                    },
+                    webRequest);
+            }, request);
+
+
+
+            //var getRequestStreamTask = Task.Factory.FromAsync(
+            //    requestStreamAr,
+            //    ar =>
+            //        ,
+            //    TaskCreationOptions.None,
+            //    TaskScheduler.FromCurrentSynchronizationContext());
+
+            return tcs.Task;
+        }
+
+        public Task<IEnumerable<SynoTrack>> GetTracksForAlbumAsync(SynoItem album)
+        {
+            var tcs = new TaskCompletionSource<IEnumerable<SynoTrack>>(album);
+
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+
+            HttpWebRequest request = BuildRequest(url);
+
+            int limit = 100;
+            string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(album.ItemID), limit);
+
+
+            byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+            var requestStreamAr = request.BeginGetRequestStream(ar =>
+            {
+                // Just make sure we retrieve the right web request : no access to modified closure.
+                HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
+
+                var requestStream = webRequest.EndGetRequestStream(ar);
+                requestStream.Write(postBytes, 0, postBytes.Length);
+                requestStream.Close();
+
+                var getResponseAr = webRequest.BeginGetResponse(
+                    responseAr =>
+                    {
+                        // Just make sure we retrieve the right web request : no access to modified closure.                        
+                        var httpWebRequest = responseAr.AsyncState;
+
+                        var webResponse = webRequest.EndGetResponse(responseAr);
+                        var responseStream = webResponse.GetResponseStream();
+                        var reader = new StreamReader(responseStream);
+                        var content = reader.ReadToEnd();
+
+                        long count;
+                        IEnumerable<SynoTrack> tracks;
+                        SynologyJsonDeserializationHelper.ParseSynologyTracks(content, out tracks, out count, urlBase);
+                        
+                        tracks = tracks.OrderBy(o => o.Track);
+
+                        var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                        if (isOnUiThread)
+                        {
+                            if (count > limit)
+                            {
+                                // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                            }
+
+                            tcs.SetResult(tracks);
+
+                            // callback(tracks);
+                        }
+                        else
+                        {
+                            Deployment.Current.Dispatcher.BeginInvoke(
+                                () =>
+                                {
+                                    if (count > limit)
+                                    {
+                                        // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    }
+                                    tcs.SetResult(tracks);
+                                });
+                        }
+                    },
+                    webRequest);
+
+
+
+
+            }, request);
+
+
+
+            //var getRequestStreamTask = Task.Factory.FromAsync(
+            //    requestStreamAr,
+            //    ar =>
+            //        ,
+            //    TaskCreationOptions.None,
+            //    TaskScheduler.FromCurrentSynchronizationContext());
+
+            return tcs.Task;
+        }
+
+        public Task<IEnumerable<SynoItem>> SearchAlbums(string album)
+        {      
+      
+            TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
+            
+            string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
+            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+
+            HttpWebRequest request = BuildRequest(url);
+
+            int limit = 100;
+            string postString = string.Format(@"action=search&target=musiclib_music_aa&server=musiclib_root&keyword={0}&start=0&limit={1}", album, limit);
+            byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
+
+            var requestStreamAr = request.BeginGetRequestStream(ar =>
+            {
+                        // Just make sure we retrieve the right web request : no access to modified closure.
+                        HttpWebRequest webRequest = (HttpWebRequest)ar.AsyncState;
+
+                        var requestStream = webRequest.EndGetRequestStream(ar);
+                        requestStream.Write(postBytes, 0, postBytes.Length);
+                        requestStream.Close();
+
+                        var getResponseAr = webRequest.BeginGetResponse(
+                            responseAr =>
+                                {
+                                   // Just make sure we retrieve the right web request : no access to modified closure.                        
+                                    var httpWebRequest = responseAr.AsyncState;
+
+                                    var webResponse = webRequest.EndGetResponse(responseAr);
+                                    var responseStream = webResponse.GetResponseStream();
+                                    var reader = new StreamReader(responseStream);
+                                    var content = reader.ReadToEnd();
+
+                                    long count;
+                                    IEnumerable<SynoItem> tracks;
+                                    SynologyJsonDeserializationHelper.ParseSynologyAlbums(
+                                        content, out tracks, out count, urlBase);
+
+                                    var isOnUiThread = Deployment.Current.Dispatcher.CheckAccess();
+                                    if (isOnUiThread)
+                                    {
+                                        if (count > limit)
+                                        {
+                                            // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                        }
+
+                                        tcs.SetResult(tracks);
+
+                                        // callback(tracks);
+                                    }
+                                    else
+                                    {
+                                        Deployment.Current.Dispatcher.BeginInvoke(
+                                            () =>
+                                                {
+                                                    if (count > limit)
+                                                    {
+                                                        // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                                    }
+                                                    tcs.SetResult(tracks);
+                                                });
+                                    }
+                            }, 
+                            webRequest);
+
+                      
+
+
+            }, request);
+
+
+
+            //var getRequestStreamTask = Task.Factory.FromAsync(
+            //    requestStreamAr,
+            //    ar =>
+            //        ,
+            //    TaskCreationOptions.None,
+            //    TaskScheduler.FromCurrentSynchronizationContext());
+
+            return tcs.Task;
+        }
 
         /// <summary>
         /// Gets the remote file network stream.
@@ -45,7 +377,7 @@ namespace Synology.AudioStationApi
             var client = new WebClient();
 
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
-            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", this.Host, this.Port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20"));
+            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", this.Host, this.Port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20").Replace("&", "%26"));
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.CookieContainer = new CookieContainer();
@@ -100,8 +432,6 @@ namespace Synology.AudioStationApi
                     Scheme = useSsl ? "https" : "http"
                 }.Uri;
 
-            // uri = new Uri("https://ds509.hamilcar.ch:5001/webman/index.cgi");
-            // uri = new Uri("http://www.google.com/accounts/ServiceLogin?service=mail&passive=true&rm=false&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F%3Fui%3Dhtml%26zy%3Dl&bsv=llya694le36z&ss=1&scc=1&ltmpl=default&ltmplcache=2&from=login");
             client.DownloadStringCompleted += (sender, e) =>
                                                   {
                                                       if (e.Error != null)
@@ -111,25 +441,35 @@ namespace Synology.AudioStationApi
                                                               throw new SynoNetworkException("Open Syno could not connect to the server. Please make sure your server's SSL certificate has been issued by a trusted Certificate Authority. see http://bit.ly/qODji5  for further detail.", e.Error);
                                                           }
 
-                                                          throw new SynoNetworkException("Open Syno could not complete the operation. Please check that your phone is not in flight mode.", e.Error);
+                                                          throw new SynoNetworkException("Open Syno could not complete the operation. Please check that your phone is not in flight mode and that you are getting a proper signal.", e.Error);
                                                       }
                                                       else
                                                       {
                                                           string rawCookie = ((WebClient)sender).ResponseHeaders["Set-Cookie"];
                                                           if (rawCookie == null)
                                                           {
-                                                              throw new SynoLoginException("The login and the password don't match, please check your credentials", null);
+                                                              if (JObject.Parse(e.Result)["success"].Value<bool>() != true)
+                                                              {
+                                                                  throw new SynoLoginException("The login and the password don't match, please check your credentials", null);                                                                  
+                                                              }
                                                           }
-
-                                                          string cookie = rawCookie.Split(';').Where(s => s.StartsWith("id=")).Single();
-                                                          this.Token = cookie;
-                                                          callback(cookie);
+                                                          else
+                                                          {
+                                                              string cookie = rawCookie.Split(';').Where(s => s.StartsWith("id=")).Single();
+                                                              this.Token = cookie;
+                                                              
+                                                              // Delete ascii urls patches
+                                                              
+                                                          }                                                          
+                                                          
+                                                          callback(this.Token);
                                                       }
 
                                                   };
 
             client.DownloadStringAsync(uri);
         }
+
 
         public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError)
         {
@@ -172,7 +512,7 @@ namespace Synology.AudioStationApi
                         {
                             if (count > limit)
                             {
-                                MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                             }
                             callback(tracks);
                         }
@@ -182,7 +522,7 @@ namespace Synology.AudioStationApi
                             {
                                 if (count > limit)
                                 {
-                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                 }
                                 callback(tracks);
                             });
@@ -223,17 +563,17 @@ namespace Synology.AudioStationApi
                             {
                                 throw new SynoSearchException("Error connecting to search engine", null);
                                 // FIXME : Use an error handling service
-                                var action = new Action(() =>MessageBox.Show("Error connecting to search engine", "Connection error",MessageBoxButton.OK));   
+                                //var action = new Action(() =>MessageBox.Show("Error connecting to search engine", "Connection error",MessageBoxButton.OK));   
 
-                                if (Deployment.Current.CheckAccess())
-                                {
-                                    action();
-                                }
-                                else
-                                {
-                                    Deployment.Current.Dispatcher.BeginInvoke(action);
-                                }
-                                return;
+                                //if (Deployment.Current.CheckAccess())
+                                //{
+                                //    action();
+                                //}
+                                //else
+                                //{
+                                //    Deployment.Current.Dispatcher.BeginInvoke(action);
+                                //}
+                                //return;
                             }
                             var webResponse = webRequest.EndGetResponse(responseAr);
                             var responseStream = webResponse.GetResponseStream();
@@ -252,7 +592,7 @@ namespace Synology.AudioStationApi
                                 if (count > limit)
                                 {
                                     // FIXME : Use an error handling service
-                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                 }
                                 callback(artists);
                             }
@@ -263,7 +603,7 @@ namespace Synology.AudioStationApi
                                         if (count > limit)
                                         {
                                             // FIXME : Use an error handling service
-                                            MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                            // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                         }
                                         callback(artists);
                                     });
@@ -349,8 +689,6 @@ namespace Synology.AudioStationApi
             string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(artist.ItemID), limit);
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 
-
-
             request.BeginGetRequestStream(ar =>
             {
                 // Just make sure we retrieve the right web request : no access to modified closure.
@@ -382,7 +720,8 @@ namespace Synology.AudioStationApi
                         {
                             if (count > limit)
                             {
-                                MessageBox.Show(string.Format("number of available albums ({0}) exceeds supported limit ({1})", count, limit));
+                                // FIXME : Use an error handling service
+                                // MessageBox.Show(string.Format("number of available albums ({0}) exceeds supported limit ({1})", count, limit));
                             }
                             callback(albums, count, artist);
                         }
@@ -392,7 +731,8 @@ namespace Synology.AudioStationApi
                             {
                                 if (count > limit)
                                 {
-                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
+                                    // FIXME : Use an error handling service
+                                    // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                 }
                                 callback(albums, count, artist);
                             });
@@ -440,9 +780,16 @@ namespace Synology.AudioStationApi
                     responseAr =>
                     {
                         // Just make sure we retrieve the right web request : no access to modified closure.                        
-                        var httpWebRequest = responseAr.AsyncState;
-
-                        var webResponse = webRequest.EndGetResponse(responseAr);
+                        var httpWebRequest = responseAr.AsyncState;                            
+                        WebResponse webResponse;
+                        try
+                        {
+                            webResponse = webRequest.EndGetResponse(responseAr);
+                        }
+                        catch (WebException exception)
+                        {
+                            throw new SynoNetworkException("The remote server did not respond to our request. Please, check that the sinal is strong enough and try again.", exception);                            
+                        }
                         var responseStream = webResponse.GetResponseStream();
                         var reader = new StreamReader(responseStream);
                         var content = reader.ReadToEnd();
@@ -458,7 +805,8 @@ namespace Synology.AudioStationApi
                         {
                             if (total > limit)
                             {
-                                MessageBox.Show(string.Format("number of available albums ({0}) exceeds supported limit ({1})", total, limit));
+                                // FIXME : Use an error handling service
+                                // MessageBox.Show(string.Format("number of available albums ({0}) exceeds supported limit ({1})", total, limit));
                             }
                             callback(tracks, total, album);
                         }
@@ -468,7 +816,8 @@ namespace Synology.AudioStationApi
                             {
                                 if (total > limit)
                                 {
-                                    MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", total, limit));
+                                    // FIXME : Use an error handling service
+                                    // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", total, limit));
                                 }
                                 callback(tracks, total, album);
                             });

@@ -6,8 +6,13 @@ using OpenSyno.Services;
 namespace OpenSyno
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
 
     using Microsoft.Phone.Controls;
+
+    using OpemSyno.Contracts;
+    using OpemSyno.Contracts.Domain;
 
     using OpenSyno.ViewModels;
 
@@ -58,6 +63,7 @@ namespace OpenSyno
             if (DataContext == null)
             {
                 var artistTicket = NavigationContext.QueryString["artistTicket"];
+                var artistAlbumsTicket = NavigationContext.QueryString["albumsListTicket"];                
 
                 if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewCurrentArtist))
                 {
@@ -68,36 +74,39 @@ namespace OpenSyno
                     _artist = (SynoItem)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(artistTicket);                    
                 }
 
+                IEnumerable<SynoItem> artistItems = null;
+                IEnumerable<IAlbumViewModel> albumViewModels;
+                if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewItems))
+                {
+                    throw new NotImplementedException("deal with the viewmodels not with the synoitems anymore here");
+                    artistItems = (IEnumerable<SynoItem>)this.State[ArtistPanoramaViewItems];
+                    //artistPanoramaViewModel.BuildArtistItems(_artistItems);
+                }
+                else
+                {
+                    //artistPanoramaViewModel.QueryAndBuildArtistItems();
+                    albumViewModels = (IEnumerable<IAlbumViewModel>)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(artistAlbumsTicket);
+                }
+                var albumTicket = NavigationContext.QueryString["albumTicket"];
+
                 int artistPanoramaViewActivePanelIndex = 0;
+
                 if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewCurrentArtist))
                 {
                     artistPanoramaViewActivePanelIndex = (int)this.State[ArtistPanoramaViewActivePanelIndex];
                 }
-
-                ArtistPanoramaViewModel artistPanoramaViewModel = IoC.Container.Get<ArtistPanoramaViewModelFactory>().Create(this._artist);
-
-                if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewItems))
-                {
-                    _artistItems = (IEnumerable<SynoItem>)this.State[ArtistPanoramaViewItems];
-                    artistPanoramaViewModel.BuildArtistItems(_artistItems);
-                }
                 else
                 {
-                    artistPanoramaViewActivePanelIndex = 0;
-                    // FIXME : make it look more like a humble object.
-                    // FIXME big time : what the heck is it doing in the view ? is there no other way to handle the tombstoning  ???
-                    var searchService = IoC.Container.Get<ISearchService>();
-                    searchService.GetAlbumsForArtist(_artist, (a, b, c) =>
-                        {
-                            _artistItems = a;
-                            artistPanoramaViewModel.BuildArtistItems(a);
-                        });
-                }
-                DataContext = artistPanoramaViewModel;
-                artistPanoramaViewModel.CurrentArtistItemIndex = artistPanoramaViewActivePanelIndex;
-                this.InvalidateArrange();
-                this.InvalidateMeasure();
+                    var album = (IAlbumViewModel)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(albumTicket);
+                    artistPanoramaViewActivePanelIndex = albumViewModels.ToList().IndexOf(album);
 
+
+
+
+                }
+                ArtistPanoramaViewModel artistPanoramaViewModel = IoC.Container.Get<ArtistPanoramaViewModelFactory>().Create(this._artist, albumViewModels,artistPanoramaViewActivePanelIndex);
+                
+                DataContext = artistPanoramaViewModel;
             }
         }
 
@@ -110,17 +119,14 @@ namespace OpenSyno
         private void PlayLast(object sender, EventArgs e)
         {
             var viewModel = (ArtistPanoramaViewModel)DataContext;
-            ArtistPanoramaItemViewModel artistPanoramaItemViewModel = viewModel.ArtistItems[viewModel.CurrentArtistItemIndex];
-            if (artistPanoramaItemViewModel.PanoramaItemKind ==  ArtistPanoramaItemKind.AlbumDetail)
-            {
-                ((ArtistPanoramaAlbumDetailItem)artistPanoramaItemViewModel).PlayListOperationCommand.Execute(null);                
-            }
-            else
-            {
-                // This should not even be available
-                // FIXME : Remove this : the button should be grayed-out !
-                MessageBox.Show("Play command not available in this context. sorry, we'll hide it for the final version ;)", "Known \"bug\"", MessageBoxButton.OK);
-            }
+            viewModel.PlayLastCommand.Execute(null);
+
+        }
+
+        private void Play(object sender, EventArgs e)
+        {
+            var viewModel = (ArtistPanoramaViewModel)DataContext;
+            viewModel.PlayCommand.Execute(null);
         }
     }
 }

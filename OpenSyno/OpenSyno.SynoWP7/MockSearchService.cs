@@ -7,10 +7,6 @@
 
     public class MockSearchService : ISearchService
     {
-        public MockSearchService()
-        {
-            
-        }
         public bool SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>, string> callback)
         {
             var items = new List<SynoTrack>();
@@ -181,7 +177,7 @@
 
         public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback)
         {
-            var tracks = new List<SynoTrack>();
+            List<SynoTrack> tracks = new List<SynoTrack>();
             tracks.Add(new SynoTrack { Album = "Alice", Artist = "Tom Waits", Title = "Alice" });
             tracks.Add(new SynoTrack { Album = "Alice", Artist = "Tom Waits", Title = "Flower's grave" });
             tracks.Add(new SynoTrack { Album = "Alice", Artist = "Tom Waits", Title = "Kommeniedzuspedt" });

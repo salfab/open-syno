@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Runtime.Serialization;
+    using System.Threading.Tasks;
 
     public interface IAudioStationSession
     {
@@ -31,6 +32,12 @@
         int Port { get; set; }
 
         [DataMember]
-        string Token { get; set; }
+        string Token { get; }
+
+        Task<IEnumerable<SynoItem>> SearchAlbums(string album);
+        Task<IEnumerable<SynoItem>> SearchArtistAsync(string artistName);
+        Task<IEnumerable<SynoItem>> GetAlbumsForArtistAsync(SynoItem artist);
+
+        Task<IEnumerable<SynoTrack>> GetTracksForAlbumAsync(SynoItem album);
     }
 }

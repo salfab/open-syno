@@ -1,4 +1,5 @@
 ﻿using Ninject;
+using OpemSyno.Contracts;
 
 namespace OpenSyno
 {
@@ -64,8 +65,8 @@ namespace OpenSyno
         /// <param name="e">An object that contains the event data.</param>
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            var viewModelBase  = IoC.Container.Get<PlayQueueViewModel>();
-            DataContext = viewModelBase;
+            var viewModel  = IoC.Container.Get<PlayQueueViewModel>();
+            DataContext = viewModel;
 
             // Note : PlayQUeueViewModel is not serializable because there are dependencies injected in the constructor,
             // therefore those dependencies are not injected when the state object is being re-hydrated.
@@ -77,48 +78,50 @@ namespace OpenSyno
             {
                 if (this.State.ContainsKey(CurrentArtworkKey))
                 {
-                    viewModelBase.CurrentArtwork = (Uri)this.State[CurrentArtworkKey];
+                    viewModel.CurrentArtwork = (Uri)this.State[CurrentArtworkKey];
                 }
 
                 if (this.State.ContainsKey(VolumeKey))
                 {
-                    viewModelBase.Volume = (double)this.State[VolumeKey];
+                    viewModel.Volume = (double)this.State[VolumeKey];
                 }
 
                 if (this.State.ContainsKey(ActiveTrackKey))
                 {
-                    viewModelBase.ActiveTrack = (TrackViewModel)this.State[ActiveTrackKey];
+                    viewModel.ActiveTrack = (TrackViewModel)this.State[ActiveTrackKey];
                 }
 
                 if (this.State.ContainsKey(BufferedBytesCountKey))
                 {
-                    viewModelBase.BufferedBytesCount = (long)this.State[BufferedBytesCountKey];
+                    viewModel.BufferedBytesCount = (long)this.State[BufferedBytesCountKey];
                 }
 
                 if (this.State.ContainsKey(CurrentFileSizeKey))
                 {
-                    viewModelBase.CurrentFileSize = (long)this.State[CurrentFileSizeKey];
+                    viewModel.CurrentFileSize = (long)this.State[CurrentFileSizeKey];
                 }
 
                 if (this.State.ContainsKey(CurrentPlaybackPercentCompleteKey))
                 {
-                    viewModelBase.CurrentPlaybackPercentComplete = (double)this.State[CurrentPlaybackPercentCompleteKey];
+                    viewModel.CurrentPlaybackPercentComplete = (double)this.State[CurrentPlaybackPercentCompleteKey];
                 }
 
                 if (this.State.ContainsKey(CurrentTrackPositionKey))
                 {
-                    viewModelBase.CurrentTrackPosition = (TimeSpan)this.State[CurrentTrackPositionKey];
+                    viewModel.CurrentTrackPosition = (TimeSpan)this.State[CurrentTrackPositionKey];
                 }
 
                 if (this.State.ContainsKey(PlayQueueItemsKey))
                 {
-                    viewModelBase.PlayQueueItems = (ObservableCollection<TrackViewModel>)this.State[PlayQueueItemsKey];
+                    viewModel.PlayQueueItems = (ObservableCollection<ITrackViewModel>)this.State[PlayQueueItemsKey];
                 }
 
                 if (this.State.ContainsKey(SelectedTrackKey))
                 {
-                    viewModelBase.SelectedTrack = (TrackViewModel)this.State[SelectedTrackKey];
+                    viewModel.SelectedTrack = (TrackViewModel)this.State[SelectedTrackKey];
                 }
+
+                viewModel.WakeUpFromTombstone();
             }
                        
             base.OnNavigatedTo(e);

@@ -20,7 +20,7 @@
             <!--Pivot item one-->
             <controls:PivotItem Header="artists">
                 <!--ListHeaderTemplate="{StaticResource ArtistsListHeader}"-->
-                <Controls:LongListSelector IsFlatList="False" DisplayAllGroups="True" ItemsSource="{Binding Artists, Mode=TwoWay}" ItemTemplate="{StaticResource ArtistLongListSelectorItemTemplate}" GroupItemTemplate="{StaticResource SquareGroupTitleTemplate}" GroupHeaderTemplate="{StaticResource SquareGroupTitleTemplate}" ListHeader="{Binding}">                    
+                <Controls:LongListSelector IsFlatList="False" DisplayAllGroups="False" ItemsSource="{Binding Artists, Mode=TwoWay}" ItemTemplate="{StaticResource ArtistLongListSelectorItemTemplate}" GroupItemTemplate="{StaticResource SquareGroupTitleTemplate}" GroupHeaderTemplate="{StaticResource SquareGroupTitleTemplate}" ListHeader="{Binding}">                    
                     <Controls:LongListSelector.GroupItemsPanel>
                         <ItemsPanelTemplate>
                             <Controls:WrapPanel/>

@@ -8,9 +8,14 @@
     using System.Linq;
     using System.Windows.Input;
 
+    using Microsoft.Phone.BackgroundAudio;
     using Microsoft.Practices.Prism.Commands;
     using Microsoft.Practices.Prism.Events;
 
+    using OpemSyno.Contracts;
+
+    using OpenSyno.Common;
+    using OpenSyno.Contracts.Domain;
     using OpenSyno.Services;
 
     using Synology.AudioStationApi;
@@ -29,11 +34,11 @@
 
 
 
-        private TrackViewModel _activeTrack;
+        private ITrackViewModel _activeTrack;
 
         private Uri _currentArtwork;
 
-        private ObservableCollection<TrackViewModel> _playQueueItems;
+        private ObservableCollection<ITrackViewModel> _playQueueItems;
 
         #endregion
 
@@ -45,7 +50,7 @@
         /// <param name="eventAggregator">The event aggregator.</param>
         /// <param name="playbackService">The playback service.</param>
         /// <param name="openSynoSettings"></param>
-        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings)
+        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings, ILogService logService, ITrackViewModelFactory trackViewModelFactory, IPageSwitchingService pageSwitchingService)
         {
             if (eventAggregator == null)
             {
@@ -56,23 +61,67 @@
             {
                 throw new ArgumentNullException("playbackService");
             }
+
             if (notificationService == null)
             {
                 throw new ArgumentNullException("notificationService");
             }
+
             if (openSynoSettings == null)
             {
                 throw new ArgumentNullException("openSynoSettings");
             }
 
+            if (trackViewModelFactory == null)
+            {
+                throw new ArgumentNullException("trackViewModelFactory");
+            }
+
+            if (pageSwitchingService == null)
+            {
+                throw new ArgumentNullException("pageSwitchingService");
+            }
+
+            _trackViewModelFactory = trackViewModelFactory;
+
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
 
-            PlayQueueItems = new ObservableCollection<TrackViewModel>();
-            PlayQueueItems.CollectionChanged += OnPlayQueueEdited;
-            eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
+            Action consecutiveAlbumsIdPatcher = () =>
+            {
+                var previousAlbumGuid = Guid.Empty;
+                string previousAlbumId = null;
+                foreach (var trackViewModel in this.PlayQueueItems)
+                {
+                    if (previousAlbumId != trackViewModel.TrackInfo.ItemPid)
+                    {
+                        previousAlbumId = trackViewModel.TrackInfo.ItemPid;
+                        previousAlbumGuid = Guid.NewGuid();
+                    }
+                    trackViewModel.ConsecutiveAlbumIdentifier = previousAlbumGuid;
+                }
+            };
+
             _playbackService = playbackService;
+            this.PlayQueueItems = new ObservableCollection<ITrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
+            this.PlayQueueItems.CollectionChanged += (s, ea) =>
+                                                         {
+                                                             consecutiveAlbumsIdPatcher();
+                                                         };
+            consecutiveAlbumsIdPatcher();
+            _playbackService.PlayqueueChanged += this.OnPlayqueueChanged;            
+            
+            // FIXME : using aggregated event is not a great idea here : we'd rather use a service : that would be cleaner and easier to debug !
+            eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Subscribe(OnPlayListOperation, true);
             this._notificationService = notificationService;
             _openSynoSettings = openSynoSettings;
+            _logService = logService;
+            _pageSwitchingService = pageSwitchingService;
+            _playbackService.TrackStarted += (o, e) =>
+                                                 {
+                                                     CurrentArtwork = new Uri(e.Track.AlbumArtUrl, UriKind.Absolute);
+                                                     this.ActiveTrack = this._trackViewModelFactory.Create(e.Guid, e.Track, this._pageSwitchingService);
+                                                 };
+
             _playbackService.BufferingProgressUpdated += (o, e) =>
                 {
                     // throttle refresh through binding.
@@ -91,31 +140,57 @@
                     CurrentTrackPosition = e.Position;
                 };
 
-            PlayCommand = new DelegateCommand<TrackViewModel>(OnPlay, track => track != null);
+            PlayCommand = new DelegateCommand<TrackViewModel>(o => OnPlay(o), track => track != null);
             PlayNextCommand = new DelegateCommand(OnPlayNext);
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
-            PlayPreviousCommand = new DelegateCommand(OnPlayPrevious, () => false);
+            PlayPreviousCommand = new DelegateCommand(OnPlayPrevious);
             SavePlaylistCommand = new DelegateCommand(OnSavePlaylist);
+            SelectAllAlbumTracksCommand = new DelegateCommand<Guid>(OnSelectAllAlbumTracks);
         }
 
-        private void OnPlayQueueEdited(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnSelectAllAlbumTracks(Guid consecutiveAlbumId)
         {
-            if (e.OldItems != null)
+            var tracksFromAlbum = this.PlayQueueItems.Where(trackViewModel => trackViewModel.ConsecutiveAlbumIdentifier == consecutiveAlbumId);
+            bool currentValue = tracksFromAlbum.First().IsSelected;
+            foreach (var trackViewModel in tracksFromAlbum)
             {
-                foreach (TrackViewModel oldItem in e.OldItems)
+                trackViewModel.IsSelected = currentValue;
+            }
+        }
+
+        private void OnPlay(TrackViewModel trackViewModel)
+        {
+            if (trackViewModel == null)
+            {
+                // TODO : Should we replace this with a "Play first" ?
+                _notificationService.Error("Please, select a track before hitting the play button.", "No track is selected");
+                return;
+            }
+            OnPlay(trackViewModel.Guid);
+        }
+
+        private void OnPlayqueueChanged(object sender, PlayqueueChangedEventArgs e)
+        {
+            if (e.RemovedItems != null)
+            {
+                foreach (var oldItem in e.RemovedItems)
                 {
-                    this._playbackService.PlayqueueItems.Remove(oldItem.TrackInfo);
+                    var guid = oldItem.Guid;
+                    this.PlayQueueItems.Remove(this.PlayQueueItems.Single(o => o.Guid == guid));
                 }
             }
 
-            if (e.NewItems != null)
+            if (e.AddedItems != null)
             {
-                foreach (TrackViewModel newItem in e.NewItems)
+                foreach (GuidToTrackMapping newItem in e.AddedItems)
                 {
-                    this._playbackService.PlayqueueItems.Add(newItem.TrackInfo);
+                    this.PlayQueueItems.Add(this._trackViewModelFactory.Create(newItem.Guid, newItem.Track, this._pageSwitchingService));
                 }
             }
+
+            // Hack : we want to make sure the converter Will be re-evaluated, so the easiest way is to trigger a propery changed.
+            OnPropertyChanged(PlayQueueItemsPropertyName);
         }
 
         private void OnSavePlaylist()
@@ -126,14 +201,17 @@
 
         private void OnRemoveTracksFromQueue(IEnumerable<object> tracks)
         {
-            
-            for (int i = this.PlayQueueItems.Count - 1; i >= 0; i--)
-            {
-                if (this.PlayQueueItems[i].IsSelected)
-                {
-                    this.PlayQueueItems.RemoveAt(i);
-                }
-            }
+            // FIXME : It seems that the check list box in the PlayQueueView doesn't discard the checked items after clicking remove.
+
+            //for (int i = this.PlayQueueItems.Count - 1; i >= 0; i--)
+            //{
+            //    if (this.PlayQueueItems[i].IsSelected)
+            //    {
+            //        this.PlayQueueItems.RemoveAt(i);
+            //    }
+            //}
+            _playbackService.RemoveTracksFromQueue(this.PlayQueueItems.Where(o=>o.IsSelected).Select(o=>o.Guid));
+
         }
 
         private void OnResumePlayback()
@@ -148,8 +226,7 @@
 
         private void OnPlayPrevious()
         {
-            //TrackViewModel previousTrack = _playbackService.GetPreviousTrack();
-            //OnPlay(previousTrack);
+            _playbackService.SkipPrevious();
         }
 
         /// <summary>
@@ -159,26 +236,27 @@
         {
             SynoTrack nextSynoTrack;
 
-            // Don't crash if there is no active track : take the first one in the playlist.
-            // (shouldn't happen, though, unless no track has ever been added to the queue, in which case, the nextTrack will be null anyway...)
-            if (ActiveTrack == null)
-            {
-                nextSynoTrack = _playbackService.PlayqueueItems.FirstOrDefault();
-            }
-            else
-            {
-                nextSynoTrack = this._playbackService.GetNextTrack(this.ActiveTrack.TrackInfo);                
-            }
+            _playbackService.SkipNext();
+            //// Don't crash if there is no active track : take the first one in the playlist.
+            //// (shouldn't happen, though, unless no track has ever been added to the queue, in which case, the nextTrack will be null anyway...)
+            //if (ActiveTrack == null)
+            //{
+            //    nextSynoTrack = _playbackService.PlayqueueItems.FirstOrDefault();
+            //}
+            //else
+            //{
+            //    nextSynoTrack = this._playbackService.GetNextTrack(this.ActiveTrack.TrackInfo);                
+            //}
 
-            if (nextSynoTrack != null)
-            {
-                var nextTrack = new TrackViewModel(nextSynoTrack);
-                OnPlay(nextTrack);
-            }
-            else
-            {
-                _notificationService.Warning("There is no next track to play : all tracks have been played.", "No more tracks to play");                                
-            }
+            //if (nextSynoTrack != null)
+            //{
+            //    var nextTrack = new TrackViewModel(nextSynoTrack);
+            //    OnPlay(nextTrack);
+            //}
+            //else
+            //{
+            //    _notificationService.Warning("There is no next track to play : all tracks have been played.", "No more tracks to play");                                
+            //}
         }
 
         private double _currentPlaybackPercentComplete;
@@ -193,7 +271,10 @@
             set
             {
                 _currentPlaybackPercentComplete = value;
-                OnPropertyChanged(CurrentPlaybackPercentCompletePropertyName);
+                if (!double.IsInfinity(value) && !double.IsNaN(value))
+                {
+                    OnPropertyChanged(CurrentPlaybackPercentCompletePropertyName);
+                }
             }
         }
 
@@ -214,7 +295,7 @@
 
         #region Properties
 
-        
+        public ICommand SelectAllAlbumTracksCommand { get; set; }
 
         public double Volume
         {
@@ -230,7 +311,7 @@
             }
         }
 
-        public TrackViewModel ActiveTrack
+        public ITrackViewModel ActiveTrack
         {
             get { return _activeTrack; }
             set
@@ -277,12 +358,15 @@
 
         private TrackViewModel _selectedTrack;
 
-        private string SelectedTrackPropertyName = "SelectedTrack";
+        private const string SelectedTrackPropertyName = "SelectedTrack";
         private DateTime _lastBufferProgressUpdate;
 
-        private INotificationService _notificationService;
+        private readonly INotificationService _notificationService;
 
         private readonly IOpenSynoSettings _openSynoSettings;
+        private readonly ILogService _logService;
+        private readonly ITrackViewModelFactory _trackViewModelFactory;
+        private readonly IPageSwitchingService _pageSwitchingService;
 
         private const string CurrentPlaybackPercentCompletePropertyName = "CurrentPlaybackPercentComplete";
 
@@ -331,7 +415,7 @@
 
         public ICommand PlayCommand { get; set; }
 
-        public ObservableCollection<TrackViewModel> PlayQueueItems
+        public ObservableCollection<ITrackViewModel> PlayQueueItems
         {
             get
             {
@@ -349,38 +433,37 @@
 
         #region Methods
 
-        private void AppendItems(IEnumerable<TrackViewModel> items)
+        public void WakeUpFromTombstone()
         {
-            var tracks = items.Select(o=>o.TrackInfo);
-
-            int insertPosition = _playbackService.PlayqueueItems.Count();
-
-            _playbackService.InsertTracksToQueue(tracks, insertPosition);
-
-            foreach (var trackViewModel in items)
+            var currentTrack = this._playbackService.GetCurrentTrack();
+            if (currentTrack != null)
             {
-                PlayQueueItems.Add(trackViewModel);
+                this.ActiveTrack = this._trackViewModelFactory.Create(currentTrack.Guid, currentTrack.Track, this._pageSwitchingService);
             }
         }
 
-        private void OnPlay(TrackViewModel trackViewModel)
+        private void AppendItems(IEnumerable<ITrackViewModel> items, Action<Dictionary<SynoTrack, Guid>> callback)
         {
-            // HACK : with silverlight 4 on the phone, there will be proper support for commanding and disabling buttons when canExecute is false
-            if (!PlayCommand.CanExecute(trackViewModel)) 
-                return;
-            if (trackViewModel == null)
+            var tracks = items.Select(o=>o.TrackInfo);
+
+            // int insertPosition = _playbackService.GetTracksCountInQueue();
+            int insertPosition = PlayQueueItems.Count();
+
+            _playbackService.InsertTracksToQueue(tracks, insertPosition, callback);
+            //foreach (var trackViewModel in items)
+            //{
+            //    PlayQueueItems.Add(trackViewModel);
+            //}
+        }
+
+        private void OnPlay(Guid guidOfTrackToPlay)
+        {
+            if (guidOfTrackToPlay == Guid.Empty)
             {
-                throw new ArgumentNullException("trackViewModel", "The play command has been triggered without specifying a track to play.");
+                throw new ArgumentNullException("guidOfTrackToPlay", "The play command has been triggered without specifying a track to play.");
             }
 
-            _playbackService.PlayTrackInQueue(trackViewModel.TrackInfo);
-            _playbackService.TrackStarted += (sender, ea) =>
-                                                 {
-                                                     CurrentArtwork = new Uri(ea.Track.AlbumArtUrl, UriKind.Absolute);
-
-                                                     // FIXME : Use a factory so we can mock the active track !
-                                                     ActiveTrack = new TrackViewModel(ea.Track);
-                                                 };
+            _playbackService.PlayTrackInQueue(guidOfTrackToPlay);
         }
 
         public ICommand RemoveTracksFromQueueCommand { get; set; }
@@ -391,33 +474,51 @@
         /// <param name="e">The e.</param>
         private void OnPlayListOperation(PlayListOperationAggregatedEvent e)
         {
-            TrackViewModel trackToPlay;
+            ITrackViewModel trackToPlay;
+
             switch (e.Operation)
             {
                 case PlayListOperation.ClearAndPlay:
-                    PlayQueueItems.Clear();
-                    AppendItems(e.Items);
-                    if (_playbackService.Status != PlaybackStatus.Stopped)
+                    ClearItems();
+                    
+                    // test lines below before uncommenting
+                    //_playbackService.ClearPlayQueue();
+                    //_playbackService.InsertTracksToQueue(e.Items.Select(o => o.TrackInfo), 0);
+
+                    AppendItems(e.Items, matchingGeneratedGuids =>
                     {
-                        // stop the playback
-                    }
-                    trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
-                    OnPlay(trackToPlay);
+                        trackToPlay = e.Items.First();
+                        _logService.Trace(string.Format("Play queue cleared : Starting playback of track {0}", trackToPlay.TrackInfo.Title));
+                        OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
+                    });                    
                     break;
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
                 case PlayListOperation.Append:
-                    AppendItems(e.Items);
-                    if (_playbackService.Status == PlaybackStatus.Stopped)
-                    {
-                        trackToPlay = SelectedTrack != null ? SelectedTrack : e.Items.First();
-                        OnPlay(trackToPlay);
-                    }
+                    _logService.Trace(string.Format("PlayQueueViewModel.OnPlayListOperation : Appending {0} tracks", e.Items.Count()));
+                    AppendItems(e.Items, matchingGeneratedGuids =>
+                                             {
+                                                 _logService.Trace(string.Format("Items appended : Current playback service status : {0}", _playbackService.Status));
+                                                 if (_playbackService.Status != PlayState.Playing)
+                                                 {
+                                                     trackToPlay = e.Items.First();
+                                                     _logService.Trace(string.Format("PlaybackStatus stopped - Starting playback of track {0}", trackToPlay.TrackInfo.Title));
+                                                     OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
+                                                 }
+                                             });
+
+
+                    
 
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private void ClearItems()
+        {
+            _playbackService.ClearTracksInQueue();
         }
 
         #endregion

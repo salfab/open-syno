@@ -7,6 +7,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Practices.Prism.Events;
 using Ninject;
+using OpenSyno.Common;
 using OpenSyno.Helpers;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;
@@ -14,11 +15,16 @@ using Synology.AudioStationApi;
 
 namespace OpenSyno
 {
+    using System.Net;
     using System.Text;
     using System.Threading;
     using System.Windows.Threading;
 
     using Microsoft.Phone.Tasks;
+
+    using OpemSyno.Contracts;
+
+    using OpenSyno.Converters;
 
     public partial class App : Application
     {
@@ -34,6 +40,7 @@ namespace OpenSyno
         /// </summary>
         public App()
         {
+            
             // Global handler for uncaught exceptions. 
             UnhandledException += Application_UnhandledException;
 
@@ -102,20 +109,44 @@ namespace OpenSyno
             IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
+            IoC.Container.Bind<IArtistDetailViewModelFactory>().To<ArtistDetailViewModelFactory>().InSingletonScope();
+            IoC.Container.Bind<ITrackViewModelFactory>().To<TrackViewModelFactory>();           
+            
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
             IoC.Container.Bind<ISearchResultItemViewModelFactory>().To<SearchResultItemViewModelFactory>().InSingletonScope();
+
             IoC.Container.Bind<IUrlParameterToObjectsPlateHeater>().To<UrlParameterToObjectsPlateHeater>().InSingletonScope();
+            IoC.Container.Bind<IAudioTrackFactory>().To<AudioTrackFactory>().InSingletonScope();
             
             _notificationService = new NotificationService();
             IoC.Container.Bind<INotificationService>().ToConstant(_notificationService).InSingletonScope();
+            ImageCachingService imageCachingService;
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("ImageCachingService"))
+            {
+                imageCachingService = (ImageCachingService)IsolatedStorageSettings.ApplicationSettings["ImageCachingService"];
+            }
+            else
+            {
+                imageCachingService = new ImageCachingService();
+	        }
 
-            // Retrieve the type PlaybackService from a config file, so we can change it.
-            IoC.Container.Bind<IPlaybackService>().To(typeof(PlaybackService)).InSingletonScope();
+            imageCachingService.SaveRequested += this.ImageCachingServiceSaveRequested;
 
+            IoC.Container.Bind<ImageCachingService>().ToConstant(imageCachingService).InSingletonScope();
+            
+            IoC.Container.Bind<IPlaybackService>().To<PlaybackService>().InSingletonScope();
+            IoC.Container.Bind<IAlbumViewModelFactory>().To<AlbumViewModelFactory>();
             ActivateEagerTypes();
 
+            ResolvePrivateMembers();
+
+        }
+
+        private void ResolvePrivateMembers()
+        {
+            _playbackService = IoC.Container.Get<IPlaybackService>();
         }
 
         private void ActivateEagerTypes()
@@ -124,7 +155,7 @@ namespace OpenSyno
             IoC.Container.Get<SearchResultsViewModelFactory>();
             IoC.Container.Get<ArtistPanoramaViewModelFactory>();
             IoC.Container.Get<ISearchAllResultsViewModelFactory>();
-            IoC.Container.Get<PlayQueueViewModel>();
+            IoC.Container.Get<PlayQueueViewModel>();           
         }
 
 
@@ -132,7 +163,30 @@ namespace OpenSyno
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            IoC.Container.Get<ISignInService>().SignIn();
+            this._signInService = IoC.Container.Get<ISignInService>();
+            this._signInService.SignInCompleted += this.OnSignInComplete;
+            EventHandler<CheckTokenValidityCompletedEventArgs> completed = null;
+            completed = (s, ea) =>
+                            {
+
+                                // the modified closure here is on purpose.
+                                this._signInService.CheckTokenValidityCompleted -= completed;
+                                if (!ea.IsValid && ea.Error == null)
+                                {
+                                    this._signInService.SignIn();
+                                }
+                            };
+
+            this._signInService.CheckTokenValidityCompleted += completed;
+            this._signInService.CheckCachedTokenValidityAsync();
+            
+
+        }
+
+        private void OnSignInComplete(object sender, SignInCompletedEventArgs e)
+        {
+            _playbackService.InvalidateCachedTokens();
+
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -212,6 +266,11 @@ namespace OpenSyno
                 this._notificationService.Error(exception.Message, "Login error");
                 handled = true;
             }
+            catch (WebException exception)
+            {
+                this._notificationService.Error(exception.Message, "Web error");
+                handled = true;
+            }
             catch (SynoSearchException exception)
             {
                 this._notificationService.Error(exception.Message, "Search error");
@@ -221,36 +280,40 @@ namespace OpenSyno
             {
                 if (handled == false)
                 {
-                    System.Threading.ManualResetEvent mre = new ManualResetEvent(false);
+                    ManualResetEvent mre = new ManualResetEvent(false);
 
                     Action errorFeedback = () =>
                                                       {
                                                           var helpDebug =
                        MessageBox.Show(
-                           "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us anonymous information. Would you like to do so ?",
+                           "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us an e-mail pre-filled with information about the crash. Would you like to do so ?",
                            "Ooops !",
                            MessageBoxButton.OKCancel);
                                                           string exceptionName = e.GetType().Name;
                                                           if (helpDebug == MessageBoxResult.OK)
                                                           {
-                                                              var mailContent = new StringBuilder();
+                                                              var exceptionContent = new StringBuilder();
                                                               while (e != null)
                                                               {
-                                                                  mailContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
-                                                                  mailContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
-                                                                  mailContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
-                                                                  mailContent.AppendLine("Inner exception : \r\n");
+                                                                  exceptionContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
+                                                                  exceptionContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
+                                                                  exceptionContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
+                                                                  exceptionContent.AppendLine("Inner exception : \r\n");
                                                                   e = e.InnerException;
                                                               }
 
                                                               ILogService logService = IoC.Container.Get<ILogService>();
-                                                              logService.Error(mailContent.ToString());
+                                                              logService.Error(exceptionContent.ToString());
 
                                                               EmailComposeTask emailComposeTask = new EmailComposeTask();
                                                               emailComposeTask.To = "opensyno@seesharp.ch";
-                                                              emailComposeTask.Body = mailContent.ToString();
+                                                              emailComposeTask.Body = "Log : \r\n" + logService.GetLogFileSinceAppStart();
                                                               emailComposeTask.Subject = "Open syno Unhandled exception - " + exceptionName;
-                                                              emailComposeTask.Show();
+                                                              emailComposeTask.Show();  
+                                                              
+
+                                                              // Ugliest code I ever wrote, but somehow, it seems that if returning too quickly, the email task window doesn't even show up... race condition within the OS ?
+                                                              Thread.Sleep(1000);
                                                               mre.Set();
                                                           }
                                                       };
@@ -282,6 +345,10 @@ namespace OpenSyno
 
         private INotificationService _notificationService;
 
+        private IPlaybackService _playbackService;
+
+        private ISignInService _signInService;
+
         // Do not add any additional code to this method
         private void InitializePhoneApplication()
         {
@@ -312,10 +379,12 @@ namespace OpenSyno
         }
 
         #endregion
-    }
 
-    public class SynoTokenReceivedAggregatedEvent
-    {
-        public string Token { get; set; }
+
+        private void ImageCachingServiceSaveRequested(object sender, EventArgs e)
+        {
+            IsolatedStorageSettings.ApplicationSettings["ImageCachingService"] = sender;
+            IsolatedStorageSettings.ApplicationSettings.Save();
+        }
     }
 }

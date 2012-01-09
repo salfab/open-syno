@@ -13,7 +13,7 @@
     </DataTemplate>    
     <DataTemplate x:Key="SquareGroupTitleTemplate">
         <Border HorizontalAlignment="Left" Background="{Binding Items.Count, Converter={StaticResource GroupToBrushValueConverter}}" Width="99" Height="99" Margin="6">
-            <TextBlock Text="{Binding Title}" FontSize="40" Foreground="{StaticResource PhoneForegroundBrush}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
+            <TextBlock Text="{Binding HeaderContent}" FontSize="40" Foreground="{StaticResource PhoneForegroundBrush}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
         </Border>
     </DataTemplate>
     <DataTemplate x:Key="ArtistsListHeader">

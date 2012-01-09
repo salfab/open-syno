@@ -23,6 +23,8 @@ namespace OpenSyno
 {
     using System.Windows.Navigation;
 
+    using OpemSyno.Contracts;
+
     public partial class SearchAllResultsView : PhoneApplicationPage
     {
         private string SearchAllMusicResults = "AllMusicSearchResultsTicket";
@@ -75,6 +77,11 @@ namespace OpenSyno
                 DataContext = IoC.Container.Get<ISearchAllResultsViewModelFactory>().Create(keyword, _searchResults);
             }
         }
+
+        private void Button_TextInput(object sender, TextCompositionEventArgs e)
+        {
+
+        }
     }
 
     public interface ISearchAllResultsViewModelFactory
@@ -86,19 +93,21 @@ namespace OpenSyno
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
+        private readonly ITrackViewModelFactory _trackViewModelFactory;
 
-        public SearchAllResultsViewModelFactory(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService)
-        {            
+        public SearchAllResultsViewModelFactory(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, ITrackViewModelFactory trackViewModelFactory)
+        {
+            if (trackViewModelFactory == null) throw new ArgumentNullException("trackViewModelFactory");
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
-
+            _trackViewModelFactory = trackViewModelFactory;
         }
 
         #region Implementation of ISearchAllResultsViewModelFactory
 
         public ISearchAllResultsViewModel Create(string keyword, IEnumerable<SynoTrack> searchResults)
         {
-            return new SearchAllResultsViewModel(_eventAggregator, _pageSwitchingService, keyword, searchResults);
+            return new SearchAllResultsViewModel(_eventAggregator, _pageSwitchingService, keyword, searchResults, this._trackViewModelFactory);
         }
 
         #endregion
@@ -107,39 +116,46 @@ namespace OpenSyno
     public interface ISearchAllResultsViewModel
     {
         string Keyword { get; set; }
-        ObservableCollection<TrackViewModel> SearchResults { get; set; }
+        ObservableCollection<ITrackViewModel> SearchResults { get; set; }
     }
+
 
     public class SearchAllResultsViewModel : ISearchAllResultsViewModel
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IPageSwitchingService _pageSwitchingService;
+        private readonly ITrackViewModelFactory _trackViewModelFactory;
 
+        public ICommand NavigateToContainingAlbumCommand { get; set; }
 
-        public SearchAllResultsViewModel(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, string keyword, IEnumerable<SynoTrack> lastResults)
+        public SearchAllResultsViewModel(IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, string keyword, IEnumerable<SynoTrack> lastResults, ITrackViewModelFactory trackViewModelFactory)
         {
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
+            _trackViewModelFactory = trackViewModelFactory;
             if (pageSwitchingService == null) throw new ArgumentNullException("pageSwitchingService");
             if (keyword == null) throw new ArgumentNullException("keyword");
             if (lastResults == null) throw new ArgumentNullException("lastResults");
+            if (trackViewModelFactory == null) throw new ArgumentNullException("trackViewModelFactory");
             ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
             PlayLastCommand = new DelegateCommand(OnPlayLast);
             Keyword = keyword;
-            SearchResults = new ObservableCollection<TrackViewModel>();
+            SearchResults = new ObservableCollection<ITrackViewModel>();
             foreach (var lastResult in lastResults)
             {
-                SearchResults.Add(new TrackViewModel(lastResult));
+                // GUIDS will be generated later when / if inserted in the playqueue.
+                SearchResults.Add(this._trackViewModelFactory.Create(Guid.Empty, lastResult, this._pageSwitchingService));
             }
         }
 
+
         public string Keyword { get; set; }
         public ICommand PlayLastCommand { get; set; }
-        public ObservableCollection<TrackViewModel> SearchResults { get; set; }
+        public ObservableCollection<ITrackViewModel> SearchResults { get; set; }
         public ICommand ShowPlayQueueCommand { get; set; }
         private void OnPlayLast()
         {
-            var tracksToPlay = from track in SearchResults where track.IsSelected select track;
+            IEnumerable<ITrackViewModel> tracksToPlay = from track in SearchResults where track.IsSelected select track;
             _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(PlayListOperation.Append, tracksToPlay));
         }
 
