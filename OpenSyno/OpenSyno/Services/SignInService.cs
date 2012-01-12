@@ -34,10 +34,15 @@ namespace OpenSyno.Services
 
         public void SignIn()
         {
-            if (_openSynoSettings.UserName == null || _openSynoSettings.Password == null || _openSynoSettings.Host == null)
+            if (string.IsNullOrEmpty(_openSynoSettings.UserName) || string.IsNullOrEmpty(_openSynoSettings.Password))
             {
                 _logService.Trace("SignInService : Signing in - Empty credential parameters - Aborted");
                 OnSignInCompleted(new SignInCompletedEventArgs { Token = string.Empty, IsBusy = false });
+            }
+            else if (string.IsNullOrEmpty(_openSynoSettings.Host))
+            {
+                _logService.Trace("SignInService : Signing in - Empty Hostname - Aborted");
+                OnSignInCompleted(new SignInCompletedEventArgs { Token = string.Empty, IsBusy = false }); 
             }
             else
             {
@@ -61,7 +66,7 @@ namespace OpenSyno.Services
         public void CheckCachedTokenValidityAsync()
         {
             // no cached token
-            if (_openSynoSettings.Token == null)
+            if (CurrentTokenExistsForCurrentHost())
             {
                 if (CheckTokenValidityCompleted != null)
                 {
@@ -97,6 +102,11 @@ namespace OpenSyno.Services
             string uriString = string.Format("http://{0}:{1}/webman/modules/AudioStation/webUI/audio.cgi?action=avoid_timeout", _openSynoSettings.Host, _openSynoSettings.Port);
             client.DownloadStringAsync(new Uri(uriString),client);
             
+        }
+
+        private bool CurrentTokenExistsForCurrentHost()
+        {
+            return _openSynoSettings.Token != null || _openSynoSettings.Host != null;
         }
 
         public bool IsSigningIn { get; set; }
