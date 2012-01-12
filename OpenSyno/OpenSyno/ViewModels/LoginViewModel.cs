@@ -90,7 +90,7 @@ namespace OpenSyno
                 {
                     // FIXME : Use noification service instead
                     MessageBox.Show(
-                        "The format of the provided hostname is not in valid. Check that it is not prefixedit with http:// or https://",
+                        "The format of the provided hostname is not valid. Check that it is not prefixed it with http:// or https://",
                         "The host name is not valid",
                         MessageBoxButton.OK);
                 }

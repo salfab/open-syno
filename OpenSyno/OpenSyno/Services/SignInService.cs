@@ -42,7 +42,7 @@ namespace OpenSyno.Services
             else if (string.IsNullOrEmpty(_openSynoSettings.Host))
             {
                 _logService.Trace("SignInService : Signing in - Empty Hostname - Aborted");
-                OnSignInCompleted(new SignInCompletedEventArgs { Token = string.Empty, IsBusy = false }); 
+                OnSignInCompleted(new SignInCompletedEventArgs { Token = string.Empty, IsBusy = false });
             }
             else
             {
@@ -66,7 +66,7 @@ namespace OpenSyno.Services
         public void CheckCachedTokenValidityAsync()
         {
             // no cached token
-            if (CurrentTokenExistsForCurrentHost())
+            if (CurrentTokenExistsForCurrentHost() == false)
             {
                 if (CheckTokenValidityCompleted != null)
                 {
@@ -106,7 +106,7 @@ namespace OpenSyno.Services
 
         private bool CurrentTokenExistsForCurrentHost()
         {
-            return _openSynoSettings.Token != null || _openSynoSettings.Host != null;
+            return !string.IsNullOrWhiteSpace(_openSynoSettings.Token) || !string.IsNullOrWhiteSpace(_openSynoSettings.Host);
         }
 
         public bool IsSigningIn { get; set; }
