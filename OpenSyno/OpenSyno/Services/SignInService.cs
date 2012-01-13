@@ -100,13 +100,12 @@ namespace OpenSyno.Services
                                                   };
                 // we pass the client object along just so it doesn't get garbage collected before the eventhandler is called.
             string uriString = string.Format("http://{0}:{1}/webman/modules/AudioStation/webUI/audio.cgi?action=avoid_timeout", _openSynoSettings.Host, _openSynoSettings.Port);
-            client.DownloadStringAsync(new Uri(uriString),client);
-            
+            client.DownloadStringAsync(new Uri(uriString),client);            
         }
 
         private bool CurrentTokenExistsForCurrentHost()
         {
-            return !string.IsNullOrWhiteSpace(_openSynoSettings.Token) || !string.IsNullOrWhiteSpace(_openSynoSettings.Host);
+            return !string.IsNullOrWhiteSpace(_openSynoSettings.Token) && !string.IsNullOrWhiteSpace(_openSynoSettings.Host);
         }
 
         public bool IsSigningIn { get; set; }
