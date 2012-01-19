@@ -312,7 +312,7 @@ namespace OpenSyno
                                                               emailComposeTask.Show();  
                                                               
 
-                                                              // Ugliest code I ever wrote, but somehow, it seems that if returning too quickly, the email task window doesn't even show up... race condition within the OS ?
+                                                              // Ugliest code I ever wrote, but somehow, it seems that if returning too quickly, the email task window doesn't even show up... race condition within the OS ? Race condition with a navigation in progress ?
                                                               Thread.Sleep(1000);
                                                               mre.Set();
                                                           }

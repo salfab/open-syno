@@ -21,6 +21,8 @@ namespace OpenSyno
 {
     using System;
 
+    using OpemSyno.Contracts;
+
     public class ViewNames
     {
         public const string SearchView = "SearchView";
@@ -91,11 +93,17 @@ namespace OpenSyno
 
         private readonly IUrlParameterToObjectsPlateHeater _urlParameterToObjectsPlateHeater;
 
+        private readonly INotificationService _notificationService;
+
+        private ILogService _logService;
+
         #region Implementation of INavigatorService
 
-        public NavigatorService(IEventAggregator eventAggregator, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater)
+        public NavigatorService(IEventAggregator eventAggregator, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater, ILogService logService, INotificationService notificationService)
         {
             _eventAggregator = eventAggregator;
+            this._notificationService = notificationService;
+            this._logService = logService;
             _urlParameterToObjectsPlateHeater = urlParameterToObjectsPlateHeater;
         }
 
@@ -105,32 +113,44 @@ namespace OpenSyno
 
             callback = ae =>
                            {
-                               if (!ae.UseNavigationServiceOperation)
-                               {                                   
-                                   navigationService.Navigate(ae.Uri);                                  
-                               }
-                               else
+                               try
                                {
-                                   switch (ae.NavigationServiceOperation)
+                                   this._logService.Trace(string.Format("About to navigate to: {0}. Use navigate service operation : {1}", ae.NavigationServiceOperation, ae.UseNavigationServiceOperation));
+                                   
+                                   this._logService.Trace(string.Format("navigationService: {0}.", navigationService));
+
+                                   if (!ae.UseNavigationServiceOperation)
                                    {
-                                       case PageSwitchedAggregatedEvent.NavigationServiceOperations.GoBack:
-                                           navigationService.GoBack();
-                                           break;
-                                       case PageSwitchedAggregatedEvent.NavigationServiceOperations.GoForward:
-                                           navigationService.GoForward();
-                                           break;
-                                       case PageSwitchedAggregatedEvent.NavigationServiceOperations.StopLoading:
-                                           navigationService.StopLoading();
-                                           break;
-                                       default:
-                                           throw new ArgumentOutOfRangeException();
+                                       navigationService.Navigate(ae.Uri);
+                                   }
+                                   else
+                                   {
+                                       switch (ae.NavigationServiceOperation)
+                                       {
+                                           case PageSwitchedAggregatedEvent.NavigationServiceOperations.GoBack:
+                                               navigationService.GoBack();
+                                               break;
+                                           case PageSwitchedAggregatedEvent.NavigationServiceOperations.GoForward:
+                                               navigationService.GoForward();
+                                               break;
+                                           case PageSwitchedAggregatedEvent.NavigationServiceOperations.StopLoading:
+                                               navigationService.StopLoading();
+                                               break;
+                                           default:
+                                               throw new ArgumentOutOfRangeException();
+                                       }
+                                   }
+                                   this._logService.Trace(string.Format("Call to navigationServie issued. Deactivate after navigation : {0}", deactivateAfterNavigation));
+
+                                   if (deactivateAfterNavigation)
+                                   {
+                                       // callback will not be modified, therefore : no need to make a copy to avoid accessing a modified closure.
+                                       _eventAggregator.GetEvent<CompositePresentationEvent<PageSwitchedAggregatedEvent>>().Unsubscribe(callback);
                                    }
                                }
-
-                               if (deactivateAfterNavigation)
+                               catch (InvalidOperationException e)
                                {
-                                   // callback will not be modified, therefore : no need to make a copy to avoid accessing a modified closure.
-                                   _eventAggregator.GetEvent<CompositePresentationEvent<PageSwitchedAggregatedEvent>>().Unsubscribe(callback);
+                                    _notificationService.Warning("Open syno is already navigating to a page. Please wait until the current navigation is over before switching to an other page.", "Just a second...");
                                }
 
                            };
