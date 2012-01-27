@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.Diagnostics;
+    using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Windows.Input;
 
@@ -102,6 +103,7 @@
             };
 
             _playbackService = playbackService;
+            Playlists = new ObservableCollection<Playlist>();
             this.PlayQueueItems = new ObservableCollection<ITrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
                                                          {
@@ -145,7 +147,7 @@
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious);
-            SavePlaylistCommand = new DelegateCommand(OnSavePlaylist);
+            SavePlaylistCommand = new DelegateCommand<IEnumerable<ITrackViewModel>>(OnSavePlaylist);
             SelectAllAlbumTracksCommand = new DelegateCommand<Guid>(OnSelectAllAlbumTracks);
         }
 
@@ -193,11 +195,27 @@
             OnPropertyChanged(PlayQueueItemsPropertyName);
         }
 
-        private void OnSavePlaylist()
+        private void OnSavePlaylist(IEnumerable<ITrackViewModel> tracks)
         {
-            Playlist playlist = null;
+            Playlist playlist = new Playlist();
+            foreach (var trackViewModel in tracks)
+            {
+                playlist.Tracks.Add((TrackViewModel)trackViewModel);
+            }
+
+            // TODO : let the user input the name.
+            playlist.Name = tracks.First().TrackInfo.Artist + " ...";
+            
             _openSynoSettings.Playlists.Add(playlist);
+            
+            // Note - we should have used a dedicated service to handle data persistence.
+            IsolatedStorageSettings.ApplicationSettings.Save();  
+            
+            // Note - we might face problems in the future when we edit a play list. Make sure the edits get propagated to the persistence as well.
+            Playlists.Add(playlist);
         }
+
+        public ObservableCollection<Playlist> Playlists { get; set; }
 
         private void OnRemoveTracksFromQueue(IEnumerable<object> tracks)
         {
@@ -467,6 +485,7 @@
         }
 
         public ICommand RemoveTracksFromQueueCommand { get; set; }
+
 
         /// <summary>
         /// Called when a play list operation is requested.

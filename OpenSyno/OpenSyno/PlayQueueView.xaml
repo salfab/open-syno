@@ -8,7 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Behaviors="clr-namespace:OpenSyno.Behaviors" xmlns:Converters="clr-namespace:OpenSyno.Converters" xmlns:Delay="clr-namespace:Delay;assembly=PhonePerformance"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
-    xmlns:OpenSyno="clr-namespace:OpenSyno" xmlns:Tilt="clr-namespace:Microsoft.Unsupported" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    xmlns:OpenSyno="clr-namespace:OpenSyno" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -109,11 +109,14 @@
                   <Grid.Resources>
                     <OpenSyno:TrackViewModelsToGroupsConverter x:Key="TrackViewModelsToGroupsConverter" />
                   </Grid.Resources>
-                  <Grid.RowDefinitions>
+                    <Grid.RowDefinitions>
+                		<RowDefinition Height="Auto" />
                 		<RowDefinition Height="Auto" />
 						<RowDefinition />           							
-					</Grid.RowDefinitions>             
-					<Button HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" />
+					</Grid.RowDefinitions>
+                    <toolkit:ListPicker ItemsSource="{Binding Playlists}"/>
+					<Button Grid.Row="1" HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" />
+                    <Button Grid.Row="1"  HorizontalAlignment="Right" Content="Save to playlist" Command="{Binding SavePlaylistCommand}" CommandParameter="{Binding PlayQueueItems, Mode=TwoWay}"/>
                     <toolkit:LongListSelector Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay, Converter={StaticResource TrackViewModelsToGroupsConverter}}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" >
                         <toolkit:LongListSelector.GroupHeaderTemplate >
                             <DataTemplate>

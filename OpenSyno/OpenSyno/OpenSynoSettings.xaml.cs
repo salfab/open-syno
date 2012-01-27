@@ -19,6 +19,11 @@ namespace OpenSyno
         public List<Playlist> Playlists { get; set; }
 
         public bool UseSsl { get; set; }
+
+        public OpenSynoSettings()
+        {
+            this.Playlists = new List<Playlist>();
+        }
       
     }
 }
