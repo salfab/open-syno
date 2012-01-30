@@ -503,30 +503,34 @@
                     // test lines below before uncommenting
                     //_playbackService.ClearPlayQueue();
                     //_playbackService.InsertTracksToQueue(e.Items.Select(o => o.TrackInfo), 0);
-
-                    AppendItems(e.Items, matchingGeneratedGuids =>
+                    if (e.Items.Count() > 0)
                     {
-                        trackToPlay = e.Items.First();
-                        _logService.Trace(string.Format("Play queue cleared : Starting playback of track {0}", trackToPlay.TrackInfo.Title));
-                        OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
-                    });                    
+                        _logService.Trace(string.Format("PlayQueueViewModel.OnPlayListOperation : Appending {0} tracks", e.Items.Count()));
+                        AppendItems(e.Items, matchingGeneratedGuids =>
+                        {
+                            trackToPlay = e.Items.First();
+                            _logService.Trace(string.Format("Play queue cleared : Starting playback of track {0}", trackToPlay.TrackInfo.Title));
+                            OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
+                        });
+                    }
                     break;
                 case PlayListOperation.InsertAfterCurrent:                    
                     break;
                 case PlayListOperation.Append:
                     _logService.Trace(string.Format("PlayQueueViewModel.OnPlayListOperation : Appending {0} tracks", e.Items.Count()));
-                    AppendItems(e.Items, matchingGeneratedGuids =>
-                                             {
-                                                 _logService.Trace(string.Format("Items appended : Current playback service status : {0}", _playbackService.Status));
-                                                 if (_playbackService.Status != PlayState.Playing)
+                    if (e.Items.Count() > 0)
+                    {
+                        AppendItems(e.Items, matchingGeneratedGuids =>
                                                  {
-                                                     trackToPlay = e.Items.First();
-                                                     _logService.Trace(string.Format("PlaybackStatus stopped - Starting playback of track {0}", trackToPlay.TrackInfo.Title));
-                                                     OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
-                                                 }
-                                             });
-
-
+                                                     _logService.Trace(string.Format("Items appended : Current playback service status : {0}", _playbackService.Status));
+                                                     if (_playbackService.Status != PlayState.Playing)
+                                                     {
+                                                         trackToPlay = e.Items.First();
+                                                         _logService.Trace(string.Format("PlaybackStatus stopped - Starting playback of track {0}", trackToPlay.TrackInfo.Title));
+                                                         OnPlay(matchingGeneratedGuids[trackToPlay.TrackInfo]);
+                                                     }
+                                                 });
+                    }
                     
 
                     break;
