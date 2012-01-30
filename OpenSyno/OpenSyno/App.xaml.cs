@@ -16,6 +16,7 @@ using Synology.AudioStationApi;
 namespace OpenSyno
 {
     using System.Net;
+    using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Windows.Threading;
@@ -307,7 +308,7 @@ namespace OpenSyno
 
                                                               EmailComposeTask emailComposeTask = new EmailComposeTask();
                                                               emailComposeTask.To = "opensyno@seesharp.ch";
-                                                              emailComposeTask.Body = "Log : \r\n" + logService.GetLogFileSinceAppStart();
+                                                              emailComposeTask.Body = "Log . Assembly : " + Assembly.GetExecutingAssembly().FullName+ ": \r\n" + logService.GetLogFileSinceAppStart();
                                                               emailComposeTask.Subject = "Open syno Unhandled exception - " + exceptionName;
                                                               emailComposeTask.Show();  
                                                               
