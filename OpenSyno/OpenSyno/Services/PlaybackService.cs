@@ -208,7 +208,7 @@ namespace OpenSyno.Services
                                 }
                                 catch (SystemException)
                                 {
-
+                                    _progressUpdater.Change(-1, 0);
                                     // swallow exception : we get an HRESULT error, when no valid position could be retrieved. Maybe a beta behavior that will change in the future. since we can ignore the error and set the duration to 0 ( maybe the track hasn't been loaded yet ) we'll just swallow the exception.
                                 }
 
