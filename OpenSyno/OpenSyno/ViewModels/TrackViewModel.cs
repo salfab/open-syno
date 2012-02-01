@@ -14,21 +14,19 @@ namespace OpenSyno.ViewModels
 
     using Microsoft.Practices.Prism.Commands;
 
-    using OpemSyno.Contracts;
-
     using OpenSyno.Services;
 
     using Synology.AudioStationApi;
 
     [DataContract]
-    public class TrackViewModel : ViewModelBase, ITrackViewModel
+    public class TrackViewModel : ViewModelBase
     {
         private bool _isSelected;
 
         private readonly IAudioStationSession _session;
         private readonly IPageSwitchingService _pageSwitchingService;
         private readonly IUrlParameterToObjectsPlateHeater _urlParameterToObjectsPlateHeater;
-        private readonly IAlbumViewModelFactory _albumViewModelFactory;
+        private readonly AlbumViewModelFactory _albumViewModelFactory;
 
         private ITrackViewModelFactory _trackViewModelFactory;
 
@@ -62,7 +60,7 @@ namespace OpenSyno.ViewModels
             }
         }
 
-        public TrackViewModel(Guid guid, SynoTrack synoTrack, IPageSwitchingService pageSwitchingService, IAlbumViewModelFactory albumViewModelFactory, IAudioStationSession session, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater, ITrackViewModelFactory trackViewModelFactory)
+        public TrackViewModel(Guid guid, SynoTrack synoTrack, IPageSwitchingService pageSwitchingService, AlbumViewModelFactory albumViewModelFactory, IAudioStationSession session, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater, ITrackViewModelFactory trackViewModelFactory)
         {
             if (synoTrack == null)
             {
@@ -122,11 +120,11 @@ namespace OpenSyno.ViewModels
                                                               
 
 
-                                                              List<IAlbumViewModel> albumViewModels = new List<IAlbumViewModel>();
+                                                              List<AlbumViewModel> albumViewModels = new List<AlbumViewModel>();
                                                                                                                             
                                                               foreach (var item in albums)
                                                               {
-                                                                  IAlbumViewModel viewModel = this._albumViewModelFactory.Create(item);                                                                  
+                                                                  AlbumViewModel viewModel = this._albumViewModelFactory.Create(item);                                                                  
                                                                   albumViewModels.Add(viewModel);
 
                                                                   // populate the tracks for each album.
@@ -143,7 +141,7 @@ namespace OpenSyno.ViewModels
                                                               }
 
                                                               // the album shown by default.
-                                                              IAlbumViewModel defaultAlbumViewModel = albumViewModels.Single(o => o.Album == album);
+                                                              AlbumViewModel defaultAlbumViewModel = albumViewModels.Single(o => o.Album == album);
 
                                                               this._urlParameterToObjectsPlateHeater.RegisterObject(album.ItemID, defaultAlbumViewModel);
 

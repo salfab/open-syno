@@ -11,7 +11,6 @@ namespace OpenSyno
 
     using Microsoft.Phone.Controls;
 
-    using OpemSyno.Contracts;
     using OpemSyno.Contracts.Domain;
 
     using OpenSyno.ViewModels;
@@ -75,7 +74,7 @@ namespace OpenSyno
                 }
 
                 IEnumerable<SynoItem> artistItems = null;
-                IEnumerable<IAlbumViewModel> albumViewModels;
+                IEnumerable<AlbumViewModel> albumViewModels;
                 if (_newPageInstance && State.ContainsKey(ArtistPanoramaViewItems))
                 {
                     throw new NotImplementedException("deal with the viewmodels not with the synoitems anymore here");
@@ -85,7 +84,7 @@ namespace OpenSyno
                 else
                 {
                     //artistPanoramaViewModel.QueryAndBuildArtistItems();
-                    albumViewModels = (IEnumerable<IAlbumViewModel>)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(artistAlbumsTicket);
+                    albumViewModels = (IEnumerable<AlbumViewModel>)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(artistAlbumsTicket);
                 }
                 var albumTicket = NavigationContext.QueryString["albumTicket"];
 
@@ -97,7 +96,7 @@ namespace OpenSyno
                 }
                 else
                 {
-                    var album = (IAlbumViewModel)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(albumTicket);
+                    var album = (AlbumViewModel)navigator.UrlParameterToObjectsPlateHeater.GetObjectForTicket(albumTicket);
                     artistPanoramaViewActivePanelIndex = albumViewModels.ToList().IndexOf(album);
 
 

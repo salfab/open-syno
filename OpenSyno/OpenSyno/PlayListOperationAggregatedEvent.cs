@@ -4,19 +4,17 @@ using Microsoft.Practices.Prism.Events;
 
 namespace OpenSyno
 {
-    using OpemSyno.Contracts;
-
     using OpenSyno.ViewModels;
 
     public class PlayListOperationAggregatedEvent 
     {
-        public PlayListOperationAggregatedEvent(PlayListOperation operation, IEnumerable<ITrackViewModel> selectedItems)
+        public PlayListOperationAggregatedEvent(PlayListOperation operation, IEnumerable<TrackViewModel> selectedItems)
         {
             Operation = operation;
             Items = selectedItems;
         }
 
         public PlayListOperation Operation { get; set; }
-        public IEnumerable<ITrackViewModel> Items { get; set; }
+        public IEnumerable<TrackViewModel> Items { get; set; }
     }
 }

@@ -4,21 +4,20 @@ namespace OpenSyno
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Linq;
     using System.Windows.Input;
 
     using Microsoft.Practices.Prism.Commands;
 
-    using OpemSyno.Contracts;
-
     using OpenSyno.ViewModels;
 
-    public class AlbumViewModel : ViewModelBase, IAlbumViewModel
+    public class AlbumViewModel : ViewModelBase, INotifyPropertyChanged
     {
         public AlbumViewModel(SynoItem album)
         {
             this.Album = album;
-            this.Tracks = new ObservableCollection<ITrackViewModel>();
+            this.Tracks = new ObservableCollection<TrackViewModel>();
             SelectedCommand = new DelegateCommand(OnSelected);
             SelectAllOrNoneCommand = new DelegateCommand(OnSelectAllOrNone);
         }
@@ -44,7 +43,7 @@ namespace OpenSyno
 
         public event EventHandler Selected;
 
-        public ObservableCollection<ITrackViewModel> Tracks { get; set; }
+        public ObservableCollection<TrackViewModel> Tracks { get; set; }
 
         public SynoItem Album { get; set; }
 

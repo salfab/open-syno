@@ -9,14 +9,13 @@ namespace OpenSyno.ViewModels
     using System.Collections.ObjectModel;
     using System.Linq;
 
-    using OpemSyno.Contracts;
     using OpemSyno.Contracts.Domain;
 
     using OpenSyno.Services;
 
     using Synology.AudioStationApi;
 
-    public class ArtistDetailViewModel : ViewModelBase, IArtistDetailViewModel
+    public class ArtistDetailViewModel : ViewModelBase
     {
         private string _artistName;
 
@@ -40,20 +39,20 @@ namespace OpenSyno.ViewModels
             }
         }
 
-        private ObservableCollection<IAlbumViewModel> _albums;
+        private ObservableCollection<AlbumViewModel> _albums;
         private readonly ISearchService _searchService;
 
-        private IAlbumViewModelFactory _albumViewModelFactory;
+        private AlbumViewModelFactory _albumViewModelFactory;
 
         private INavigatorService _navigatorSevice;
 
         private IPageSwitchingService _pageSwitchingService;
         private readonly ITrackViewModelFactory _trackViewModelFactory;
 
-        public ArtistDetailViewModel(SynoItem artist, ISearchService searchService, IAlbumViewModelFactory albumViewModelFactory, INavigatorService navigatorSevice, IPageSwitchingService pageSwitchingService, ITrackViewModelFactory trackViewModelFactory)
+        public ArtistDetailViewModel(SynoItem artist, ISearchService searchService, AlbumViewModelFactory albumViewModelFactory, INavigatorService navigatorSevice, IPageSwitchingService pageSwitchingService, ITrackViewModelFactory trackViewModelFactory)
         {
             if (trackViewModelFactory == null) throw new ArgumentNullException("trackViewModelFactory");
-            this.Albums = new ObservableCollection<IAlbumViewModel>();
+            this.Albums = new ObservableCollection<AlbumViewModel>();
             this.ArtistName = artist.Title;
             this.SimilarArtists = new ObservableCollection<IArtistViewModel>();
             this._searchService = searchService;
@@ -93,7 +92,7 @@ namespace OpenSyno.ViewModels
         {
             foreach (var album in albums)
             {
-                IAlbumViewModel albumViewModel = _albumViewModelFactory.Create(album);
+                AlbumViewModel albumViewModel = _albumViewModelFactory.Create(album);
 
                 // prepare an empty track list
                 albumViewModel.Tracks.Clear();
@@ -133,7 +132,7 @@ namespace OpenSyno.ViewModels
             }
         }
 
-        public ObservableCollection<IAlbumViewModel> Albums
+        public ObservableCollection<AlbumViewModel> Albums
         {
             get
             {

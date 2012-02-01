@@ -15,7 +15,6 @@ namespace OpenSyno
 {
     using Ninject;
 
-    using OpemSyno.Contracts;
     using Synology.AudioStationApi;
 
     public partial class ArtistDetailView : PhoneApplicationPage
@@ -35,7 +34,7 @@ namespace OpenSyno
 
             if (DataContext == null)
             {
-                var viewModelFactory = IoC.Container.Get<IArtistDetailViewModelFactory>();
+                var viewModelFactory = IoC.Container.Get<ArtistDetailViewModelFactory>();
 
                 string ticket = this.NavigationContext.QueryString["artistTicket"];
 
