@@ -131,7 +131,8 @@ namespace OpenSyno
             }
             else
             {
-                imageCachingService = new ImageCachingService();
+                // Todo : we should use a factory in order to have a mockable service.
+                imageCachingService = new ImageCachingService(_logService);
 	        }
 
             imageCachingService.SaveRequested += this.ImageCachingServiceSaveRequested;
