@@ -48,7 +48,9 @@ namespace Seesharp.LastFmApi.Mango
         {
             Name = name;
             Mbid = mbid;
-            Match = Convert.ToDouble(match);
+            double result;
+            double.TryParse(match, out result);
+            Match = result;
             Url = url;
             Images = images;
             Streamable = streamable == "1";
