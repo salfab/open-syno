@@ -7,6 +7,7 @@
     using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Net;
+    using System.Runtime.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -17,6 +18,7 @@
 
     using OpenSyno.Services;
 
+    [DataContract]
     public class ImageCachingService
     {
         private static List<Task<string>> _tasksWritingOnDisk;
@@ -245,10 +247,13 @@
             wc.OpenReadAsync(imageUri, d);
         }
 
+        [DataMember]
         public int MaxBindingsLimit { get; set; }
 
+        [DataMember]
         public List<CachedImagesMapping> CachedImagesMappings { get; set; }
 
+        [DataMember]
         public long TotalImageRequests { get; set; }
     }
 }
