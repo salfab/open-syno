@@ -16,6 +16,7 @@ using Synology.AudioStationApi;
 namespace OpenSyno
 {
     using System.Net;
+    using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Windows.Threading;
@@ -68,6 +69,7 @@ namespace OpenSyno
             // Phone-specific initialization
             InitializePhoneApplication();
 
+            this._logService = IoC.Container.Get<ILogService>();
         }
 
         private void InitializeSettings()
@@ -109,7 +111,7 @@ namespace OpenSyno
             IoC.Container.Bind<SearchViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModelFactory>().ToSelf().InSingletonScope();
             IoC.Container.Bind<ArtistPanoramaViewModelFactory>().ToSelf().InSingletonScope();
-            IoC.Container.Bind<IArtistDetailViewModelFactory>().To<ArtistDetailViewModelFactory>().InSingletonScope();
+            IoC.Container.Bind<ArtistDetailViewModelFactory>().To<ArtistDetailViewModelFactory>().InSingletonScope();
             IoC.Container.Bind<ITrackViewModelFactory>().To<TrackViewModelFactory>();           
             
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
@@ -129,7 +131,8 @@ namespace OpenSyno
             }
             else
             {
-                imageCachingService = new ImageCachingService();
+                // Todo : we should use a factory in order to have a mockable service.
+                imageCachingService = new ImageCachingService(_logService);
 	        }
 
             imageCachingService.SaveRequested += this.ImageCachingServiceSaveRequested;
@@ -137,7 +140,7 @@ namespace OpenSyno
             IoC.Container.Bind<ImageCachingService>().ToConstant(imageCachingService).InSingletonScope();
             
             IoC.Container.Bind<IPlaybackService>().To<PlaybackService>().InSingletonScope();
-            IoC.Container.Bind<IAlbumViewModelFactory>().To<AlbumViewModelFactory>();
+            IoC.Container.Bind<AlbumViewModelFactory>().To<AlbumViewModelFactory>();
             ActivateEagerTypes();
 
             ResolvePrivateMembers();
@@ -284,6 +287,8 @@ namespace OpenSyno
 
                     Action errorFeedback = () =>
                                                       {
+                                                          string exceptionText = this.GetExceptionTreeText(e);
+                                                          _logService.Error(exceptionText);
                                                           var helpDebug =
                        MessageBox.Show(
                            "Open syno encountered an error. The app will have to close, but you can help us to fix it for the next release by sending us an e-mail pre-filled with information about the crash. Would you like to do so ?",
@@ -291,26 +296,12 @@ namespace OpenSyno
                            MessageBoxButton.OKCancel);
                                                           string exceptionName = e.GetType().Name;
                                                           if (helpDebug == MessageBoxResult.OK)
-                                                          {
-                                                              var exceptionContent = new StringBuilder();
-                                                              while (e != null)
-                                                              {
-                                                                  exceptionContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
-                                                                  exceptionContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
-                                                                  exceptionContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
-                                                                  exceptionContent.AppendLine("Inner exception : \r\n");
-                                                                  e = e.InnerException;
-                                                              }
-
-                                                              ILogService logService = IoC.Container.Get<ILogService>();
-                                                              logService.Error(exceptionContent.ToString());
-
+                                                          {                                                                                                                            
                                                               EmailComposeTask emailComposeTask = new EmailComposeTask();
                                                               emailComposeTask.To = "opensyno@seesharp.ch";
-                                                              emailComposeTask.Body = "Log : \r\n" + logService.GetLogFileSinceAppStart();
+                                                              emailComposeTask.Body = "Log :  \r\nAssembly : " + Assembly.GetExecutingAssembly().FullName + "\r\n" + _logService.GetLogFileSinceAppStart();
                                                               emailComposeTask.Subject = "Open syno Unhandled exception - " + exceptionName;
-                                                              emailComposeTask.Show();  
-                                                              
+                                                              emailComposeTask.Show();                                                                
 
                                                               // Ugliest code I ever wrote, but somehow, it seems that if returning too quickly, the email task window doesn't even show up... race condition within the OS ? Race condition with a navigation in progress ?
                                                               Thread.Sleep(1000);
@@ -336,6 +327,20 @@ namespace OpenSyno
             return handled;
         }
 
+        private string GetExceptionTreeText(Exception e)
+        {
+            var exceptionContent = new StringBuilder();
+            while (e != null)
+            {
+                exceptionContent.AppendFormat("Exception name : {0}\r\n", e.GetType().Name);
+                exceptionContent.AppendFormat("Exception Message : {0}\r\n", e.Message);
+                exceptionContent.AppendFormat("Exception StackTrace : {0}\r\n\r\n", e.StackTrace);
+                exceptionContent.AppendLine("Inner exception : \r\n");
+                e = e.InnerException;
+            }
+            return exceptionContent.ToString();
+        }
+
         #region Phone application initialization
 
         // Avoid double-initialization
@@ -348,6 +353,8 @@ namespace OpenSyno
         private IPlaybackService _playbackService;
 
         private ISignInService _signInService;
+
+        private readonly ILogService _logService;
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()

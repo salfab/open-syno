@@ -7,6 +7,7 @@
     using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Net;
+    using System.Runtime.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -15,15 +16,18 @@
 
     using Ninject;
 
+    using OpenSyno.Services;
+
+    [DataContract]
     public class ImageCachingService
     {
         private static List<Task<string>> _tasksWritingOnDisk;
-        public ImageCachingService()
+        public ImageCachingService(ILogService logService)
         {
             _tasksWritingOnDisk = new List<Task<string>>();
             this.CachedImagesMappings = new List<CachedImagesMapping>();
             this.MaxBindingsLimit = 100;
-            internalIsolatedStorageAccessLock = new object();
+            internalIsolatedStorageAccessLock = new object();            
         }
 
 
@@ -73,6 +77,8 @@
 
         private static object internalIsolatedStorageAccessLock;
 
+        private static readonly ILogService _logService = IoC.Container.Get<ILogService>();
+
         private static void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             string albumCoverId = GetImageId(d);
@@ -99,10 +105,6 @@
             }
             imageCachingService.TotalImageRequests++;
 
-            //using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
-            //{
-            //    fileExists = userStore.FileExists(fileName);
-            //}
             if (matchingMapping != null)
             {
                 matchingMapping.TimesUsed++;
@@ -127,6 +129,7 @@
                                     {
                                         var readBytes = fs.EndRead(ar);
                                         MemoryStream ms = new MemoryStream(buffer);
+                                        _logService.Trace(string.Format("ImageCachingService.OnSourcePropertyChanged : Network read completed with {0} bytes", readBytes));                                        
                                         image.SetSource(ms);
                                         ((Image)ar.AsyncState).Source = image;
                                     },
@@ -158,6 +161,8 @@
                                 {
                                     var bytes = ea.Result.EndRead(ar);
                                     MemoryStream ms = new MemoryStream(buffer);
+                                    _logService.Trace(string.Format("ImageCachingService.OnSourcePropertyChanged : Network read completed with {0} bytes", bytes));
+
                                     image.SetSource(ms);
                                     ((Image)ea.UserState).Source = image;
                                     Task<string> taskWriteToDisk = new Task<string>(
@@ -242,10 +247,13 @@
             wc.OpenReadAsync(imageUri, d);
         }
 
+        [DataMember]
         public int MaxBindingsLimit { get; set; }
 
+        [DataMember]
         public List<CachedImagesMapping> CachedImagesMappings { get; set; }
 
+        [DataMember]
         public long TotalImageRequests { get; set; }
     }
 }

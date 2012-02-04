@@ -35,11 +35,11 @@
 
 
 
-        private ITrackViewModel _activeTrack;
+        private TrackViewModel _activeTrack;
 
         private Uri _currentArtwork;
 
-        private ObservableCollection<ITrackViewModel> _playQueueItems;
+        private ObservableCollection<TrackViewModel> _playQueueItems;
 
         #endregion
 
@@ -103,8 +103,7 @@
             };
 
             _playbackService = playbackService;
-            Playlists = new ObservableCollection<Playlist>();
-            this.PlayQueueItems = new ObservableCollection<ITrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
+            this.PlayQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
                                                          {
                                                              consecutiveAlbumsIdPatcher();
@@ -329,7 +328,7 @@
             }
         }
 
-        public ITrackViewModel ActiveTrack
+        public TrackViewModel ActiveTrack
         {
             get { return _activeTrack; }
             set
@@ -433,7 +432,7 @@
 
         public ICommand PlayCommand { get; set; }
 
-        public ObservableCollection<ITrackViewModel> PlayQueueItems
+        public ObservableCollection<TrackViewModel> PlayQueueItems
         {
             get
             {
@@ -460,7 +459,7 @@
             }
         }
 
-        private void AppendItems(IEnumerable<ITrackViewModel> items, Action<Dictionary<SynoTrack, Guid>> callback)
+        private void AppendItems(IEnumerable<TrackViewModel> items, Action<Dictionary<SynoTrack, Guid>> callback)
         {
             var tracks = items.Select(o=>o.TrackInfo);
 
@@ -493,7 +492,7 @@
         /// <param name="e">The e.</param>
         private void OnPlayListOperation(PlayListOperationAggregatedEvent e)
         {
-            ITrackViewModel trackToPlay;
+            TrackViewModel trackToPlay;
 
             switch (e.Operation)
             {

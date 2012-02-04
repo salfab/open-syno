@@ -37,7 +37,7 @@ namespace OpenSyno
         //    artistPanoramaViewModel.BuildArtistItems(artistItems);
         //    return artistPanoramaViewModel;
         //}
-        public ArtistPanoramaViewModel Create(SynoItem artist, IEnumerable<IAlbumViewModel> albumViewModels, int artistPanoramaViewActivePanelIndex)
+        public ArtistPanoramaViewModel Create(SynoItem artist, IEnumerable<AlbumViewModel> albumViewModels, int artistPanoramaViewActivePanelIndex)
         {
             
             var artistPanoramaViewModel = new ArtistPanoramaViewModel(artist, albumViewModels,artistPanoramaViewActivePanelIndex, this._searchService, this._eventAggregator, this._pageSwitchingService, this._notificationService);

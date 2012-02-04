@@ -43,15 +43,4 @@ namespace OpenSyno.Converters
             throw new NotImplementedException();
         }
     }
-
-    public class CachedImagesMapping
-    {
-        public string ImageId { get; set; }
-
-        public int TimesUsed { get; set; }
-
-        public DateTime LastTimeUsed { get; set; }
-
-        public string FilePath { get; set; }
-    }
 }

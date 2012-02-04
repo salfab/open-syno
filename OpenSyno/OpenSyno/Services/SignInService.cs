@@ -99,8 +99,22 @@ namespace OpenSyno.Services
 
                                                   };
                 // we pass the client object along just so it doesn't get garbage collected before the eventhandler is called.
-            string uriString = string.Format("http://{0}:{1}/webman/modules/AudioStation/webUI/audio.cgi?action=avoid_timeout", _openSynoSettings.Host, _openSynoSettings.Port);
-            client.DownloadStringAsync(new Uri(uriString),client);            
+            var isBadFormat = CheckHostnameDoesNotContainPort(_openSynoSettings.Host);
+            if (!isBadFormat)
+            {
+                string uriString = string.Format("http://{0}:{1}/webman/modules/AudioStation/webUI/audio.cgi?action=avoid_timeout", this._openSynoSettings.Host, this._openSynoSettings.Port);
+                client.DownloadStringAsync(new Uri(uriString),client);
+            }
+        }
+
+        private bool CheckHostnameDoesNotContainPort(string hostname)
+        {
+            var isUrlBadFormat = hostname.Contains(":");
+            if (isUrlBadFormat)
+            {
+                _notificationService.Warning("Please, enter the port in the dedicated field instead of using the notation hostname:port", "Hostname not valid");
+            }
+            return isUrlBadFormat;
         }
 
         private bool CurrentTokenExistsForCurrentHost()

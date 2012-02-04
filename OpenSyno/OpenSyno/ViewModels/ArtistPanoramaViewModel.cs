@@ -23,7 +23,7 @@ namespace OpenSyno.ViewModels
 
         private readonly IPageSwitchingService _pageSwitchingService;
 
-        public ObservableCollection<IAlbumViewModel> ArtistAlbums { get; set; }
+        public ObservableCollection<AlbumViewModel> ArtistAlbums { get; set; }
 
         private string _artistName;
         private const string ArtistNamePropertyName = "ArtistName";
@@ -33,7 +33,7 @@ namespace OpenSyno.ViewModels
 
         private void OnPlayLast()
         {
-            IAlbumViewModel albumViewModel = ArtistAlbums[CurrentArtistItemIndex];
+            AlbumViewModel albumViewModel = ArtistAlbums[CurrentArtistItemIndex];
             var tracksToPlay = albumViewModel.Tracks.Where(t => t.IsSelected);
             _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(PlayListOperation.Append, tracksToPlay));                
 
@@ -77,7 +77,7 @@ namespace OpenSyno.ViewModels
 
         private SynoItem _artist;
 
-        public ArtistPanoramaViewModel(SynoItem artist, IEnumerable<IAlbumViewModel> albums, int activePanelIndex, ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, INotificationService notificationService)
+        public ArtistPanoramaViewModel(SynoItem artist, IEnumerable<AlbumViewModel> albums, int activePanelIndex, ISearchService searchService, IEventAggregator eventAggregator, IPageSwitchingService pageSwitchingService, INotificationService notificationService)
         {
             if (searchService == null)
             {
@@ -115,7 +115,7 @@ namespace OpenSyno.ViewModels
             _panoramaItemSwitchingService.ActiveItemChangeRequested += (s, e) => CurrentArtistItemIndex = e.NewItemIndex;
             _eventAggregator = eventAggregator;
             _pageSwitchingService = pageSwitchingService;
-            this.ArtistAlbums = new ObservableCollection<IAlbumViewModel>();
+            this.ArtistAlbums = new ObservableCollection<AlbumViewModel>();
             foreach (var albumViewModel in albums)
             {
                 this.ArtistAlbums.Add(albumViewModel);
@@ -134,7 +134,7 @@ namespace OpenSyno.ViewModels
 
         private void OnPlay()
         {
-            IAlbumViewModel albumViewModel = ArtistAlbums[CurrentArtistItemIndex];
+            AlbumViewModel albumViewModel = ArtistAlbums[CurrentArtistItemIndex];
             var tracksToPlay = albumViewModel.Tracks.Where(t => t.IsSelected);
             _eventAggregator.GetEvent<CompositePresentationEvent<PlayListOperationAggregatedEvent>>().Publish(new PlayListOperationAggregatedEvent(PlayListOperation.ClearAndPlay, tracksToPlay));                
         }
@@ -153,7 +153,7 @@ namespace OpenSyno.ViewModels
         {
             if (e.NewItems != null)
             {
-                foreach (IAlbumViewModel artistItem in e.NewItems)
+                foreach (AlbumViewModel artistItem in e.NewItems)
                 {
                     artistItem.PropertyChanged += UpdateBusyness;
                 } 
@@ -161,7 +161,7 @@ namespace OpenSyno.ViewModels
 
             if (e.OldItems != null)
             {
-                foreach (IAlbumViewModel artistItem in e.OldItems)
+                foreach (AlbumViewModel artistItem in e.OldItems)
                 {
                     artistItem.PropertyChanged -= UpdateBusyness;
                 }

@@ -92,6 +92,7 @@
     <Compile Include="ArtistDetailViewModelFactory.cs" />
     <Compile Include="Behaviors\RadioButtonCheckedToCommandBehavior.cs" />
     <Compile Include="Converters\AlbumItemIdToCachedImageConverter.cs" />
+    <Compile Include="Converters\CachedImagesMapping.cs" />
     <Compile Include="Converters\ImageCachingService.cs" />
     <Compile Include="Converters\TypeTypeConverter.cs" />
     <Compile Include="DashboardView.xaml.cs">
