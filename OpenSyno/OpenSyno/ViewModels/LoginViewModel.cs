@@ -10,6 +10,8 @@ namespace OpenSyno
     using Microsoft.Practices.Prism.Commands;
     using Microsoft.Practices.Prism.Events;
 
+    using OpemSyno.Contracts;
+
     using OpenSyno.Services;
     using OpenSyno.ViewModels;
 
@@ -70,9 +72,21 @@ namespace OpenSyno
             else
             {
                 // need to get a new token.
-                _playbackService.InvalidateCachedTokens();
+
+                // we need to check if the settings are okay too because this takes place before the check performed in the OnSignIn command handler.
+                var formatValidity = _synoSettings.IsCredentialFormatValid();
+
+                if (formatValidity != CredentialFormatValidationResult.Valid)
+                {
+                    _signInService.ShowCredentialErrorMessage(formatValidity);
+                    return;
+                }
+
                 _audioStationSession.Host = Host;
                 _audioStationSession.Port = Port;
+
+                _playbackService.InvalidateCachedTokens();
+
                 try
                 {
                     _audioStationSession.LoginAsync(this.UserName, this.Password, this.OnLoginAsyncCompleted,
@@ -112,6 +126,15 @@ namespace OpenSyno
             _synoSettings.UseSsl = UseSsl;
             _synoSettings.Host = Host;
             _synoSettings.Port = Port;
+
+            // NOTE - is it still needed here, since we do a check cached token validity async just after ?
+            var formatValidity = _synoSettings.IsCredentialFormatValid();
+
+            if (formatValidity != CredentialFormatValidationResult.Valid)
+            {
+                _signInService.ShowCredentialErrorMessage(formatValidity);               
+                return;
+            }
 
             // FIXME : we should use the SignIn method of the signInService, so we don't duplicate the logic !
             _signInService.CheckTokenValidityCompleted += OnCheckTokenValidityCompleted;
