@@ -197,6 +197,15 @@
 
         private void OnSavePlaylist(IEnumerable<TrackViewModel> tracks)
         {
+            if (tracks == null)
+            {
+                throw new ArgumentNullException("tracks");
+            }
+            if (tracks.Count() == 0)
+            {
+                _notificationService.Warning("Please add tracks before saving them as a playlist.", "Empty playqueue");
+            }
+
             Playlist playlist = new Playlist();
             foreach (var trackViewModel in tracks)
             {
@@ -213,6 +222,28 @@
             
             // Note - we might face problems in the future when we edit a play list. Make sure the edits get propagated to the persistence as well.
             Playlists.Add(playlist);
+
+            this.CurrentPlaylist = playlist;
+        }  
+
+        private Playlist _currentPlaylist;
+
+        public Playlist CurrentPlaylist
+        {
+            get
+            {
+                return this._currentPlaylist;
+            }
+            set
+            {
+                if (value != this._currentPlaylist)
+                {
+                    // TODO : Needs to raise the PropertyChanged event.
+                    this._currentPlaylist = value;
+                    this.ClearItems();
+                    this.AppendItems(value.Tracks, matchingGuid => { });
+                }                                
+            }
         }
 
         public ObservableCollection<Playlist> Playlists { get; set; }
@@ -462,7 +493,25 @@
 
         private void AppendItems(IEnumerable<TrackViewModel> items, Action<Dictionary<SynoTrack, Guid>> callback)
         {
-            var tracks = items.Select(o=>o.TrackInfo);
+            if (!IsPopulatingCurrentPlaylist(items))
+            {
+                var existingTemporaryPlayqueue = this.Playlists.SingleOrDefault(o => o.Id == Guid.Empty);
+                if (existingTemporaryPlayqueue != null)
+                {
+                    this.Playlists.Remove(existingTemporaryPlayqueue);
+                }
+
+                Playlist playQueue = new Playlist()
+                    {
+                        Id = Guid.Empty, 
+                        Name = "Unsaved playqueue",
+                        Tracks = this.CurrentPlaylist.Tracks 
+                    };
+
+                this.CurrentPlaylist = playQueue;
+            }
+
+            var tracks = items.Select(o => o.TrackInfo);
 
             // int insertPosition = _playbackService.GetTracksCountInQueue();
             int insertPosition = PlayQueueItems.Count();
@@ -472,6 +521,12 @@
             //{
             //    PlayQueueItems.Add(trackViewModel);
             //}
+        }
+
+        private bool IsPopulatingCurrentPlaylist(IEnumerable<TrackViewModel> itemsToPopulatePlaylistWith)
+        {
+            var isPopulatingCurrentPlaylist = this.PlayQueueItems.Count == 0 && this.CurrentPlaylist.Tracks.SequenceEqual(itemsToPopulatePlaylistWith);
+            return isPopulatingCurrentPlaylist;
         }
 
         private void OnPlay(Guid guidOfTrackToPlay)
