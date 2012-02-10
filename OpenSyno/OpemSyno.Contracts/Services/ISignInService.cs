@@ -2,6 +2,8 @@ using System;
 
 namespace OpenSyno.Services
 {
+    using OpemSyno.Contracts;
+
     public interface ISignInService
     {
         event EventHandler<SignInCompletedEventArgs> SignInCompleted;
@@ -9,5 +11,7 @@ namespace OpenSyno.Services
         event EventHandler<CheckTokenValidityCompletedEventArgs> CheckTokenValidityCompleted;
         void SignIn();
         void CheckCachedTokenValidityAsync();
+
+        void ShowCredentialErrorMessage(CredentialFormatValidationResult formatValidity);
     }
 }

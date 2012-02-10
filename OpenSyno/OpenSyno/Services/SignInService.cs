@@ -99,22 +99,43 @@ namespace OpenSyno.Services
 
                                                   };
                 // we pass the client object along just so it doesn't get garbage collected before the eventhandler is called.
-            var isBadFormat = CheckHostnameDoesNotContainPort(_openSynoSettings.Host);
-            if (!isBadFormat)
+            var formatValidity = _openSynoSettings.IsCredentialFormatValid();
+
+            if (formatValidity != CredentialFormatValidationResult.Valid)
+            {
+                ShowCredentialErrorMessage(formatValidity);
+            }                        
+
+            // var isBadFormat = CheckHostnameDoesNotContainPort(_openSynoSettings.Host);
+            if (formatValidity == CredentialFormatValidationResult.Valid)
             {
                 string uriString = string.Format("http://{0}:{1}/webman/modules/AudioStation/webUI/audio.cgi?action=avoid_timeout", this._openSynoSettings.Host, this._openSynoSettings.Port);
                 client.DownloadStringAsync(new Uri(uriString),client);
             }
         }
 
-        private bool CheckHostnameDoesNotContainPort(string hostname)
+        public void ShowCredentialErrorMessage(CredentialFormatValidationResult formatValidity)
         {
-            var isUrlBadFormat = hostname.Contains(":");
-            if (isUrlBadFormat)
+            switch (formatValidity)
             {
-                _notificationService.Warning("Please, enter the port in the dedicated field instead of using the notation hostname:port", "Hostname not valid");
+                case CredentialFormatValidationResult.Valid:
+                    break;
+                case CredentialFormatValidationResult.HostEmpty:
+                    _notificationService.Warning("No hostname was specified in the settings. Please provide a hostname for the Disk Station.", "Hostname not specified");
+                    break;
+                case CredentialFormatValidationResult.InvalidHostFormat:
+                    break;
+                case CredentialFormatValidationResult.InvalidPort:
+                    break;
+                case CredentialFormatValidationResult.EmptyUsernamePassword:
+                    _notificationService.Warning("The username or the password was not specified in the settings. Please provide a username and a matching password registered in the Disk Station.", "Missing username or password");
+                    break;
+                case CredentialFormatValidationResult.PortIncludedInHostname:
+                    _notificationService.Warning("Please, enter the port in the dedicated field instead of using the notation hostname:port", "Hostname not valid");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("formatValidity");
             }
-            return isUrlBadFormat;
         }
 
         private bool CurrentTokenExistsForCurrentHost()

@@ -2,6 +2,8 @@
 {
     using System.Collections.Generic;
 
+    using OpemSyno.Contracts;
+
     using OpenSyno.ViewModels;
 
     public interface IOpenSynoSettings
@@ -15,5 +17,7 @@
         List<Playlist> Playlists { get; set; }
 
         bool UseSsl { get; set; }
+
+        CredentialFormatValidationResult IsCredentialFormatValid();
     }
 }
