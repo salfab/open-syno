@@ -100,8 +100,7 @@
                     trackViewModel.ConsecutiveAlbumIdentifier = previousAlbumGuid;
                 }
             };
-
-            Playlists = new ObservableCollection<Playlist>();
+            
             _playbackService = playbackService;
             this.PlayQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
