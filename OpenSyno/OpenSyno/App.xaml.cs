@@ -188,8 +188,17 @@ namespace OpenSyno
 
         private void OnSignInComplete(object sender, SignInCompletedEventArgs e)
         {
-            _playbackService.InvalidateCachedTokens();
+            if (NewTokenIsValid(e))
+            {
+                // there is no point in invalidating cached tokens if we cannot replace it with a valid token
+                _playbackService.InvalidateCachedTokens();                
+            }
 
+        }
+
+        private bool NewTokenIsValid(SignInCompletedEventArgs signInCompletedEventArgs)
+        {
+            return !string.IsNullOrWhiteSpace(signInCompletedEventArgs.Token);
         }
 
         // Code to execute when the application is activated (brought to foreground)
