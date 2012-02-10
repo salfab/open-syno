@@ -86,7 +86,7 @@
             _trackViewModelFactory = trackViewModelFactory;
 
             RemoveTracksFromQueueCommand = new DelegateCommand<IEnumerable<object>>(OnRemoveTracksFromQueue);
-
+            
             Action consecutiveAlbumsIdPatcher = () =>
             {
                 var previousAlbumGuid = Guid.Empty;
@@ -102,6 +102,7 @@
                 }
             };
 
+            Playlists = new ObservableCollection<Playlist>();
             _playbackService = playbackService;
             this.PlayQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
@@ -146,7 +147,7 @@
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious);
-            SavePlaylistCommand = new DelegateCommand<IEnumerable<ITrackViewModel>>(OnSavePlaylist);
+            SavePlaylistCommand = new DelegateCommand<IEnumerable<TrackViewModel>>(OnSavePlaylist);
             SelectAllAlbumTracksCommand = new DelegateCommand<Guid>(OnSelectAllAlbumTracks);
         }
 
@@ -194,12 +195,12 @@
             OnPropertyChanged(PlayQueueItemsPropertyName);
         }
 
-        private void OnSavePlaylist(IEnumerable<ITrackViewModel> tracks)
+        private void OnSavePlaylist(IEnumerable<TrackViewModel> tracks)
         {
             Playlist playlist = new Playlist();
             foreach (var trackViewModel in tracks)
             {
-                playlist.Tracks.Add((TrackViewModel)trackViewModel);
+                playlist.Tracks.Add(trackViewModel);
             }
 
             // TODO : let the user input the name.

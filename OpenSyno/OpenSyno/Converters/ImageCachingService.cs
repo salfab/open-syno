@@ -24,6 +24,7 @@
         private static List<Task<string>> _tasksWritingOnDisk;
         public ImageCachingService(ILogService logService)
         {
+            _logService = IoC.Container.Get<ILogService>();
             _tasksWritingOnDisk = new List<Task<string>>();
             this.CachedImagesMappings = new List<CachedImagesMapping>();
             this.MaxBindingsLimit = 100;
@@ -77,7 +78,7 @@
 
         private static object internalIsolatedStorageAccessLock;
 
-        private static readonly ILogService _logService = IoC.Container.Get<ILogService>();
+        private static ILogService _logService;
 
         private static void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
