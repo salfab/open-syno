@@ -144,7 +144,7 @@
                                     {
                                         var readBytes = fs.EndRead(ar);
                                         MemoryStream ms = new MemoryStream(buffer);
-                                        _logService.Trace(string.Format("ImageCachingService.OnSourcePropertyChanged : Network read completed with {0} bytes", readBytes));                                        
+                                        _logService.Trace(string.Format("ImageCachingService.OnSourcePropertyChanged : Cached image read completed with {0} bytes", readBytes));
                                         image.SetSource(ms);
                                         ((Image)ar.AsyncState).Source = image;
                                     },
@@ -161,8 +161,7 @@
 
                         if (wc.ResponseHeaders == null)
                         {
-                            throw new WebException(
-                                "Could not retrieve album cover. Please check your internet connection.");
+                            throw new WebException("Could not retrieve album cover. Please check your internet connection.");
                         }
 
                         // download image to a local memory stream
