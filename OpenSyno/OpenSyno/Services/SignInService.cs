@@ -109,8 +109,18 @@ namespace OpenSyno.Services
             // var isBadFormat = CheckHostnameDoesNotContainPort(_openSynoSettings.Host);
             if (formatValidity == CredentialFormatValidationResult.Valid)
             {
-                string uriString = string.Format("http://{0}:{1}/webman/modules/AudioStation/webUI/audio.cgi?action=avoid_timeout", this._openSynoSettings.Host, this._openSynoSettings.Port);
-                client.DownloadStringAsync(new Uri(uriString),client);
+                // let's prevent unexpected validation error.
+                try
+                {
+                    string uriString = string.Format("http://{0}:{1}/webman/modules/AudioStation/webUI/audio.cgi?action=avoid_timeout", this._openSynoSettings.Host, this._openSynoSettings.Port);
+                    client.DownloadStringAsync(new Uri(uriString), client);
+                }
+                catch (UriFormatException e)
+                {
+                    _notificationService.Error("The credentials could not be parsed. Please check that the provided connection information do not contain any invalid characters.", "Invalid connection info");
+                    return;
+                }
+                
             }
         }
 
