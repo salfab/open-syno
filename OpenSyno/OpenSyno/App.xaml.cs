@@ -128,6 +128,7 @@ namespace OpenSyno
             if (IsolatedStorageSettings.ApplicationSettings.Contains("ImageCachingService"))
             {
                 imageCachingService = (ImageCachingService)IsolatedStorageSettings.ApplicationSettings["ImageCachingService"];
+                imageCachingService.Initialize();
             }
             else
             {
