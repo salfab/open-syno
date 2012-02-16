@@ -93,7 +93,7 @@ namespace OpenSyno.Services
                                                       }
                                                       catch (WebException exception)
                                                       {
-                                                          _notificationService.Error("Please check that the specified hostname for the Disk Station is correct.", "We can't connect to your Disk Station");
+                                                          _notificationService.Error("Please check that the specified hostname for the Disk Station is correct and that you are connected to the Internet.", "We can't connect to your Disk Station");
                                                           CheckTokenValidityCompleted(this, new CheckTokenValidityCompletedEventArgs { IsValid = false, Token = null, Error = exception });
                                                       }
 
