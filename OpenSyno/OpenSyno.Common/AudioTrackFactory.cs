@@ -18,7 +18,19 @@ namespace OpenSyno.Common
 
         public AudioTrack Create(SynoTrack baseSynoTrack, Guid guid, string host, int port, string token)
         {
-          
+            if (baseSynoTrack == null)
+            {
+                throw new ArgumentNullException("baseSynoTrack");
+            }
+            if (host == null)
+            {
+                throw new ArgumentNullException("host");
+            }
+            if (token == null)
+            {
+                throw new ArgumentNullException("token");
+            }
+
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
             string url =
                 string.Format(
@@ -54,6 +66,22 @@ namespace OpenSyno.Common
 
         public AudioTrack Create(SynoTrack baseSynoTrack, Guid guid, string host, int port, string token, string urlOverride)
         {
+            if (baseSynoTrack == null)
+            {
+                throw new ArgumentNullException("baseSynoTrack");
+            }
+            if (host == null)
+            {
+                throw new ArgumentNullException("host");
+            }
+            if (token == null)
+            {
+                throw new ArgumentNullException("token");
+            }
+            if (urlOverride == null)
+            {
+                throw new ArgumentNullException("urlOverride");
+            }
             return new AudioTrack(
                 new Uri(urlOverride),
                 baseSynoTrack.Title,
