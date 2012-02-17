@@ -24,14 +24,24 @@
         private static List<Task<string>> _tasksWritingOnDisk;
         public ImageCachingService(ILogService logService)
         {
+            Initialize();
+            _logService = logService;
+        }
+
+        /// <summary>
+        /// Initializes this instance.
+        /// </summary>
+        /// <remarks>
+        /// When the service gets deserialized, the constructor doesn't get called, therefore, this method can be called after deserialization in order to initialize the private non-persisted internals.
+        /// </remarks>
+        public void Initialize()
+        {
             _logService = IoC.Container.Get<ILogService>();
             _tasksWritingOnDisk = new List<Task<string>>();
             this.CachedImagesMappings = new List<CachedImagesMapping>();
             this.MaxBindingsLimit = 100;
-            internalIsolatedStorageAccessLock = new object();            
+            internalIsolatedStorageAccessLock = new object();
         }
-
-
 
         public static string GetImageId(DependencyObject obj)
         {
@@ -74,13 +84,18 @@
         }
 
         // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SourceProperty = DependencyProperty.RegisterAttached("Source", typeof(string), typeof(ImageCachingService), new PropertyMetadata(null, OnSourcePropertyChanged));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.RegisterAttached(
+            "Source", 
+            typeof(string), 
+            typeof(ImageCachingService), 
+            new PropertyMetadata(
+                null, (source, ea) => IoC.Container.Get<ImageCachingService>().OnSourcePropertyChanged(source, ea)));
 
         private static object internalIsolatedStorageAccessLock;
 
         private static ILogService _logService;
 
-        private static void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             string albumCoverId = GetImageId(d);
             if (albumCoverId == null)
@@ -88,13 +103,12 @@
                 throw new ArgumentNullException("AlbumId", "The attached property 'AlbumIdProperty' must be set for an image to be cached.");
             }
 
-            var imageCachingService = IoC.Container.Get<ImageCachingService>();
             string uriString = (string)e.NewValue;
             WebClient wc = new WebClient();
 
             string fileName;
 
-            var matchingMapping = imageCachingService.CachedImagesMappings.FirstOrDefault(o => o.ImageId == albumCoverId);
+            var matchingMapping = this.CachedImagesMappings.FirstOrDefault(o => o.ImageId == albumCoverId);
 
             if (matchingMapping != null)
             {
@@ -104,7 +118,7 @@
             {
                 fileName = Path.GetFileName(uriString);
             }
-            imageCachingService.TotalImageRequests++;
+            this.TotalImageRequests++;
 
             if (matchingMapping != null)
             {
@@ -130,7 +144,7 @@
                                     {
                                         var readBytes = fs.EndRead(ar);
                                         MemoryStream ms = new MemoryStream(buffer);
-                                        _logService.Trace(string.Format("ImageCachingService.OnSourcePropertyChanged : Network read completed with {0} bytes", readBytes));                                        
+                                        _logService.Trace(string.Format("ImageCachingService.OnSourcePropertyChanged : Cached image read completed with {0} bytes", readBytes));
                                         image.SetSource(ms);
                                         ((Image)ar.AsyncState).Source = image;
                                     },
@@ -147,8 +161,7 @@
 
                         if (wc.ResponseHeaders == null)
                         {
-                            throw new WebException(
-                                "Could not retrieve album cover. Please check your internet connection.");
+                            throw new WebException("Could not retrieve album cover. Please check your internet connection.");
                         }
 
                         // download image to a local memory stream
@@ -172,9 +185,9 @@
                                                 try
                                                 {
                                                     IEnumerable<string> paths = null;
-                                                    if (imageCachingService.CachedImagesMappings.Count >= imageCachingService.MaxBindingsLimit)
+                                                    if (this.CachedImagesMappings.Count >= this.MaxBindingsLimit)
                                                     {
-                                                        paths = from mapping in imageCachingService.CachedImagesMappings
+                                                        paths = from mapping in this.CachedImagesMappings
                                                                 where mapping.LastTimeUsed < DateTime.Now.AddDays(-14)
                                                                 orderby mapping.TimesUsed descending
                                                                 select mapping.FilePath;
@@ -218,7 +231,7 @@
                                                         LastTimeUsed = DateTime.Now, 
                                                         TimesUsed = 1
                                                     };
-                                                imageCachingService.CachedImagesMappings.Add(cachedImagesMapping);
+                                                this.CachedImagesMappings.Add(cachedImagesMapping);
                                                 
                                                 // let's try not to kill our storage by writing too often on it.
                                                 Timer throttlingWriteToDisk = new Timer(t =>
@@ -230,7 +243,7 @@
                                                         }
                                                         
                                                         Debug.WriteLine("Actual write request.");
-                                                        imageCachingService.RequestSave(EventArgs.Empty);
+                                                        this.RequestSave(EventArgs.Empty);
                                                     }, 
                                                     null, 
                                                     2000, 

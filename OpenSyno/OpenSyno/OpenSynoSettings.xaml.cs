@@ -47,11 +47,6 @@ namespace OpenSyno
             var isUrlBadFormat = hostname.Contains(":");            
             return isUrlBadFormat;
         }
-
-        public OpenSynoSettings()
-        {
-            this.Playlists = new List<Playlist>();
-        }
       
     }
 }

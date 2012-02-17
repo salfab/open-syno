@@ -3,8 +3,6 @@
     using System;
     using System.Collections.Generic;
 
-    using OpemSyno.Contracts;
-
     using OpenSyno.ViewModels;
 
     public class Playlist

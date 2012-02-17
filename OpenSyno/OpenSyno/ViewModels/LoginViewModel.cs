@@ -85,8 +85,6 @@ namespace OpenSyno
                 _audioStationSession.Host = Host;
                 _audioStationSession.Port = Port;
 
-                _playbackService.InvalidateCachedTokens();
-
                 try
                 {
                     _audioStationSession.LoginAsync(this.UserName, this.Password, this.OnLoginAsyncCompleted,
@@ -166,6 +164,9 @@ namespace OpenSyno
         private void OnLoginAsyncCompleted(string token)
         {
             _synoSettings.Token = token;
+
+            _playbackService.InvalidateCachedTokens();
+
 
             // if it worked : let's save the credentials.
             IsolatedStorageSettings.ApplicationSettings["SynoSettings"] = _synoSettings;

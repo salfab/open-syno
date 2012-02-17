@@ -191,16 +191,28 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     player.Stop();
                     break;
                 case UserAction.Pause:
-                    player.Pause();
+                    if (player.CanPause)
+                    {
+                        player.Pause();                        
+                    }
                     break;
                 case UserAction.FastForward:
-                    player.FastForward();
+                    if (player.CanSeek)
+                    {
+                        player.FastForward();                        
+                    }
                     break;
                 case UserAction.Rewind:
-                    player.Rewind();
+                    if (player.CanSeek)
+                    {
+                        player.Rewind();
+                    }
                     break;
                 case UserAction.Seek:
-                    player.Position = (TimeSpan)param;
+                    if (player.CanSeek)
+                    {
+                        player.Position = (TimeSpan)param;
+                    }
                     break;
                 case UserAction.SkipNext:
                         Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (mappings, currentTrack) =>

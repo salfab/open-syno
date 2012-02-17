@@ -12,6 +12,8 @@ namespace Synology.AudioStationApi
     using System.Threading.Tasks;
     using System.Windows;
 
+    using Newtonsoft.Json;
+
     using OpenSyno.SynoWP7;
 
     [DataContract]
@@ -448,10 +450,19 @@ namespace Synology.AudioStationApi
                                                           string rawCookie = ((WebClient)sender).ResponseHeaders["Set-Cookie"];
                                                           if (rawCookie == null)
                                                           {
-                                                              if (JObject.Parse(e.Result)["success"].Value<bool>() != true)
+                                                              try
                                                               {
-                                                                  throw new SynoLoginException("The login and the password don't match, please check your credentials", null);                                                                  
+                                                                  if (JObject.Parse(e.Result)["success"].Value<bool>() != true)
+                                                                  {
+                                                                      throw new SynoLoginException("The login and the password don't match, please check your credentials", null);
+                                                                  }
                                                               }
+                                                              catch (JsonReaderException exception)
+                                                              {
+                                                                  PiggybackingJsonReaderException extendedException = new PiggybackingJsonReaderException("Failed JSON document was : " + e.Result, exception);
+                                                                  callbackError(extendedException);
+                                                              }
+                                                              
                                                           }
                                                           else
                                                           {

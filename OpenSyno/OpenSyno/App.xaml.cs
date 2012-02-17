@@ -23,6 +23,8 @@ namespace OpenSyno
 
     using Microsoft.Phone.Tasks;
 
+    using Newtonsoft.Json;
+
     using OpemSyno.Contracts;
 
     using OpenSyno.Converters;
@@ -128,6 +130,7 @@ namespace OpenSyno
             if (IsolatedStorageSettings.ApplicationSettings.Contains("ImageCachingService"))
             {
                 imageCachingService = (ImageCachingService)IsolatedStorageSettings.ApplicationSettings["ImageCachingService"];
+                imageCachingService.Initialize();
             }
             else
             {
@@ -287,6 +290,10 @@ namespace OpenSyno
             {
                 this._notificationService.Error(exception.Message, "Search error");
                 handled = true;
+            }
+            catch (PiggybackingJsonReaderException exception)
+            {
+                this._logService.Error("a JSON parsing exception was thrown. " + exception.Message);
             }
             finally
             {

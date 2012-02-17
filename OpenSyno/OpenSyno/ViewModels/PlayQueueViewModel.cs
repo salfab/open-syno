@@ -5,7 +5,6 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.Diagnostics;
-    using System.IO.IsolatedStorage;
     using System.Linq;
     using System.Windows.Input;
 
@@ -101,8 +100,7 @@
                     trackViewModel.ConsecutiveAlbumIdentifier = previousAlbumGuid;
                 }
             };
-
-            Playlists = new ObservableCollection<Playlist>();
+            
             _playbackService = playbackService;
             this.PlayQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
@@ -540,7 +538,6 @@
         }
 
         public ICommand RemoveTracksFromQueueCommand { get; set; }
-
 
         /// <summary>
         /// Called when a play list operation is requested.
