@@ -61,6 +61,7 @@
     <Compile Include="IAudioStationSession.cs" />
     <Compile Include="ISearchService.cs" />
     <Compile Include="MockSearchService.cs" />
+    <Compile Include="PiggybackingJsonReaderException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteFileMockAudioStationSession.cs" />
     <Compile Include="SearchService.cs" />
