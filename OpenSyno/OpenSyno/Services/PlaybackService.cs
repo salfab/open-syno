@@ -6,6 +6,7 @@ namespace OpenSyno.Services
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.IO.IsolatedStorage;
     using System.Linq;
@@ -516,19 +517,40 @@ namespace OpenSyno.Services
         {
             _logService.Trace("Serializing playqueue");
             // TODO : Handle case where the background agent would be reading and the file cannot be written to !
-            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
+            bool tryAgain = true;
+            int triesCount = 1;
+            while (tryAgain)
             {
-                var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
-
-                var serialization = new PlayqueueInterProcessCommunicationTransporter()
+                try
+                {
+                    using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
                     {
-                        Host = _audioStationSession.Host,
-                        Port = _audioStationSession.Port,
-                        Mappings = _tracksToGuidMapping,
-                        Token = _audioStationSession.Token
-                    };
-                dcs.WriteObject(playQueueFile, serialization);
-            }
+                        var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+
+                        var serialization = new PlayqueueInterProcessCommunicationTransporter()
+                        {
+                            Host = _audioStationSession.Host,
+                            Port = _audioStationSession.Port,
+                            Mappings = _tracksToGuidMapping,
+                            Token = _audioStationSession.Token
+                        };
+                        dcs.WriteObject(playQueueFile, serialization);
+                    }
+                    tryAgain = false;
+                }
+                catch (Exception e)
+                {
+                    Thread.Sleep(300);
+                    triesCount++;
+                    if (triesCount > 10)
+                    {
+                        tryAgain = false;
+                        throw new InvalidOperationException("The isolated storage could ont be accessed at this time.", e);
+                    }
+                    throw;
+                }
+                
+            }            
         }
 
         public IEnumerable<GuidToTrackMapping> GetTracksInQueue()
