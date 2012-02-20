@@ -574,16 +574,24 @@ namespace OpenSyno.Services
 
         public void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove)
         {
-            var guidsToRemove = tracksToRemove.ToArray();
-            foreach (var guid in guidsToRemove)
+            // If not using an array, an Invalid Operation Exception will be thrown : something about Movenext, maybe the enumerator is not correctly implemented.
+            var trackToRemoveArray = tracksToRemove.ToArray();
+            PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
+            var guidToTrackMappings = new GuidToTrackMapping[trackToRemoveArray.Length];
+            int guidToTrackMappingIndex = 0;
+            foreach (var guid in trackToRemoveArray)
             {
-                var guidToTrackMapping = _tracksToGuidMapping.Single(o=>o.Guid == guid);
+
+                var guidToTrackMapping = _tracksToGuidMapping.Single(o => o.Guid == guid);
+
+
                 _tracksToGuidMapping.Remove(guidToTrackMapping);
 
-                PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
-                ea.RemovedItems = new[] { guidToTrackMapping };
-                this.OnTracksInQueueChanged(ea);
+                guidToTrackMappings[guidToTrackMappingIndex] = guidToTrackMapping;
+                guidToTrackMappingIndex++;
             }
+            ea.RemovedItems = guidToTrackMappings;
+            this.OnTracksInQueueChanged(ea);
         }
 
         public void SkipPrevious()
