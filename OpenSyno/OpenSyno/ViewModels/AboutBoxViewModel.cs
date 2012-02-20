@@ -1,5 +1,6 @@
 ﻿namespace OpenSyno.ViewModels
 {
+    using System;
     using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
@@ -17,8 +18,17 @@
         public AboutBoxViewModel()
         {
             OpenWebsiteCommand = new DelegateCommand<string>(OnOpenWebsite);
+            SendEmailCommand = new DelegateCommand<string>(OnSendEmailCommand);
             var versionRegex = new Regex("Version=([0-9\\.]+),");
             Version = versionRegex.Match(Assembly.GetExecutingAssembly().FullName).Groups[1].Value;
+        }
+
+        private void OnSendEmailCommand(string obj)
+        {
+            EmailComposeTask emailComposeTask = new EmailComposeTask();
+            emailComposeTask.To = "opensyno@seesharp.ch";
+            emailComposeTask.Subject = string.Format("open syno {0} feedback", Version);
+            emailComposeTask.Show();
         }
 
         /// <summary>
@@ -36,6 +46,9 @@
         /// </summary>
         /// <value>The command to open the website.</value>
         public ICommand OpenWebsiteCommand { get; set; }
+
+
+        public ICommand SendEmailCommand { get; set; }
 
         public string Version { get; set; }
     }
