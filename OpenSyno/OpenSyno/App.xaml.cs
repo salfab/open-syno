@@ -281,7 +281,7 @@ namespace OpenSyno
             }
             catch (SynoLoginException exception)
             {
-                this._notificationService.Error(exception.Message, "Login error");
+                this._notificationService.Error(exception.Message, "Could not sign-in");
                 handled = true;
             }
             catch (WebException exception)
