@@ -118,7 +118,10 @@ namespace OpenSyno
             
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModel>().ToSelf().InSingletonScope();
-            IoC.Container.Bind<ILogService>().To<IsolatedStorageLogService>().InSingletonScope();
+
+            _logService = new IsolatedStorageLogService();
+            IoC.Container.Bind<ILogService>().ToConstant(_logService).InSingletonScope();
+            
             IoC.Container.Bind<ISearchResultItemViewModelFactory>().To<SearchResultItemViewModelFactory>().InSingletonScope();
 
             IoC.Container.Bind<IUrlParameterToObjectsPlateHeater>().To<UrlParameterToObjectsPlateHeater>().InSingletonScope();
@@ -370,7 +373,7 @@ namespace OpenSyno
 
         private ISignInService _signInService;
 
-        private readonly ILogService _logService;
+        private ILogService _logService;
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()

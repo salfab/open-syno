@@ -24,6 +24,11 @@
         private static List<Task<string>> _tasksWritingOnDisk;
         public ImageCachingService(ILogService logService)
         {
+            if (logService == null)
+            {
+                throw new ArgumentNullException("logService");
+            }
+
             Initialize();
             _logService = logService;
         }

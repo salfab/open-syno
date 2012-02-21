@@ -6,6 +6,7 @@ namespace OpenSyno.Services
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.IO.IsolatedStorage;
     using System.Linq;
@@ -516,19 +517,40 @@ namespace OpenSyno.Services
         {
             _logService.Trace("Serializing playqueue");
             // TODO : Handle case where the background agent would be reading and the file cannot be written to !
-            using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
+            bool tryAgain = true;
+            int triesCount = 1;
+            while (tryAgain)
             {
-                var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
-
-                var serialization = new PlayqueueInterProcessCommunicationTransporter()
+                try
+                {
+                    using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
                     {
-                        Host = _audioStationSession.Host,
-                        Port = _audioStationSession.Port,
-                        Mappings = _tracksToGuidMapping,
-                        Token = _audioStationSession.Token
-                    };
-                dcs.WriteObject(playQueueFile, serialization);
-            }
+                        var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+
+                        var serialization = new PlayqueueInterProcessCommunicationTransporter()
+                        {
+                            Host = _audioStationSession.Host,
+                            Port = _audioStationSession.Port,
+                            Mappings = _tracksToGuidMapping,
+                            Token = _audioStationSession.Token
+                        };
+                        dcs.WriteObject(playQueueFile, serialization);
+                    }
+                    tryAgain = false;
+                }
+                catch (Exception e)
+                {
+                    Thread.Sleep(300);
+                    triesCount++;
+                    if (triesCount > 10)
+                    {
+                        tryAgain = false;
+                        throw new InvalidOperationException("The isolated storage could ont be accessed at this time.", e);
+                    }
+                    throw;
+                }
+                
+            }            
         }
 
         public IEnumerable<GuidToTrackMapping> GetTracksInQueue()
@@ -552,16 +574,24 @@ namespace OpenSyno.Services
 
         public void RemoveTracksFromQueue(IEnumerable<Guid> tracksToRemove)
         {
-            var guidsToRemove = tracksToRemove.ToArray();
-            foreach (var guid in guidsToRemove)
+            // If not using an array, an Invalid Operation Exception will be thrown : something about Movenext, maybe the enumerator is not correctly implemented.
+            var trackToRemoveArray = tracksToRemove.ToArray();
+            PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
+            var guidToTrackMappings = new GuidToTrackMapping[trackToRemoveArray.Length];
+            int guidToTrackMappingIndex = 0;
+            foreach (var guid in trackToRemoveArray)
             {
-                var guidToTrackMapping = _tracksToGuidMapping.Single(o=>o.Guid == guid);
+
+                var guidToTrackMapping = _tracksToGuidMapping.Single(o => o.Guid == guid);
+
+
                 _tracksToGuidMapping.Remove(guidToTrackMapping);
 
-                PlayqueueChangedEventArgs ea = new PlayqueueChangedEventArgs();
-                ea.RemovedItems = new[] { guidToTrackMapping };
-                this.OnTracksInQueueChanged(ea);
+                guidToTrackMappings[guidToTrackMappingIndex] = guidToTrackMapping;
+                guidToTrackMappingIndex++;
             }
+            ea.RemovedItems = guidToTrackMappings;
+            this.OnTracksInQueueChanged(ea);
         }
 
         public void SkipPrevious()
