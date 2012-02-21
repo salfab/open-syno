@@ -148,6 +148,20 @@
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious);
             SavePlaylistCommand = new DelegateCommand<IEnumerable<TrackViewModel>>(OnSavePlaylist);
             SelectAllAlbumTracksCommand = new DelegateCommand<Guid>(OnSelectAllAlbumTracks);
+
+            LoadSavedPlaylists();
+            LoadCurrentPlaylist();
+        }
+
+        private void LoadSavedPlaylists()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void LoadCurrentPlaylist()
+        {
+            
+            throw new NotImplementedException();
         }
 
         private void OnSelectAllAlbumTracks(Guid consecutiveAlbumId)
