@@ -31,6 +31,12 @@ namespace OpenSyno.SynoWP7
             total = jObject["total"].Value<long>();
         }
 
+        private static bool IsSuccessful(JObject jObject)
+        {
+            var success = jObject["success"].Value<bool>();
+            return success;
+        }
+
         private static string BuildAbsoluteAlbumArtUrl(string urlBase, string relativeAlbumArtUrl)
         {
             // In the iPhone app : 
