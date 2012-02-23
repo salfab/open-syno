@@ -155,13 +155,28 @@
 
         private void LoadSavedPlaylists()
         {
-            throw new NotImplementedException();
+            if (_openSynoSettings.Playlists == null)
+            {
+                this.Playlists = new ObservableCollection<Playlist>();
+            }
+            else
+            {
+                this.Playlists = new ObservableCollection<Playlist>(_openSynoSettings.Playlists);
+            }
         }
 
         private void LoadCurrentPlaylist()
         {
-            
-            throw new NotImplementedException();
+            Guid currentPlaylistId = _openSynoSettings.CurrentPlaylistGuid;
+
+            // NOTE - if there is a bug and we have two matches, then we are going to fallback to an unsaved playlist.
+            this.CurrentPlaylist = this.Playlists.SingleOrDefault(o => o.Id == currentPlaylistId);
+
+            // 2+ or no matching playlists at all : 
+            if (this.CurrentPlaylist == null)
+            {
+                this.CurrentPlaylist = new Playlist();
+            }
         }
 
         private void OnSelectAllAlbumTracks(Guid consecutiveAlbumId)

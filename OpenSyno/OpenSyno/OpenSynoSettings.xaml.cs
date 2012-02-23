@@ -20,6 +20,8 @@ namespace OpenSyno
 
         public List<Playlist> Playlists { get; set; }
 
+        public Guid CurrentPlaylistGuid { get; set; }
+
         public bool UseSsl { get; set; }
 
         public CredentialFormatValidationResult IsCredentialFormatValid()

@@ -1,5 +1,6 @@
 ﻿namespace OpenSyno
 {
+    using System;
     using System.Collections.Generic;
 
     using OpemSyno.Contracts;
@@ -17,6 +18,8 @@
         List<Playlist> Playlists { get; set; }
 
         bool UseSsl { get; set; }
+
+        Guid CurrentPlaylistGuid { get; set; }
 
         CredentialFormatValidationResult IsCredentialFormatValid();
     }
