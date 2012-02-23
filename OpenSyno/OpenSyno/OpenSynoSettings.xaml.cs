@@ -24,6 +24,11 @@ namespace OpenSyno
 
         public bool UseSsl { get; set; }
 
+        public OpenSynoSettings()
+        {
+            this.Playlists = new List<Playlist>();
+        }
+
         public CredentialFormatValidationResult IsCredentialFormatValid()
         {
             if (string.IsNullOrEmpty(this.UserName) || string.IsNullOrEmpty(this.Password))
