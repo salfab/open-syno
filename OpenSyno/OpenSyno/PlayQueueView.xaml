@@ -111,10 +111,9 @@
                   </Grid.Resources>
                   <Grid.RowDefinitions>
                 		<RowDefinition Height="Auto" />
-						<RowDefinition />
+                		<RowDefinition Height="Auto" />						
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    
                     <toolkit:ListPicker ItemsSource="{Binding Playlists}"/>
                     <Button Grid.Row="1" HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" />
                     <Button Grid.Row="1"  HorizontalAlignment="Right" Content="Save to playlist" Command="{Binding SavePlaylistCommand}" CommandParameter="{Binding PlayQueueItems, Mode=TwoWay}"/>                    
