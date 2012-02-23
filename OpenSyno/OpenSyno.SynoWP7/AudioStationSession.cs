@@ -593,6 +593,7 @@ namespace Synology.AudioStationApi
 
                             long count;
                             IEnumerable<SynoItem> artists;
+                            
                             SynologyJsonDeserializationHelper.ParseSynologyArtists(content, out artists, out count, urlBase);
 
 
@@ -609,15 +610,17 @@ namespace Synology.AudioStationApi
                             }
                             else
                             {
-                                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                                Deployment.Current.Dispatcher.BeginInvoke(
+                                    new Action<IEnumerable<SynoItem>>(a =>
                                     {
                                         if (count > limit)
                                         {
                                             // FIXME : Use an error handling service
                                             // MessageBox.Show(string.Format("number of available artists ({0}) exceeds supported limit ({1})", count, limit));
                                         }
-                                        callback(artists);
-                                    });
+                                        callback(a);
+                                    }),
+                                    new[] { artists });
                             }
                         },
                         webRequest);
