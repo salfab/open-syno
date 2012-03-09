@@ -548,8 +548,16 @@ namespace Synology.AudioStationApi
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
             var url = urlBase + "/audio/webUI/audio_browse.cgi";
+            HttpWebRequest request;
 
-            HttpWebRequest request = BuildRequest(url);
+            try
+            {
+                request = BuildRequest(url);
+            }
+            catch (UriFormatException e)
+            {                
+                throw new NotSupportedException("given url format is not supported : " + url,  e);
+            }
 
             // TODO : Find a way to retrieve the whole list by chunks of smaller size to have something to show earlier... or stream the JSON and parse it on the fly if it is possible
             int limit = 5000;
