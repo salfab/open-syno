@@ -19,6 +19,8 @@ namespace Synology.AudioStationApi
     [DataContract]
     public class AudioStationSession : IAudioStationSession
     {
+        private IVersionDependentResourcesProvider versionDependentResourcesProvider;
+
         [DataMember]
         public string Host { get;  set; }
 
@@ -547,7 +549,8 @@ namespace Synology.AudioStationApi
         public void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/audio/webUI/audio_browse.cgi";
+            DsmVersions version = DsmVersions.V4_0;
+            var url = urlBase + this.versionDependentResourcesProvider.GetArtistSearchServiceRelativePath(DsmVersions.V4_0); 
             HttpWebRequest request;
 
             try
