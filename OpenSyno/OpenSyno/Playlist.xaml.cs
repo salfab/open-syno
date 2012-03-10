@@ -13,8 +13,13 @@
 
         public Guid Id { get; set; }
 
-        public Playlist()
+        public Playlist() : this(Guid.NewGuid(), string.Empty)
         {
+        }
+
+        public Playlist(Guid playlistIt, string unsavedPlayqueue)
+        {
+            this.Name = unsavedPlayqueue;
             Tracks = new List<TrackViewModel>();
         }
     }

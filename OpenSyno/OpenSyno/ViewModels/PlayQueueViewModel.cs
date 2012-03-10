@@ -7,6 +7,7 @@
     using System.Diagnostics;
     using System.IO.IsolatedStorage;
     using System.Linq;
+    using System.Windows;
     using System.Windows.Input;
 
     using Microsoft.Phone.BackgroundAudio;
@@ -163,6 +164,27 @@
             {
                 this.Playlists = new ObservableCollection<Playlist>(_openSynoSettings.Playlists);
             }
+
+            var unsavedPlayqueueIsPresent = this._openSynoSettings.Playlists.Any(playlist => playlist.Id.Equals(Guid.Empty));
+            if (!unsavedPlayqueueIsPresent)
+            {
+                var unsavedPlayqueue = new Playlist(Guid.Empty, "unsaved playqueue");
+                this.Playlists.Add(unsavedPlayqueue);
+                this.AddPlaylistToPersistedSettings(unsavedPlayqueue);
+            }
+            else
+            {
+                this.PlayqueueSanityCheck(this._openSynoSettings.Playlists);
+            }
+            
+        }
+
+        private void PlayqueueSanityCheck(List<Playlist> playlists)
+        {
+            if (playlists.Count(o => o.Id.Equals(Guid.Empty)) > 1)
+            {
+                throw new ArgumentOutOfRangeException("There should be only one unsaved playqueue.");
+            }
         }
 
         private void LoadCurrentPlaylist()
@@ -170,13 +192,15 @@
             Guid currentPlaylistId = _openSynoSettings.CurrentPlaylistGuid;
 
             // NOTE - if there is a bug and we have two matches, then we are going to fallback to an unsaved playlist.
-            this.CurrentPlaylist = this.Playlists.SingleOrDefault(o => o.Id == currentPlaylistId);
+            var currentPlaylist = this.Playlists.SingleOrDefault(o => o.Id == currentPlaylistId);
 
             // 2+ or no matching playlists at all : 
-            if (this.CurrentPlaylist == null)
+            if (currentPlaylist == null)
             {
-                this.CurrentPlaylist = new Playlist();
+                currentPlaylist = this.Playlists.Single(o => o.Id.Equals(Guid.Empty));
             }
+
+            this.CurrentPlaylist = currentPlaylist;
         }
 
         private void OnSelectAllAlbumTracks(Guid consecutiveAlbumId)
@@ -202,6 +226,13 @@
 
         private void OnPlayqueueChanged(object sender, PlayqueueChangedEventArgs e)
         {
+            if (this.CurrentPlaylist.Id != Guid.Empty)
+            {
+                var savedPlayList = this.CurrentPlaylist;
+                this.CurrentPlaylist = this.Playlists.Single(o => o.Id == Guid.Empty);
+                this.CurrentPlaylist.Tracks.Clear();
+                this.CurrentPlaylist.Tracks.AddRange(savedPlayList.Tracks);
+            }
             if (e.RemovedItems != null)
             {
                 foreach (var oldItem in e.RemovedItems)
@@ -242,17 +273,22 @@
 
             // TODO : let the user input the name.
             playlist.Name = tracks.First().TrackInfo.Artist + " ...";
-            
-            _openSynoSettings.Playlists.Add(playlist);
-            
-            // Note - we should have used a dedicated service to handle data persistence.
-            IsolatedStorageSettings.ApplicationSettings.Save();  
-            
+            playlist.Id = Guid.NewGuid();
+            AddPlaylistToPersistedSettings(playlist);
+
             // Note - we might face problems in the future when we edit a play list. Make sure the edits get propagated to the persistence as well.
             Playlists.Add(playlist);
 
             this.CurrentPlaylist = playlist;
-        }  
+        }
+
+        private void AddPlaylistToPersistedSettings(Playlist playlist)
+        {
+            this._openSynoSettings.Playlists.Add(playlist);
+            
+            // Note - we should have used a dedicated service to handle data persistence.
+            IsolatedStorageSettings.ApplicationSettings.Save();
+        }
 
         private Playlist _currentPlaylist;
 
@@ -270,7 +306,37 @@
                     this._currentPlaylist = value;
                     this.ClearItems();
                     this.AppendItems(value.Tracks, matchingGuid => { });
+                    
+                    this.OnPropertyChanged(CurrentPlaylistPropertyName);
+
+                    // NOTE : beware the race conditions.
+                    this.CurrentPlaylistIndex = this.Playlists.IndexOf(value);
+
+                    PersistCurrentPlaylistSettings(this.CurrentPlaylist);
+                    
                 }                                
+            }
+        }
+
+        private void PersistCurrentPlaylistSettings(Playlist currentPlaylist)
+        {
+            _openSynoSettings.CurrentPlaylistGuid = currentPlaylist.Id;
+            IsolatedStorageSettings.ApplicationSettings.Save();
+        }
+
+        protected int CurrentPlaylistIndex
+        {
+            get
+            {
+                return _currentPlaylistIndex;
+            }
+            set
+            {
+                if (value != _currentPlaylistIndex)
+                {
+                    this._currentPlaylistIndex = value;
+                    this.OnPropertyChanged(CurrentPlaylistIndexPropertyName);
+                }
             }
         }
 
@@ -446,6 +512,12 @@
         private readonly ITrackViewModelFactory _trackViewModelFactory;
         private readonly IPageSwitchingService _pageSwitchingService;
 
+        private static string CurrentPlaylistPropertyName = "CurrentPlaylist";
+
+        private int _currentPlaylistIndex;
+
+        private const string CurrentPlaylistIndexPropertyName = "CurrentPlaylistIndex";
+
         private const string CurrentPlaybackPercentCompletePropertyName = "CurrentPlaybackPercentComplete";
 
         private const string BufferBytesCountPropertyName = "BufferedBytesCount";
@@ -530,9 +602,9 @@
                     this.Playlists.Remove(existingTemporaryPlayqueue);
                 }
 
-                Playlist playQueue = new Playlist()
+                Playlist playQueue = new Playlist
                     {
-                        Id = Guid.Empty, 
+                        Id = Guid.Empty,
                         Name = "Unsaved playqueue",
                         Tracks = this.CurrentPlaylist.Tracks 
                     };

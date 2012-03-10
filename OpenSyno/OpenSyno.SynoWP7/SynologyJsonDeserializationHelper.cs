@@ -13,6 +13,8 @@ namespace OpenSyno.SynoWP7
         public static void ParseSynologyArtists(string result, out IEnumerable<SynoItem> artists, out long total, string urlBase)
         {
             JObject jObject = JObject.Parse(result);
+            bool successful = SynologyJsonDeserializationHelper.IsSuccessful(jObject);
+
             total = 0L;
             artists = null;
             artists = (from album in jObject["items"]
