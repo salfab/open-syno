@@ -123,7 +123,14 @@ namespace OpenSyno.BackgroundPlaybackAgent
                 case PlayState.TrackEnded:
                     Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (mappings, currentTrack) =>
                         {
-                            var index = mappings.IndexOf(mappings.Single(o=>o.Guid == new Guid(currentTrack.Tag)));
+                            var guidToTrackMapping = mappings.SingleOrDefault(o => o.Guid == new Guid(currentTrack.Tag));
+                            if (guidToTrackMapping == null)
+                            {
+                                // play queue has been messed with and the current track could not be found, therefore, we cannot find the next one. for now, we'll stop playback.
+                                return null;
+                            }
+
+                            var index = mappings.IndexOf(guidToTrackMapping);
                             index++;
                             if (index >= mappings.Count)
                             {
