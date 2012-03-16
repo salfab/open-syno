@@ -122,6 +122,8 @@ namespace OpenSyno
             _synoSettings.UserName = UserName;
             _synoSettings.Password = Password;
             _synoSettings.UseSsl = UseSsl;
+            // FIXME : detect or ask version
+            _synoSettings.DsmVersion = DsmVersions.V4_0;
             _synoSettings.Host = Host;
             _synoSettings.Port = Port;
 

@@ -6,6 +6,8 @@
 
     using OpenSyno.ViewModels;
 
+    using Synology.AudioStationApi;
+
     public interface IOpenSynoSettings
     {        
         string Token { get; set; }
@@ -17,6 +19,8 @@
         List<Playlist> Playlists { get; set; }
 
         bool UseSsl { get; set; }
+
+        DsmVersions DsmVersion { get; set; }
 
         CredentialFormatValidationResult IsCredentialFormatValid();
     }

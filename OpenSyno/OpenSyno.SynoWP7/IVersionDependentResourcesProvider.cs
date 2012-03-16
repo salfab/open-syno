@@ -1,7 +1,7 @@
 ﻿namespace Synology.AudioStationApi
 {
-    internal interface IVersionDependentResourcesProvider
+    public interface IVersionDependentResourcesProvider
     {
-        string GetArtistSearchServiceRelativePath(DsmVersions dsmVersion);
+        string GetAudioSearchWebserviceRelativePath(DsmVersions dsmVersion);        
     }
 }

@@ -6,6 +6,8 @@ namespace OpenSyno
 
     using OpemSyno.Contracts;
 
+    using Synology.AudioStationApi;
+
     public class OpenSynoSettings : IOpenSynoSettings
     {
         public string Token { get; set; }
@@ -21,6 +23,8 @@ namespace OpenSyno
         public List<Playlist> Playlists { get; set; }
 
         public bool UseSsl { get; set; }
+
+        public DsmVersions DsmVersion { get; set; }
 
         public CredentialFormatValidationResult IsCredentialFormatValid()
         {

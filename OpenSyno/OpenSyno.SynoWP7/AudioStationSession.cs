@@ -21,6 +21,17 @@ namespace Synology.AudioStationApi
     {
         private IVersionDependentResourcesProvider versionDependentResourcesProvider;
 
+        public AudioStationSession(IVersionDependentResourcesProvider versionDependentResourcesProvider, DsmVersions dsmVersion) : this()
+        {
+            this.DsmVersion = dsmVersion;
+            this.versionDependentResourcesProvider = versionDependentResourcesProvider;
+        }
+
+        public AudioStationSession()
+        {
+            // TODO: Complete member initialization
+        }
+
         [DataMember]
         public string Host { get;  set; }
 
@@ -30,13 +41,17 @@ namespace Synology.AudioStationApi
         [DataMember]
         public string Token { get; set; }
 
+        [DataMember]
+        public DsmVersions DsmVersion { get; set; }
+
         public Task<IEnumerable<SynoItem>> SearchArtistAsync(string artistName)
         {
 
             TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
 
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            //var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -119,7 +134,8 @@ namespace Synology.AudioStationApi
             var tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
 
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            // var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -197,7 +213,8 @@ namespace Synology.AudioStationApi
             var tcs = new TaskCompletionSource<IEnumerable<SynoTrack>>(album);
 
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            // var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -283,7 +300,8 @@ namespace Synology.AudioStationApi
             TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
             
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            // var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -487,7 +505,8 @@ namespace Synology.AudioStationApi
         public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            // var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -549,8 +568,7 @@ namespace Synology.AudioStationApi
         public void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            DsmVersions version = DsmVersions.V4_0;
-            var url = urlBase + this.versionDependentResourcesProvider.GetArtistSearchServiceRelativePath(DsmVersions.V4_0); 
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
             HttpWebRequest request;
 
             try
@@ -670,6 +688,7 @@ namespace Synology.AudioStationApi
             //wc.DownloadStringAsync(uri);          
         }
 
+        
         private HttpWebRequest BuildRequest(string url)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
@@ -691,7 +710,7 @@ namespace Synology.AudioStationApi
         public void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/audio/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion);
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
@@ -769,7 +788,7 @@ namespace Synology.AudioStationApi
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
 
-            var url = urlBase + "/audio/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion);
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 

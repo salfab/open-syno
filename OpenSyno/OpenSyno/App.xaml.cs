@@ -87,6 +87,9 @@ namespace OpenSyno
 
             // FIXME : Load from config files instead of  hard-coded bindings.
 
+            IVersionDependentResourcesProvider versionDependentResourcesProvider = new VersionDependentResourcesProvider();
+            IoC.Container.Bind<IVersionDependentResourcesProvider>().ToConstant(versionDependentResourcesProvider).InSingletonScope();
+                        
             // Retrieve the type IAudioStationSession from a config file, so we can change it.
             // Also possible : RemoteFileMockAudioStationSession
             IAudioStationSession audioStationSession;
@@ -96,7 +99,7 @@ namespace OpenSyno
             }
             else
             {
-                audioStationSession = new AudioStationSession { Host = _openSynoSettings.Host, Port = _openSynoSettings.Port, Token = _openSynoSettings.Token };
+                audioStationSession = new AudioStationSession(versionDependentResourcesProvider, _openSynoSettings.DsmVersion) { Host = _openSynoSettings.Host, Port = _openSynoSettings.Port, Token = _openSynoSettings.Token };
             }
 
             IoC.Container.Bind<IAudioStationSession>().ToConstant(audioStationSession).InSingletonScope();

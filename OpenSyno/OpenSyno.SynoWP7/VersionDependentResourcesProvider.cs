@@ -4,7 +4,7 @@
 
     public class VersionDependentResourcesProvider : IVersionDependentResourcesProvider
     {
-        public string GetArtistSearchServiceRelativePath(DsmVersions dsmVersion)
+        public string GetAudioSearchWebserviceRelativePath(DsmVersions dsmVersion)
         {
             switch (dsmVersion)
             {
