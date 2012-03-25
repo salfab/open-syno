@@ -14,6 +14,13 @@ namespace OpenSyno.Common
 
     public class AudioTrackFactory : IAudioTrackFactory
     {
+        private IVersionDependentResourcesProvider versionDependentResourcesProvider;
+
+        public AudioTrackFactory(IVersionDependentResourcesProvider versionDependentResourcesProvider)
+        {
+            this.versionDependentResourcesProvider = versionDependentResourcesProvider;
+        }
+
         #region Implementation of IAudioTrackFactory
 
         public AudioTrack Create(SynoTrack baseSynoTrack, Guid guid, string host, int port, string token)
@@ -32,11 +39,13 @@ namespace OpenSyno.Common
             }
 
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
+            var relativePathToAudioStreamService = this.versionDependentResourcesProvider.GetAudioStreamWebserviceRelativePath(DsmVersions.V4_0);
             string url =
                 string.Format(
-                    "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+                    "http://{0}:{1}{2}/0.mp3?sid={3}&action=streaming&songpath={4}",
                     host,
                     port,
+                    relativePathToAudioStreamService,
                     token.Split('=')[1],
                     HttpUtility.UrlEncode(baseSynoTrack.Res).Replace("+", "%20"));
 

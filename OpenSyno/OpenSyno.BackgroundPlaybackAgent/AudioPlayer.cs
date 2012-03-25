@@ -36,7 +36,10 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// </remarks>
         public AudioPlayer()
         {
-            _audioTrackFactory = new AudioTrackFactory();
+            // since we are in a background agent : the types registered in the IoC container are not shared.
+            IVersionDependentResourcesProvider versionDependentResourcesProvider = new VersionDependentResourcesProvider();
+
+            _audioTrackFactory = new AudioTrackFactory(versionDependentResourcesProvider);
             using (var userStoreForApplication = IsolatedStorageFile.GetUserStoreForApplication())
             {
                 using (
