@@ -21,6 +21,8 @@ namespace OpenSyno
 {
     using System;
 
+    using Microsoft.Phone.Tasks;
+
     using OpemSyno.Contracts;
 
     public class ViewNames
@@ -36,6 +38,12 @@ namespace OpenSyno
         {
             Loaded += PageLoaded;
             InitializeComponent();
+            MessageBox.Show("The latest updates (including support for DSM v.4.0) can now be found under the publisher name 'seesharp.ch'.\r\n\r\nYou will now be redirected to the marketplace in order to get the latest update.", "Open Syno just moved !", MessageBoxButton.OK);           
+
+            var marketplaceDetail = new MarketplaceDetailTask();
+            marketplaceDetail.ContentType = MarketplaceContentType.Applications;
+            marketplaceDetail.ContentIdentifier = "0639ef86-f1c0-4472-a323-10e4a0e994d5";
+            marketplaceDetail.Show();
         }
 
         // HACK : If NavigationService in silverlight was the same as in WPF, we wouldn't have to put this logic in the view : we could have it in a view factory and have it more decoupled, unfortunately
