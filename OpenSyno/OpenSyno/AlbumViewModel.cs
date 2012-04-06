@@ -19,7 +19,7 @@ namespace OpenSyno
             this.Album = album;
             this.Tracks = new ObservableCollection<TrackViewModel>();
             SelectedCommand = new DelegateCommand(OnSelected);
-            SelectAllOrNoneCommand = new DelegateCommand(OnSelectAllOrNone);
+            SelectAllOrNoneCommand = new DelegateCommand(OnSelectAllOrNone,() => this.Tracks.Count > 0);
         }
 
         private void OnSelectAllOrNone()
