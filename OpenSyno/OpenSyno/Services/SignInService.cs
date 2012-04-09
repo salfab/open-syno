@@ -19,15 +19,17 @@ namespace OpenSyno.Services
         private INotificationService _notificationService;
 
         private ILogService _logService;
+        private IVersionDependentResourcesProvider _versionDependentResourcesProvider;
 
         public event EventHandler<SignInCompletedEventArgs> SignInCompleted;
 
-        public SignInService(IOpenSynoSettings openSynoSettings, IEventAggregator eventAggregator, INotificationService notificationService, ILogService logService)
+        public SignInService(IOpenSynoSettings openSynoSettings, IEventAggregator eventAggregator, INotificationService notificationService, ILogService logService, IVersionDependentResourcesProvider versionDependentResourcesProvider)
         {
             _openSynoSettings = openSynoSettings;
             _eventAggregator = eventAggregator;
             _notificationService = notificationService;
             _logService = logService;
+            _versionDependentResourcesProvider = versionDependentResourcesProvider;
         }
 
         public event EventHandler<CheckTokenValidityCompletedEventArgs> CheckTokenValidityCompleted;
@@ -112,7 +114,8 @@ namespace OpenSyno.Services
                 // let's prevent unexpected validation error.
                 try
                 {
-                    string uriString = string.Format("http://{0}:{1}/webman/modules/AudioStation/webUI/audio.cgi?action=avoid_timeout", this._openSynoSettings.Host, this._openSynoSettings.Port);
+                    string audioStationWebserviceRelativePath = this._versionDependentResourcesProvider.GetAudioStationWebserviceRelativePath(_openSynoSettings.DsmVersion);
+                    string uriString = string.Format("http://{0}:{1}{2}?action=avoid_timeout", this._openSynoSettings.Host, this._openSynoSettings.Port, audioStationWebserviceRelativePath);
                     client.DownloadStringAsync(new Uri(uriString), client);
                 }
                 catch (UriFormatException e)

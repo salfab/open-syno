@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using OpemSyno.Contracts;
 
 namespace OpenSyno.ViewModels
 {
@@ -29,6 +30,7 @@ namespace OpenSyno.ViewModels
         private readonly AlbumViewModelFactory _albumViewModelFactory;
 
         private ITrackViewModelFactory _trackViewModelFactory;
+        private INotificationService _notificationService;
 
         private const string IsSelectedPropertyName = "IsSelected";
 
@@ -60,7 +62,7 @@ namespace OpenSyno.ViewModels
             }
         }
 
-        public TrackViewModel(Guid guid, SynoTrack synoTrack, IPageSwitchingService pageSwitchingService, AlbumViewModelFactory albumViewModelFactory, IAudioStationSession session, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater, ITrackViewModelFactory trackViewModelFactory)
+        public TrackViewModel(Guid guid, SynoTrack synoTrack, IPageSwitchingService pageSwitchingService, AlbumViewModelFactory albumViewModelFactory, IAudioStationSession session, IUrlParameterToObjectsPlateHeater urlParameterToObjectsPlateHeater, ITrackViewModelFactory trackViewModelFactory, INotificationService notificationService)
         {
             if (synoTrack == null)
             {
@@ -72,6 +74,7 @@ namespace OpenSyno.ViewModels
                 throw new ArgumentNullException("session");
             }
             _trackViewModelFactory = trackViewModelFactory;
+            _notificationService = notificationService;
 
             if (albumViewModelFactory == null) throw new ArgumentNullException("albumViewModelFactory");
 
@@ -88,7 +91,13 @@ namespace OpenSyno.ViewModels
         }
 
         private void OnNavigateToContainingAlbum()
-        {                        
+        {
+            if (string.IsNullOrEmpty(this.TrackInfo.Artist))
+            {
+                _notificationService.Warning("We could not find other songs of the same album.\r\n\r\nThe track selected looks like it is not well tagged. No information could be found about the artist performing it, therefore, we could not navigate to the containing album.\r\nPlease consider tagging your 'Unknown Artist' tracks", "Sorry...");
+                return;
+            }
+            
             Task<IEnumerable<SynoItem>> searchArtistsTask = this._session.SearchArtistAsync(this.TrackInfo.Artist);
             searchArtistsTask.ContinueWith(
                 task =>
@@ -98,7 +107,7 @@ namespace OpenSyno.ViewModels
                         // TODO : check also that the artist name match !! otherwise, two albums might have the same name and still be two different albums.
                         if (artist == null)
                         {
-                            throw new NotSupportedException("we could not find strictly one perfect match for artist names. Maybe there are multiple artists with the same name in your library which might mean your library is corrupted.");
+                            throw new NotSupportedException("we could not find strictly one perfect match for artist '" + TrackInfo.Artist + "' (" + task.Result.First().ItemID + "). Maybe there are multiple artists with the same name in your library which might mean your library is corrupted. " + task.Result.Count() + " matches were found. The song the artist is supposed to have sung is '"+ TrackInfo.Title +"'.");
                         }
 
                         Task<IEnumerable<SynoItem>> searchAlbumsTask = this._session.GetAlbumsForArtistAsync(artist);

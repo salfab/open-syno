@@ -36,45 +36,16 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// </remarks>
         public AudioPlayer()
         {
-            _audioTrackFactory = new AudioTrackFactory();
+            // since we are in a background agent : the types registered in the IoC container are not shared.
+            IVersionDependentResourcesProvider versionDependentResourcesProvider = new VersionDependentResourcesProvider();
+
+            _audioTrackFactory = new AudioTrackFactory(versionDependentResourcesProvider);
+
+            // TODO : Handle exceptions 
             using (var userStoreForApplication = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (
-                    IsolatedStorageFileStream asciiUriFixes = userStoreForApplication.OpenFile(
-                        "AsciiUriFixes.xml", FileMode.OpenOrCreate))
-                {
-
-                    DataContractSerializer dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
-                    //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
-
-                    try
-                    {
-                        _asciiUriFixes = (List<AsciiUriFix>)dcs.ReadObject(asciiUriFixes);
-                    }
-                    catch (Exception e)
-                    {
-                        // could not deserialize XML for playlist : let's build an empty list.
-                        _asciiUriFixes = new List<AsciiUriFix>();
-                    }
-                }
-
-                using (
-                    IsolatedStorageFileStream playQueueFile = userStoreForApplication.OpenFile(
-                        "playqueue.xml", FileMode.OpenOrCreate))
-                {
-                    // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
-                    var dcs = new DataContractSerializer(
-                        typeof(PlayqueueInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
-
-
-                    _playqueueInformation = (PlayqueueInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
-
-                    foreach (GuidToTrackMapping pair in _playqueueInformation.Mappings)
-                    {
-                        _tracksToGuidMapping.Add(pair);
-                    }
-
-                }
+                LoadAsciiUriFixes(userStoreForApplication);
+                LoadPlayqueue(userStoreForApplication);
             }
 
             if (!_classInitialized)
@@ -86,6 +57,47 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     Application.Current.UnhandledException += AudioPlayer_UnhandledException;
                 });
 
+            }
+        }
+
+        private void LoadPlayqueue(IsolatedStorageFile userStoreForApplication)
+        {
+            using (
+                IsolatedStorageFileStream playQueueFile = userStoreForApplication.OpenFile(
+                    "playqueue.xml", FileMode.OpenOrCreate))
+            {
+                // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
+                var dcs = new DataContractSerializer(
+                    typeof (PlayqueueInterProcessCommunicationTransporter), new Type[] {typeof (SynoTrack)});
+
+
+                _playqueueInformation = (PlayqueueInterProcessCommunicationTransporter) dcs.ReadObject(playQueueFile);
+
+                foreach (GuidToTrackMapping pair in _playqueueInformation.Mappings)
+                {
+                    _tracksToGuidMapping.Add(pair);
+                }
+            }
+        }
+
+        private void LoadAsciiUriFixes(IsolatedStorageFile userStoreForApplication)
+        {
+            using (
+                IsolatedStorageFileStream asciiUriFixes = userStoreForApplication.OpenFile(
+                    "AsciiUriFixes.xml", FileMode.OpenOrCreate))
+            {
+                DataContractSerializer dcs = new DataContractSerializer(typeof (List<AsciiUriFix>));
+                //var xs = new XmlSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+
+                try
+                {
+                    _asciiUriFixes = (List<AsciiUriFix>) dcs.ReadObject(asciiUriFixes);
+                }
+                catch (Exception e)
+                {
+                    // could not deserialize XML for playlist : let's build an empty list.
+                    _asciiUriFixes = new List<AsciiUriFix>();
+                }
             }
         }
 
@@ -200,13 +212,13 @@ namespace OpenSyno.BackgroundPlaybackAgent
                 case UserAction.Pause:
                     if (player.CanPause)
                     {
-                        player.Pause();                        
+                        player.Pause();
                     }
                     break;
                 case UserAction.FastForward:
                     if (player.CanSeek)
                     {
-                        player.FastForward();                        
+                        player.FastForward();
                     }
                     break;
                 case UserAction.Rewind:
@@ -222,20 +234,20 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     }
                     break;
                 case UserAction.SkipNext:
-                        Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (mappings, currentTrack) =>
+                    Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (mappings, currentTrack) =>
+                    {
+                        var index = mappings.IndexOf(mappings.Single(o => o.Guid == new Guid(currentTrack.Tag)));
+                        index++;
+                        if (index >= mappings.Count)
                         {
-                            var index = mappings.IndexOf(mappings.Single(o => o.Guid == new Guid(currentTrack.Tag)));
-                            index++;
-                            if (index >= mappings.Count)
-                            {
-                                // no random, no repeat !
-                                return null;
-                            }
-                            return new GuidToTrackMapping { Guid = mappings[index].Guid, Track = mappings[index].Track };
-                         
-                        };
+                            // no random, no repeat !
+                            return null;
+                        }
+                        return new GuidToTrackMapping { Guid = mappings[index].Guid, Track = mappings[index].Track };
+
+                    };
                     player.Track = GetNextTrack(track, defineNextTrackPredicate);
-   
+
                     break;
                 case UserAction.SkipPrevious:
                     Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> definePreviousTrackPredicate = (mappings, currentTrack) =>
@@ -279,14 +291,14 @@ namespace OpenSyno.BackgroundPlaybackAgent
             if (defineNextTrackPredicate == null)
             {
                 throw new ArgumentNullException("defineNextTrackPredicate");
-            }            
+            }
 
             if (audioTrack != null && !string.IsNullOrWhiteSpace(audioTrack.Tag))
             {
 
                 GuidToTrackMapping guidToTrackMapping = defineNextTrackPredicate(_tracksToGuidMapping, audioTrack);
 
-                if (guidToTrackMapping != null )
+                if (guidToTrackMapping != null)
                 {
                     AudioTrack track;
                     SynoTrack nextTrack = guidToTrackMapping.Track;
@@ -304,7 +316,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
                     else
                     {
                         track = _audioTrackFactory.Create(nextTrack, guidToTrackMapping.Guid, _playqueueInformation.Host, _playqueueInformation.Port, _playqueueInformation.Token);
-                        
+
                     }
                     // new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);
                     // new AudioTrack(new Uri(nextTrack.Res), nextTrack.Title, nextTrack.Artist, nextTrack.Album, new Uri(nextTrack.AlbumArtUrl), guidToTrackMapping.Guid.ToString(), EnabledPlayerControls.All);

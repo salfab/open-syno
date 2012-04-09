@@ -19,6 +19,19 @@ namespace Synology.AudioStationApi
     [DataContract]
     public class AudioStationSession : IAudioStationSession
     {
+        private IVersionDependentResourcesProvider versionDependentResourcesProvider;
+
+        public AudioStationSession(IVersionDependentResourcesProvider versionDependentResourcesProvider, DsmVersions dsmVersion) : this()
+        {
+            this.DsmVersion = dsmVersion;
+            this.versionDependentResourcesProvider = versionDependentResourcesProvider;
+        }
+
+        public AudioStationSession()
+        {
+            // TODO: Complete member initialization
+        }
+
         [DataMember]
         public string Host { get;  set; }
 
@@ -28,13 +41,17 @@ namespace Synology.AudioStationApi
         [DataMember]
         public string Token { get; set; }
 
+        [DataMember]
+        public DsmVersions DsmVersion { get; set; }
+
         public Task<IEnumerable<SynoItem>> SearchArtistAsync(string artistName)
         {
 
             TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
 
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            //var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -117,7 +134,8 @@ namespace Synology.AudioStationApi
             var tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
 
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            // var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -195,7 +213,8 @@ namespace Synology.AudioStationApi
             var tcs = new TaskCompletionSource<IEnumerable<SynoTrack>>(album);
 
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            // var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -281,7 +300,8 @@ namespace Synology.AudioStationApi
             TaskCompletionSource<IEnumerable<SynoItem>> tcs = new TaskCompletionSource<IEnumerable<SynoItem>>();
             
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            // var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -379,7 +399,8 @@ namespace Synology.AudioStationApi
             var client = new WebClient();
 
             // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
-            string url = string.Format("http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?action=streaming&songpath={2}", this.Host, this.Port, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20").Replace("&", "%26"));
+            var relativePathToAudioStreamService = this.versionDependentResourcesProvider.GetAudioStreamWebserviceRelativePath(this.DsmVersion);
+            string url = string.Format("http://{0}:{1}{2}/0.mp3?action=streaming&songpath={3}", this.Host, this.Port,relativePathToAudioStreamService, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20").Replace("&", "%26"));
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.CookieContainer = new CookieContainer();
@@ -485,7 +506,8 @@ namespace Synology.AudioStationApi
         public void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            // var url = urlBase + "/webman/modules/AudioStation/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
 
             HttpWebRequest request = BuildRequest(url);
 
@@ -547,9 +569,17 @@ namespace Synology.AudioStationApi
         public void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/audio/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion); 
+            HttpWebRequest request;
 
-            HttpWebRequest request = BuildRequest(url);
+            try
+            {
+                request = BuildRequest(url);
+            }
+            catch (UriFormatException e)
+            {                
+                throw new NotSupportedException("given url format is not supported : " + url,  e);
+            }
 
             // TODO : Find a way to retrieve the whole list by chunks of smaller size to have something to show earlier... or stream the JSON and parse it on the fly if it is possible
             int limit = 5000;
@@ -662,6 +692,7 @@ namespace Synology.AudioStationApi
             //wc.DownloadStringAsync(uri);          
         }
 
+        
         private HttpWebRequest BuildRequest(string url)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
@@ -683,7 +714,7 @@ namespace Synology.AudioStationApi
         public void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
-            var url = urlBase + "/audio/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion);
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
@@ -761,7 +792,7 @@ namespace Synology.AudioStationApi
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
 
-            var url = urlBase + "/audio/webUI/audio_browse.cgi";
+            var url = urlBase + this.versionDependentResourcesProvider.GetAudioSearchWebserviceRelativePath(this.DsmVersion);
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
