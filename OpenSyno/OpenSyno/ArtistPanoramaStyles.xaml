@@ -26,7 +26,7 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>-->
-                    <Button Tilt:TiltEffect.IsTiltEnabled="True" Behaviors:ButtonClickToCommandBehavior.Command="{Binding SelectAllOrNoneCommand}" HorizontalAlignment="Left" VerticalAlignment="Top"  Style="{StaticResource StillButton}" BorderThickness="0" Padding="0" >
+                    <Button Tilt:TiltEffect.IsTiltEnabled="True" Command="{Binding SelectAllOrNoneCommand}" HorizontalAlignment="Left" VerticalAlignment="Top"  Style="{StaticResource StillButton}" BorderThickness="0" Padding="0" >
                         <Image Stretch="None" Behavior:ImageCachingService.ImageId="{Binding Album.ItemID}" Behavior:ImageCachingService.Source="{Binding Album.AlbumArtUrl}"/>
                     </Button>
                     <!--<Button Behaviors:ButtonClickToCommandBehavior.Command="{Binding PlayListOperationCommand}" Grid.Column="0" Grid.Row="1" Content="play" HorizontalAlignment="Left" />-->
