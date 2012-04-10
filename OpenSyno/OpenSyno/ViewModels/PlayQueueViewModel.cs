@@ -147,7 +147,7 @@
             PausePlaybackCommand = new DelegateCommand(OnPausePlayback);
             ResumePlaybackCommand = new DelegateCommand(OnResumePlayback);
             PlayPreviousCommand = new DelegateCommand(OnPlayPrevious);
-            SavePlaylistCommand = new DelegateCommand<IEnumerable<TrackViewModel>>(OnSavePlaylist);
+            SavePlaylistCommand = new DelegateCommand<IEnumerable<TrackViewModel>>(OnSavePlaylist, t => this.CurrentPlaylist.Id == Guid.Empty);
             SelectAllAlbumTracksCommand = new DelegateCommand<Guid>(OnSelectAllAlbumTracks);
 
             LoadSavedPlaylists();
@@ -200,7 +200,10 @@
                 currentPlaylist = this.Playlists.Single(o => o.Id.Equals(Guid.Empty));
             }
 
+            this.ClearItems();
+            this.AppendItems(currentPlaylist.Tracks, matchingGuid => { });
             this.CurrentPlaylist = currentPlaylist;
+
         }
 
         private void OnSelectAllAlbumTracks(Guid consecutiveAlbumId)
@@ -226,14 +229,6 @@
 
         private void OnPlayqueueChanged(object sender, PlayqueueChangedEventArgs e)
         {
-            if (this.CurrentPlaylist.Id != Guid.Empty)
-            {
-                var savedPlayList = this.CurrentPlaylist;
-                var playlist = this.Playlists.Single(o => o.Id == Guid.Empty);
-                playlist.Tracks.Clear();
-                playlist.Tracks.AddRange(savedPlayList.Tracks);
-                this.CurrentPlaylist = playlist;
-            }
             if (e.RemovedItems != null)
             {
                 foreach (var oldItem in e.RemovedItems)
@@ -250,6 +245,16 @@
                     this.PlayQueueItems.Add(this._trackViewModelFactory.Create(newItem.Guid, newItem.Track, this._pageSwitchingService));
                 }
             }
+
+            if (this.CurrentPlaylist != null && this.CurrentPlaylist.Id != Guid.Empty)
+            {
+                var savedPlayList = this.CurrentPlaylist;
+                var playlist = this.Playlists.Single(o => o.Id == Guid.Empty);
+                playlist.Tracks.Clear();
+                playlist.Tracks.AddRange(savedPlayList.Tracks);
+                this.CurrentPlaylist = playlist;
+            }
+
 
             // Hack : we want to make sure the converter Will be re-evaluated, so the easiest way is to trigger a propery changed.
             OnPropertyChanged(PlayQueueItemsPropertyName);
@@ -280,7 +285,10 @@
             // Note - we might face problems in the future when we edit a play list. Make sure the edits get propagated to the persistence as well.
             Playlists.Add(playlist);
 
+            this.ClearItems();
+            this.AppendItems(playlist.Tracks, matchingGuid => { });
             this.CurrentPlaylist = playlist;
+
         }
 
         private void AddPlaylistToPersistedSettings(Playlist playlist)
@@ -303,10 +311,19 @@
             {
                 if (value != this._currentPlaylist)
                 {
+                    // If the playlist was not set before, we don't need to prepare the underlying services for the change : there are no changes, it's the first assignation.
+                    if (this._currentPlaylist != null)
+                    {
+                        // prepare the underlying services with the caches and ascii mappings before we define the value as the current playlist.
+                        // it is important to assign the value after because it is a business rule to make an unsaved playqueue out of a modified saved playlist.
+                        // therefore, assigning the value anytime sooner would result in switching back to an unsaved playqueue !
+                        //this.ClearItems();
+                        //this.AppendItems(value.Tracks, matchingGuid => { });
+                    }
+
+
                     // TODO : Needs to raise the PropertyChanged event.
                     this._currentPlaylist = value;
-                    this.ClearItems();
-                    this.AppendItems(value.Tracks, matchingGuid => { });
                     
                     this.OnPropertyChanged(CurrentPlaylistPropertyName);
 
@@ -321,11 +338,12 @@
 
         private void PersistCurrentPlaylistSettings(Playlist currentPlaylist)
         {
+            _logService.Trace("PlayQueueViewModel.PersistCurrentPlaylistSettings : Persisting playlist  " + currentPlaylist.Name + " (" + currentPlaylist.Id +")");
             _openSynoSettings.CurrentPlaylistGuid = currentPlaylist.Id;
             IsolatedStorageSettings.ApplicationSettings.Save();
         }
 
-        protected int CurrentPlaylistIndex
+        public int CurrentPlaylistIndex
         {
             get
             {
@@ -337,6 +355,9 @@
                 {
                     this._currentPlaylistIndex = value;
                     this.OnPropertyChanged(CurrentPlaylistIndexPropertyName);
+                    this.ClearItems();                    
+                    this.AppendItems(this._currentPlaylist.Tracks,guids => {});
+                    this.CurrentPlaylist = this.Playlists[this._currentPlaylistIndex];
                 }
             }
         }

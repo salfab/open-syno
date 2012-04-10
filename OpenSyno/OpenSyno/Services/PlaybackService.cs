@@ -280,7 +280,7 @@ namespace OpenSyno.Services
                     if (_tracksToGuidMapping.Any(o=>o.Guid == guid))
                     {
                         SynoTrack synoTrack = this._tracksToGuidMapping.Single(o=>o.Guid == guid).Track;
-                        _logService.Error("Track matching the guid was found : " + synoTrack.Title);
+                        _logService.Trace("Track matching the guid was found : " + synoTrack.Title);
                         OnTrackStarted(new TrackStartedEventArgs { Guid = guid, Track = synoTrack });
                     }
                     else
@@ -454,7 +454,8 @@ namespace OpenSyno.Services
                             if (!_asciiUriFixes.Any(fix => fix.Url == null))
                             {
                                 SerializeAsciiUriFixes();
-                                callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Track)).ToDictionary(o => o.Track, o => o.Guid));
+                                Dictionary<SynoTrack, Guid> dictionary = _tracksToGuidMapping.Where(o => tracks.Contains(o.Track)).ToDictionary(o => o.Track, o => o.Guid);
+                                callback(dictionary);
                             }
                         };
                     var relativePathToAudioStreamService = this._versionDependentResourceProvider.GetAudioStreamWebserviceRelativePath(DsmVersions.V4_0);
@@ -622,8 +623,11 @@ namespace OpenSyno.Services
             _asciiUriFixes.Clear();
             var mappingsCopy = _tracksToGuidMapping.ToArray();
             _tracksToGuidMapping.Clear();
-            OnTracksInQueueChanged(new PlayqueueChangedEventArgs { RemovedItems = mappingsCopy });
 
+            if (mappingsCopy.Length > 0)
+            {
+                OnTracksInQueueChanged(new PlayqueueChangedEventArgs { RemovedItems = mappingsCopy });
+            }
         }
 
         public int GetTracksCountInQueue()

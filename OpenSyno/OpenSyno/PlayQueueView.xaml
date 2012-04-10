@@ -114,7 +114,7 @@
                 		<RowDefinition Height="Auto" />						
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <toolkit:ListPicker ItemsSource="{Binding Playlists}" DisplayMemberPath="Name" SelectedIndex="{Binding CurrentPlaylistIndex}"/>
+                    <toolkit:ListPicker ItemsSource="{Binding Playlists}" DisplayMemberPath="Name" SelectedIndex="{Binding CurrentPlaylistIndex, Mode=TwoWay}"/>
                     <Button Grid.Row="1" HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" />
                     <Button Grid.Row="1"  HorizontalAlignment="Right" Content="Save to playlist" Command="{Binding SavePlaylistCommand}" CommandParameter="{Binding PlayQueueItems, Mode=TwoWay}"/>                    
                     <toolkit:LongListSelector Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay, Converter={StaticResource TrackViewModelsToGroupsConverter}}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" >
