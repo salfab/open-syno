@@ -229,9 +229,10 @@
             if (this.CurrentPlaylist.Id != Guid.Empty)
             {
                 var savedPlayList = this.CurrentPlaylist;
-                this.CurrentPlaylist = this.Playlists.Single(o => o.Id == Guid.Empty);
-                this.CurrentPlaylist.Tracks.Clear();
-                this.CurrentPlaylist.Tracks.AddRange(savedPlayList.Tracks);
+                var playlist = this.Playlists.Single(o => o.Id == Guid.Empty);
+                playlist.Tracks.Clear();
+                playlist.Tracks.AddRange(savedPlayList.Tracks);
+                this.CurrentPlaylist = playlist;
             }
             if (e.RemovedItems != null)
             {
@@ -594,23 +595,23 @@
 
         private void AppendItems(IEnumerable<TrackViewModel> items, Action<Dictionary<SynoTrack, Guid>> callback)
         {
-            if (!IsPopulatingCurrentPlaylist(items))
-            {
-                var existingTemporaryPlayqueue = this.Playlists.SingleOrDefault(o => o.Id == Guid.Empty);
-                if (existingTemporaryPlayqueue != null)
-                {
-                    this.Playlists.Remove(existingTemporaryPlayqueue);
-                }
+            //if (!IsPopulatingCurrentPlaylist(items))
+            //{
+            //    var existingTemporaryPlayqueue = this.Playlists.SingleOrDefault(o => o.Id == Guid.Empty);
+            //    if (existingTemporaryPlayqueue != null)
+            //    {
+            //        this.Playlists.Remove(existingTemporaryPlayqueue);
+            //    }
 
-                Playlist playQueue = new Playlist
-                    {
-                        Id = Guid.Empty,
-                        Name = "Unsaved playqueue",
-                        Tracks = this.CurrentPlaylist.Tracks 
-                    };
+            //    Playlist playQueue = new Playlist
+            //        {
+            //            Id = Guid.Empty,
+            //            Name = "Unsaved playqueue",
+            //            Tracks = this.CurrentPlaylist.Tracks 
+            //        };
 
-                this.CurrentPlaylist = playQueue;
-            }
+            //    this.CurrentPlaylist = playQueue;
+            //}
 
             var tracks = items.Select(o => o.TrackInfo);
 
