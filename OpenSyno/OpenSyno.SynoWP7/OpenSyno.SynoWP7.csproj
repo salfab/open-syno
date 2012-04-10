@@ -56,10 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioStationSession.cs" />
+    <Compile Include="DsmVersions.cs" />
     <Compile Include="Helpers\CookieAwareWebClient.cs" />
     <Compile Include="FileDownloadResponseReceivedUserState.cs" />
     <Compile Include="IAudioStationSession.cs" />
     <Compile Include="ISearchService.cs" />
+    <Compile Include="IVersionDependentResourcesProvider.cs" />
     <Compile Include="MockSearchService.cs" />
     <Compile Include="PiggybackingJsonReaderException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,6 +70,7 @@
     <Compile Include="SynoItem.cs" />
     <Compile Include="SynologyJsonDeserializationHelper.cs" />
     <Compile Include="SynoTrack.cs" />
+    <Compile Include="VersionDependentResourcesProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

@@ -47,6 +47,7 @@ namespace OpenSyno.Services
         private Dictionary<Guid, SynoTrack> _cachedAudioTracks;
 
         private Timer _progressUpdater;
+        private IVersionDependentResourcesProvider _versionDependentResourceProvider;
 
         /// <summary>
         /// Gets or sets what strategy should be used to define the next track to play.
@@ -122,12 +123,13 @@ namespace OpenSyno.Services
         /// </summary>
         /// <param name="audioStationSession"></param>
         /// <param name="audioTrackFactory"></param>
-        public PlaybackService(IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory)
+        public PlaybackService(IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory, IVersionDependentResourcesProvider versionDependentResourceProvider)
         {
             _logService = IoC.Container.Get<ILogService>();
                         
             _audioStationSession = audioStationSession;
             _audioTrackFactory = audioTrackFactory;
+            _versionDependentResourceProvider = versionDependentResourceProvider;
 
             // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
             //PlayqueueItems = new ObservableCollection<ISynoTrack>();
@@ -448,18 +450,20 @@ namespace OpenSyno.Services
                         {
                             var shortUrl = e.Result;
                             var res = (string)e.UserState;
-                            _asciiUriFixes.Where(fix => fix.Res == res).Single().Url = shortUrl;
+                            _asciiUriFixes.Single(fix => fix.Res == res).Url = shortUrl;
                             if (!_asciiUriFixes.Any(fix => fix.Url == null))
                             {
                                 SerializeAsciiUriFixes();
                                 callback(_tracksToGuidMapping.Where(o => tracks.Contains(o.Track)).ToDictionary(o => o.Track, o => o.Guid));
                             }
                         };
+                    var relativePathToAudioStreamService = this._versionDependentResourceProvider.GetAudioStreamWebserviceRelativePath(DsmVersions.V4_0);
                     string url =
                    string.Format(
-                       "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+                       "http://{0}:{1}{2}/0.mp3?sid={3}&action=streaming&songpath={4}",
                        _audioStationSession.Host,
                        _audioStationSession.Port,
+                       relativePathToAudioStreamService,
                        _audioStationSession.Token.Split('=')[1],
                        HttpUtility.UrlEncode(track.Res).Replace("+", "%20"));
 
@@ -655,11 +659,13 @@ namespace OpenSyno.Services
                         callback(_tracksToGuidMapping.Where(o => potentiallyUnsafeMappings.Any(x => x.Track == o.Track)).ToDictionary(o => o.Track, o => o.Guid));
                     }
                 };
+                var relativePathToAudioStreamService = this._versionDependentResourceProvider.GetAudioStreamWebserviceRelativePath(DsmVersions.V4_0);
                 string url =
                 string.Format(
-                    "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+                    "http://{0}:{1}{2}/0.mp3?sid={3}&action=streaming&songpath={4}",
                     _audioStationSession.Host,
                     _audioStationSession.Port,
+                    relativePathToAudioStreamService,
                     _audioStationSession.Token.Split('=')[1],
                     HttpUtility.UrlEncode(track.Res).Replace("+", "%20"));
 
