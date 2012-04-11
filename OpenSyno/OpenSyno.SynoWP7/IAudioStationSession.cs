@@ -39,5 +39,6 @@
         Task<IEnumerable<SynoItem>> GetAlbumsForArtistAsync(SynoItem artist);
 
         Task<IEnumerable<SynoTrack>> GetTracksForAlbumAsync(SynoItem album);
+        string GetUrlForTrack(SynoTrack synoTrack);
     }
 }

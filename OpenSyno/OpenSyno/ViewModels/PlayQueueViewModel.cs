@@ -1,13 +1,15 @@
-﻿namespace OpenSyno.ViewModels
+﻿using System.IO;
+using System.Net;
+using System.Threading.Tasks;
+
+namespace OpenSyno.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using System.Diagnostics;
     using System.IO.IsolatedStorage;
     using System.Linq;
-    using System.Windows;
     using System.Windows.Input;
 
     using Microsoft.Phone.BackgroundAudio;
@@ -15,8 +17,6 @@
     using Microsoft.Practices.Prism.Events;
 
     using OpemSyno.Contracts;
-
-    using OpenSyno.Common;
     using OpenSyno.Contracts.Domain;
     using OpenSyno.Services;
 
@@ -52,7 +52,7 @@
         /// <param name="eventAggregator">The event aggregator.</param>
         /// <param name="playbackService">The playback service.</param>
         /// <param name="openSynoSettings"></param>
-        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings, ILogService logService, ITrackViewModelFactory trackViewModelFactory, IPageSwitchingService pageSwitchingService)
+        public PlayQueueViewModel(IEventAggregator eventAggregator, IPlaybackService playbackService, INotificationService notificationService, IOpenSynoSettings openSynoSettings, ILogService logService, ITrackViewModelFactory trackViewModelFactory, IPageSwitchingService pageSwitchingService, IAudioStationSession audiostationSession)
         {
             if (eventAggregator == null)
             {
@@ -109,7 +109,7 @@
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
                                                          {
                                                              consecutiveAlbumsIdPatcher();
-                                                         };
+                                                         };            
             consecutiveAlbumsIdPatcher();
             _playbackService.PlayqueueChanged += this.OnPlayqueueChanged;            
             
@@ -119,6 +119,7 @@
             _openSynoSettings = openSynoSettings;
             _logService = logService;
             _pageSwitchingService = pageSwitchingService;
+            _audiostationSession = audiostationSession;
             _playbackService.TrackStarted += (o, e) =>
                                                  {
                                                      CurrentArtwork = new Uri(e.Track.AlbumArtUrl, UriKind.Absolute);
@@ -579,10 +580,10 @@
                 _currentArtwork = value;
                 OnPropertyChanged(CurrentArtworkPropertyName);
             }
-        }
+        }        
 
         public ICommand SavePlaylistCommand { get; set; }
-
+        
         public ICommand PlayPreviousCommand { get; set; }
 
         public ICommand PlayNextCommand { get; set; }
@@ -592,6 +593,101 @@
         public ICommand ResumePlaybackCommand { get; set; }
 
         public ICommand PlayCommand { get; set; }
+
+        private bool _isPlaylistAvailableOffline;
+        private IAudioStationSession _audiostationSession;
+
+        private const string IsPlaylistAvailableOfflinePropertyName = "IsPlaylistAvailableOffline";
+
+        public bool IsPlaylistAvailableOffline
+        {
+            get { return _isPlaylistAvailableOffline; }
+            set
+            {
+                _isPlaylistAvailableOffline = value;
+                if (value)
+                {
+                    MakePlaylistAvailableOffline(this.CurrentPlaylist);
+                }
+                else
+                {
+                    DeleteOfflinedFilesForPlaylist(this.CurrentPlaylist);
+                }
+                OnPropertyChanged(IsPlaylistAvailableOfflinePropertyName);
+            }
+        }
+
+        private void DeleteOfflinedFilesForPlaylist(Playlist currentPlaylist)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void MakePlaylistAvailableOffline(Playlist currentPlaylist)
+        {
+            Queue<TrackViewModel> processingQueue = new Queue<TrackViewModel>(currentPlaylist.Tracks);
+
+            ProcessOffliningQueue(processingQueue);
+        }
+
+        private void ProcessOffliningQueue(Queue<TrackViewModel> processingQueue)
+        {
+            // note : that's pretty elegant : with this recursion we are not pushing things on the stack :)
+
+            Task<TrackViewModel> downloadTask = DownloadFileForTrack(processingQueue.Dequeue());
+            downloadTask.ContinueWith(task =>
+                                          {
+                                              
+                                              if (processingQueue.Count > 0)
+                                              {
+                                                  ProcessOffliningQueue(processingQueue);
+                                                  _playbackService.AddUrlRedirection(task.Result.TrackInfo, task.Result.CachedFilePath);
+                                                  _playbackService.SerializeAsciiUriFixes();
+                                              }
+                                              else
+                                              {
+                                                  _notificationService.Warning("The playlist was successfuly offlined.", "Playlist now available offline.");
+                                              }
+                                          });
+        }
+
+        private Task<TrackViewModel> DownloadFileForTrack(TrackViewModel trackViewModel)
+        {
+            TaskCompletionSource<TrackViewModel> taskCompletionSource = new TaskCompletionSource<TrackViewModel>();
+            this._audiostationSession.GetFileStream(trackViewModel.TrackInfo, (response, track) =>
+                                                                                  {
+                                                                                      Task<string> filePathTask =  WriteStreamToMp3FileAsync(trackViewModel, response.GetResponseStream());
+                                                                                      filePathTask.ContinueWith(filePath =>
+                                                                                                                    {
+                                                                                                                        if (filePath.IsFaulted == true)
+                                                                                                                        {
+                                                                                                                            _notificationService.Error("An unknown error occured while offlining track " + filePath + "\r\nException : " + filePath.Exception.Message , "Error while offlining.");
+                                                                                                                        }
+                                                                                                                        trackViewModel.CachedFilePath = filePath.Result;
+                                                                                                                        taskCompletionSource.SetResult(trackViewModel);
+                                                                                                                    });
+                                                                                  });
+
+
+            return taskCompletionSource.Task;
+        }
+
+        private Task<string> WriteStreamToMp3FileAsync(TrackViewModel track, Stream getResponseStream)
+        {
+            Task<string> taskWriteFile = new Task<string>(() =>
+                                                              {
+                                                                  var tempFileName = track.Guid.ToString();
+                                                                  using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+                                                                    {
+                                                                        using (var isolatedStorageFile = userStore.CreateFile(tempFileName))
+                                                                        {
+                                                                            getResponseStream.CopyTo(isolatedStorageFile);
+                                                                        }
+                                                                    }
+                                                                  return tempFileName;
+                                                                });
+            taskWriteFile.Start();
+            return taskWriteFile;
+        }
 
         public ObservableCollection<TrackViewModel> PlayQueueItems
         {

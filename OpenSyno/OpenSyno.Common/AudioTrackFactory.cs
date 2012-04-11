@@ -91,8 +91,10 @@ namespace OpenSyno.Common
             {
                 throw new ArgumentNullException("urlOverride");
             }
+
+            // Build an AudioTrack for local file if the urlOverride is in the isolatedstorage ( and also introduce a new mean to detect if it is stored in the IsoStorage ) 
             return new AudioTrack(
-                new Uri(urlOverride),
+                new Uri(urlOverride, UriKind.RelativeOrAbsolute),
                 baseSynoTrack.Title,
                 baseSynoTrack.Artist,
                 baseSynoTrack.Album,

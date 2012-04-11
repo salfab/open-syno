@@ -258,7 +258,7 @@ namespace OpenSyno.Services
             if (BackgroundAudioPlayer.Instance.Track != null)
             {
                 guid = Guid.Parse(BackgroundAudioPlayer.Instance.Track.Tag);
-                source = BackgroundAudioPlayer.Instance.Track.Source.AbsoluteUri;
+                source = BackgroundAudioPlayer.Instance.Track.Source.ToString();
                 _logService.Trace("Current track guid : " + guid);
                 _logService.Trace("Current track source : '" + source + "'");
             }
@@ -494,7 +494,7 @@ namespace OpenSyno.Services
             }
         }
 
-        private void SerializeAsciiUriFixes()
+        public void SerializeAsciiUriFixes()
         {
             using (
                 IsolatedStorageFileStream stream = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(
@@ -532,23 +532,28 @@ namespace OpenSyno.Services
             {
                 try
                 {
-                    using (IsolatedStorageFileStream playQueueFile = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("playqueue.xml", FileMode.Create))
+                    using (IsolatedStorageFile userStoreForApplication = IsolatedStorageFile.GetUserStoreForApplication())
                     {
-                        var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
-
-                        var serialization = new PlayqueueInterProcessCommunicationTransporter()
+                        using (IsolatedStorageFileStream playQueueFile = userStoreForApplication.OpenFile("playqueue.xml", FileMode.Create))
                         {
-                            Host = _audioStationSession.Host,
-                            Port = _audioStationSession.Port,
-                            Mappings = _tracksToGuidMapping,
-                            Token = _audioStationSession.Token
-                        };
-                        dcs.WriteObject(playQueueFile, serialization);
+                            var dcs = new DataContractSerializer(typeof(PlayqueueInterProcessCommunicationTransporter));
+
+                            var serialization = new PlayqueueInterProcessCommunicationTransporter()
+                            {
+                                Host = _audioStationSession.Host,
+                                Port = _audioStationSession.Port,
+                                Mappings = _tracksToGuidMapping,
+                                Token = _audioStationSession.Token
+                            };
+                            dcs.WriteObject(playQueueFile, serialization);
+                        }
                     }
+                    
                     tryAgain = false;
                 }
                 catch (Exception e)
                 {
+                    _logService.Error("Reading in the isolated storage failed. Will try 10 times before giving up.");
                     Thread.Sleep(300);
                     triesCount++;
                     if (triesCount > 10)
@@ -615,16 +620,29 @@ namespace OpenSyno.Services
         public void InvalidateCachedTokens()
         {
             _logService.Trace("PlaybackService : Invalidating cached token");
-            _asciiUriFixes.Clear();
+            RemoveRemoteLocations();
 
 
             DetectAffectedTracksAndBuildFix(_tracksToGuidMapping, mapping => SerializeAsciiUriFixes());
             SerializePlayqueue();
         }
 
-        public void ClearTracksInQueue()
+        private void RemoveRemoteLocations()
         {
-            _asciiUriFixes.Clear();
+            //_asciiUriFixes.Clear();
+            IEnumerable<AsciiUriFix> itemsToRemove;
+            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                itemsToRemove = _asciiUriFixes.Where(o => userStore.FileExists(o.Url));
+            }
+            foreach (var asciiUriFix in itemsToRemove)
+            {
+                _asciiUriFixes.Remove(asciiUriFix);
+            }
+        }
+
+        public void ClearTracksInQueue()
+        {            
             var mappingsCopy = _tracksToGuidMapping.ToArray();
             _tracksToGuidMapping.Clear();
 
@@ -648,7 +666,7 @@ namespace OpenSyno.Services
             var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Track.Res == fix.Res) && mapping.Track.Res.Any(c => c == '&' || c > 127)).Select(t => t.Track);
             foreach (var track in tracksToFix)
             {
-                _asciiUriFixes.Add(new AsciiUriFix(track.Res, null));
+                AddUrlRedirection(track, null);
 
                 // query shorten URL
 
@@ -680,6 +698,16 @@ namespace OpenSyno.Services
                 webClient.DownloadStringAsync(new Uri("http://tinyurl.com/api-create.php?url=" + HttpUtility.UrlEncode(url)), track.Res);
 
             }
+        }
+
+        /// <summary>
+        /// Adds an URL redirection.
+        /// </summary>
+        /// <remarks>Typically used for URL that need ASCII fix, but also for cached tracks.</remarks>
+        /// <param name="track">The track.</param>
+        public void AddUrlRedirection(SynoTrack track, string url)
+        {
+            _asciiUriFixes.Add(new AsciiUriFix(track.Res, url));
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)

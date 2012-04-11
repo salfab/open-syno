@@ -92,6 +92,14 @@ namespace OpenSyno.Services
         void ClearTracksInQueue();
 
         int GetTracksCountInQueue();
+        void SerializeAsciiUriFixes();
+
+        /// <summary>
+        /// Adds an URL redirection.
+        /// </summary>
+        /// <remarks>Typically used for URL that need ASCII fix, but also for cached tracks.</remarks>
+        /// <param name="track">The track.</param>
+        void AddUrlRedirection(SynoTrack track, string url);
     }
 
     public delegate void PlayqueueChangedEventHandler(object sender, PlayqueueChangedEventArgs args);

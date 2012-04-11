@@ -398,9 +398,7 @@ namespace Synology.AudioStationApi
 
             var client = new WebClient();
 
-            // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
-            var relativePathToAudioStreamService = this.versionDependentResourcesProvider.GetAudioStreamWebserviceRelativePath(this.DsmVersion);
-            string url = string.Format("http://{0}:{1}{2}/0.mp3?action=streaming&songpath={3}", this.Host, this.Port,relativePathToAudioStreamService, HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20").Replace("&", "%26"));
+            var url = GetUrlForTrack(synoTrack);
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.CookieContainer = new CookieContainer();
@@ -415,6 +413,17 @@ namespace Synology.AudioStationApi
             request.AllowReadStreamBuffering = false;
             request.BeginGetResponse(OnFileDownloadResponseReceived, new FileDownloadResponseReceivedUserState(request, callback, synoTrack));
 
+        }
+
+        public string GetUrlForTrack(SynoTrack synoTrack)
+        {
+            // hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
+            var relativePathToAudioStreamService =
+                this.versionDependentResourcesProvider.GetAudioStreamWebserviceRelativePath(this.DsmVersion);
+            string url = string.Format("http://{0}:{1}{2}/0.mp3?action=streaming&songpath={3}", this.Host, this.Port,
+                                       relativePathToAudioStreamService,
+                                       HttpUtility.UrlEncode(synoTrack.Res).Replace("+", "%20").Replace("&", "%26"));
+            return url;
         }
 
         private void OnFileDownloadResponseReceived(IAsyncResult ar)

@@ -157,5 +157,10 @@
         {
             throw new NotImplementedException();
         }
+
+        public string GetUrlForTrack(SynoTrack synoTrack)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

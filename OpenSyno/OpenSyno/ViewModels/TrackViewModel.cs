@@ -166,5 +166,7 @@ namespace OpenSyno.ViewModels
         }
 
         public ICommand NavigateToContainingAlbumCommand { get; set; }
+
+        public string CachedFilePath { get; set; }
     }
 }
