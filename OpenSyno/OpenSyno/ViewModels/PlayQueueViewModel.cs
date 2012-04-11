@@ -104,7 +104,8 @@
             };
             
             _playbackService = playbackService;
-            this.PlayQueueItems = new ObservableCollection<TrackViewModel>(playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService)));
+            IEnumerable<TrackViewModel> trackViewModels = playbackService.GetTracksInQueue().Select(o => _trackViewModelFactory.Create(o.Guid, o.Track, this._pageSwitchingService));
+            this.PlayQueueItems = new ObservableCollection<TrackViewModel>(trackViewModels);
             this.PlayQueueItems.CollectionChanged += (s, ea) =>
                                                          {
                                                              consecutiveAlbumsIdPatcher();
@@ -158,12 +159,10 @@
         {
             if (_openSynoSettings.Playlists == null)
             {
-                this.Playlists = new ObservableCollection<Playlist>();
+                _openSynoSettings.Playlists = new List<Playlist>();
             }
-            else
-            {
-                this.Playlists = new ObservableCollection<Playlist>(_openSynoSettings.Playlists);
-            }
+
+            this.Playlists = new ObservableCollection<Playlist>(_openSynoSettings.Playlists);
 
             var unsavedPlayqueueIsPresent = this._openSynoSettings.Playlists.Any(playlist => playlist.Id.Equals(Guid.Empty));
             if (!unsavedPlayqueueIsPresent)
@@ -285,8 +284,6 @@
             // Note - we might face problems in the future when we edit a play list. Make sure the edits get propagated to the persistence as well.
             Playlists.Add(playlist);
 
-            this.ClearItems();
-            this.AppendItems(playlist.Tracks, matchingGuid => { });
             this.CurrentPlaylist = playlist;
 
         }
@@ -309,6 +306,8 @@
             }
             set
             {
+                string oldValue = this._currentPlaylist == null ? "null" : this._currentPlaylist.Name;
+                this._logService.Trace("Setting CurrentPlaylis. old : " + oldValue + " new : " + value.Name);
                 if (value != this._currentPlaylist)
                 {
                     // If the playlist was not set before, we don't need to prepare the underlying services for the change : there are no changes, it's the first assignation.
@@ -328,7 +327,13 @@
                     this.OnPropertyChanged(CurrentPlaylistPropertyName);
 
                     // NOTE : beware the race conditions.
-                    this.CurrentPlaylistIndex = this.Playlists.IndexOf(value);
+                    int currentPlaylistIndex = this.Playlists.IndexOf(value);
+
+                    // beware : because of the list control somewhat flaky, we cannot bind to the elements, but we need to bind to the index.
+                    // by doing so, we need to keep those in sync. Firthermore withion the setter is some code we don't want to execute at this
+                    // point, that means we'll need to be a little bit dirty in the implementation :( we need to work with a field and call the OnPropertyChanged event-raiser manually.
+                    this._currentPlaylistIndex = currentPlaylistIndex;
+                    OnPropertyChanged(CurrentPlaylistIndexPropertyName);
 
                     PersistCurrentPlaylistSettings(this.CurrentPlaylist);
                     
@@ -355,9 +360,10 @@
                 {
                     this._currentPlaylistIndex = value;
                     this.OnPropertyChanged(CurrentPlaylistIndexPropertyName);
-                    this.ClearItems();                    
-                    this.AppendItems(this._currentPlaylist.Tracks,guids => {});
-                    this.CurrentPlaylist = this.Playlists[this._currentPlaylistIndex];
+                    this.ClearItems();
+                    Playlist currentPlaylist = this.Playlists[value];
+                    this.AppendItems(currentPlaylist.Tracks,guids => {});
+                    this.CurrentPlaylist = currentPlaylist;
                 }
             }
         }

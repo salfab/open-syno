@@ -421,6 +421,10 @@ namespace OpenSyno.Services
 
         public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition, Action<Dictionary<SynoTrack, Guid>> callback)
         {
+            _tracksToGuidMapping = new List<GuidToTrackMapping>(tracks.Select(o => new GuidToTrackMapping(Guid.NewGuid(), o)));
+            OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = _tracksToGuidMapping , AddedItemsPosition = insertPosition });
+            return;
+            
             if (insertPosition != _tracksToGuidMapping.Count())
             {
                 // we need to change the infrastructure and replace the dictionary with a list so we can choose the order !
