@@ -496,13 +496,19 @@ namespace OpenSyno.Services
 
         public void SerializeAsciiUriFixes()
         {
-            using (
-                IsolatedStorageFileStream stream = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(
-                    "AsciiUriFixes.xml", FileMode.Create))
+            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                var dcs = new DataContractSerializer(typeof (List<AsciiUriFix>));
-                dcs.WriteObject(stream, _asciiUriFixes);
-            }
+                using (IsolatedStorageFileStream stream = userStore.OpenFile("AsciiUriFixes.xml", FileMode.Create))
+                {
+                    var dcs = new DataContractSerializer(typeof(List<AsciiUriFix>));
+                    dcs.WriteObject(stream, _asciiUriFixes);
+                }    
+            }            
+        }
+        
+        public void RefreshTracksInQueue()
+        {
+
         }
 
         private void OnTracksInQueueChanged(PlayqueueChangedEventArgs eventArgs)

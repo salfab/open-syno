@@ -624,6 +624,12 @@ namespace OpenSyno.ViewModels
 
         private void MakePlaylistAvailableOffline(Playlist currentPlaylist)
         {
+            //currentPlaylist.Tracks.Select(t => DownloadFileForTrack(t).RunSynchronously()).ToObservable().ObserveOnDispatcher().SubscribeOn(Scheduler.TaskPool).Subscribe(() =>
+            //{
+            //    DownloadFileForTrack();
+            //}).Select();
+            //Observable.
+
             Queue<TrackViewModel> processingQueue = new Queue<TrackViewModel>(currentPlaylist.Tracks);
 
             ProcessOffliningQueue(processingQueue);
@@ -633,15 +639,16 @@ namespace OpenSyno.ViewModels
         {
             // note : that's pretty elegant : with this recursion we are not pushing things on the stack :)
 
-            Task<TrackViewModel> downloadTask = DownloadFileForTrack(processingQueue.Dequeue());
+            var trackToProcess = processingQueue.Dequeue();
+            Task<string> downloadTask = DownloadFileForTrack(trackToProcess);
             downloadTask.ContinueWith(task =>
                                           {
-                                              
                                               if (processingQueue.Count > 0)
                                               {
                                                   ProcessOffliningQueue(processingQueue);
-                                                  _playbackService.AddUrlRedirection(task.Result.TrackInfo, task.Result.CachedFilePath);
+                                                  _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
                                                   _playbackService.SerializeAsciiUriFixes();
+                                                  // Force refresh of the PlayqueueItems.
                                               }
                                               else
                                               {
@@ -650,20 +657,19 @@ namespace OpenSyno.ViewModels
                                           });
         }
 
-        private Task<TrackViewModel> DownloadFileForTrack(TrackViewModel trackViewModel)
+        private Task<string> DownloadFileForTrack(TrackViewModel trackViewModel)
         {
-            TaskCompletionSource<TrackViewModel> taskCompletionSource = new TaskCompletionSource<TrackViewModel>();
+            TaskCompletionSource<string> taskCompletionSource = new TaskCompletionSource<string>();
             this._audiostationSession.GetFileStream(trackViewModel.TrackInfo, (response, track) =>
                                                                                   {
                                                                                       Task<string> filePathTask =  WriteStreamToMp3FileAsync(trackViewModel, response.GetResponseStream());
-                                                                                      filePathTask.ContinueWith(filePath =>
+                                                                                      filePathTask.ContinueWith(filePathTaskResponse =>
                                                                                                                     {
-                                                                                                                        if (filePath.IsFaulted == true)
+                                                                                                                        if (filePathTask.IsFaulted == true)
                                                                                                                         {
-                                                                                                                            _notificationService.Error("An unknown error occured while offlining track " + filePath + "\r\nException : " + filePath.Exception.Message , "Error while offlining.");
+                                                                                                                            _notificationService.Error("An unknown error occured while offlining track " + filePathTask + "\r\nException : " + filePathTaskResponse.Exception.Message, "Error while offlining.");
                                                                                                                         }
-                                                                                                                        trackViewModel.CachedFilePath = filePath.Result;
-                                                                                                                        taskCompletionSource.SetResult(trackViewModel);
+                                                                                                                        taskCompletionSource.SetResult(filePathTaskResponse.Result);
                                                                                                                     });
                                                                                   });
 

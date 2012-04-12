@@ -37,6 +37,8 @@ namespace OpenSyno.Services
 
         PlayState Status { get; }
 
+        void RefreshTracksInQueue();
+
         ///// <summary>
         ///// Clears the play queue.
         ///// </summary>
