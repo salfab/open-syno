@@ -130,7 +130,7 @@ namespace OpenSyno
             IoC.Container.Bind<IUrlParameterToObjectsPlateHeater>().To<UrlParameterToObjectsPlateHeater>().InSingletonScope();
             IoC.Container.Bind<IAudioTrackFactory>().To<AudioTrackFactory>().InSingletonScope();
             
-            _notificationService = new NotificationService();
+            _notificationService = new NotificationService(_logService);
             IoC.Container.Bind<INotificationService>().ToConstant(_notificationService).InSingletonScope();
             ImageCachingService imageCachingService;
             if (IsolatedStorageSettings.ApplicationSettings.Contains("ImageCachingService"))
