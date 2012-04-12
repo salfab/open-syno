@@ -1,4 +1,6 @@
-﻿namespace OpenSyno
+﻿using OpenSyno.Services;
+
+namespace OpenSyno
 {
     using System.Windows;
 
@@ -6,8 +8,16 @@
 
     public class NotificationService : INotificationService
     {
+        private ILogService _logService;
+
+        public NotificationService(ILogService logService)
+        {
+            _logService = logService;
+        }
+
         public void Warning(string warningMessage, string warningTitle)
         {
+            _logService.Trace(warningMessage);
             MessageBox.Show(warningMessage, warningTitle, MessageBoxButton.OK);
         }
 
