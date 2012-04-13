@@ -713,7 +713,29 @@ namespace OpenSyno.Services
         /// <param name="track">The track.</param>
         public void AddUrlRedirection(SynoTrack track, string url)
         {
-            _asciiUriFixes.Add(new AsciiUriFix(track.Res, url));
+            AsciiUriFix existingRedirection = _asciiUriFixes.FirstOrDefault(o => o.Res == track.Res);
+            if (existingRedirection != null)
+            {
+                existingRedirection.Url = url;
+            }
+            else
+            {
+                _asciiUriFixes.Add(new AsciiUriFix(track.Res, url));
+            }
+        }
+
+        public string GetRedirectionForTrack(SynoTrack trackInfo)
+        {
+            var firstOrDefault = _asciiUriFixes.FirstOrDefault(o => o.Res == trackInfo.Res);
+            if (firstOrDefault != null)
+            {
+                var redirectionForTrack = firstOrDefault.Url;
+                return redirectionForTrack;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)

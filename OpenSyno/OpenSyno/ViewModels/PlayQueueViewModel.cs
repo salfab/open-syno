@@ -242,7 +242,9 @@ namespace OpenSyno.ViewModels
             {
                 foreach (GuidToTrackMapping newItem in e.AddedItems)
                 {
-                    this.PlayQueueItems.Add(this._trackViewModelFactory.Create(newItem.Guid, newItem.Track, this._pageSwitchingService));
+                    var trackViewModel = this._trackViewModelFactory.Create(newItem.Guid, newItem.Track, this._pageSwitchingService);
+                    trackViewModel.IsCached = IsTrackCached(trackViewModel);
+                    this.PlayQueueItems.Add(trackViewModel);
                 }
             }
 
@@ -258,6 +260,22 @@ namespace OpenSyno.ViewModels
 
             // Hack : we want to make sure the converter Will be re-evaluated, so the easiest way is to trigger a propery changed.
             OnPropertyChanged(PlayQueueItemsPropertyName);
+        }
+
+        private bool IsTrackCached(TrackViewModel trackViewModel)
+        {
+            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                string redirectionForTrack = this._playbackService.GetRedirectionForTrack(trackViewModel.TrackInfo);
+                if (redirectionForTrack != null)
+                {
+                    if (userStore.FileExists(redirectionForTrack))
+                    {
+                        return true;
+                    }  
+                }
+            }
+            return false;
         }
 
         private void OnSavePlaylist(IEnumerable<TrackViewModel> tracks)
@@ -629,10 +647,16 @@ namespace OpenSyno.ViewModels
             //    DownloadFileForTrack();
             //}).Select();
             //Observable.
+            Queue<TrackViewModel> processingQueue;
+            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                processingQueue = new Queue<TrackViewModel>(currentPlaylist.Tracks.Where(t => !userStore.FileExists(t.Guid.ToString())));
+            }
 
-            Queue<TrackViewModel> processingQueue = new Queue<TrackViewModel>(currentPlaylist.Tracks);
-
-            ProcessOffliningQueue(processingQueue);
+            if (processingQueue.Count > 0)
+            {
+                ProcessOffliningQueue(processingQueue);
+            }
         }
 
         private void ProcessOffliningQueue(Queue<TrackViewModel> processingQueue)

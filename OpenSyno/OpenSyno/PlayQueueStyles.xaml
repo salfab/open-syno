@@ -43,8 +43,11 @@
 		</Setter>
 	</Style>
 	<DataTemplate x:Key="CheckBoxVerticalBar">
-		<CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding TrackInfo.Title}" />
-		<!--<Grid>
+        <StackPanel Orientation="Horizontal">
+		    <CheckBox  IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding TrackInfo.Title}" />
+            <TextBlock Text="*" Visibility="{Binding IsCached, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </StackPanel>
+        <!--<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto"/>
 				<ColumnDefinition />
