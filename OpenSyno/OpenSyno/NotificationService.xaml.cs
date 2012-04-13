@@ -1,4 +1,9 @@
-﻿using OpenSyno.Services;
+﻿using System;
+using System.Reflection;
+using System.Threading;
+using System.Windows.Threading;
+using Microsoft.Phone.Tasks;
+using OpenSyno.Services;
 
 namespace OpenSyno
 {
@@ -18,7 +23,18 @@ namespace OpenSyno
         public void Warning(string warningMessage, string warningTitle)
         {
             _logService.Trace(warningMessage);
-            MessageBox.Show(warningMessage, warningTitle, MessageBoxButton.OK);
+
+            Action errorFeedback = () => MessageBox.Show(warningMessage, warningTitle, MessageBoxButton.OK);
+
+            if (!Deployment.Current.Dispatcher.CheckAccess())
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(errorFeedback);
+            }
+            else
+            {
+                errorFeedback();
+            }
+            
         }
 
         public void Error(string message, string messageTitle)
