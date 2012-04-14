@@ -102,6 +102,8 @@ namespace OpenSyno.Services
         /// <remarks>Typically used for URL that need ASCII fix, but also for cached tracks.</remarks>
         /// <param name="track">The track.</param>
         void AddUrlRedirection(SynoTrack track, string url);
+
+        string GetRedirectionForTrack(SynoTrack trackInfo);
     }
 
     public delegate void PlayqueueChangedEventHandler(object sender, PlayqueueChangedEventArgs args);

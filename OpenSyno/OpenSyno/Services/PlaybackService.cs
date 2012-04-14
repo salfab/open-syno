@@ -386,6 +386,7 @@ namespace OpenSyno.Services
             AudioTrack audioTrack;
             if (_asciiUriFixes.Any(fix => fix.Res == baseSynoTrack.Res))
             {
+                _logService.Trace("Uri fix found for track " + guidOfTrackToPlay);
                 AsciiUriFix asciiUriFix = this._asciiUriFixes.Single(fix => fix.Res == baseSynoTrack.Res);
                 asciiUriFix.CallbackWhenFixIsApplicable( fix =>
                     {
@@ -396,6 +397,7 @@ namespace OpenSyno.Services
             }
             else
             {
+                _logService.Trace("No uri fix found for track " + guidOfTrackToPlay);
                 audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
                 BackgroundAudioPlayer.Instance.Track = audioTrack;
                 BackgroundAudioPlayer.Instance.Play();
@@ -639,7 +641,8 @@ namespace OpenSyno.Services
             IEnumerable<AsciiUriFix> itemsToRemove;
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                itemsToRemove = _asciiUriFixes.Where(o => userStore.FileExists(o.Url));
+                // Don't forget the ToArray, otherwise, linq will defer the iteration after the disposal of the userStore.
+                itemsToRemove = _asciiUriFixes.Where(o => userStore.FileExists(o.Url)).ToArray();
             }
             foreach (var asciiUriFix in itemsToRemove)
             {
