@@ -167,6 +167,20 @@ namespace OpenSyno.ViewModels
 
         public ICommand NavigateToContainingAlbumCommand { get; set; }
 
-        public bool IsCached { get; set; }
+        private bool _isCached;
+        private const string IsCachedPropertyName = "IsCached";
+
+        public bool IsCached
+        {
+            get { return _isCached; }
+            set
+            {
+                if (_isCached != value)
+                {
+                    _isCached = value;   
+                    OnPropertyChanged(IsCachedPropertyName);
+                }
+            }
+        }
     }
 }

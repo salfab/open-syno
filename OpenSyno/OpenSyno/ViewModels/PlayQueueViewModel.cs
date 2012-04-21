@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace OpenSyno.ViewModels
 {
@@ -689,7 +691,15 @@ namespace OpenSyno.ViewModels
 
         private void MarkTrackAsCached(TrackViewModel trackToProcess)
         {
-            trackToProcess.IsCached = true;
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                                                          {
+                                                              var itemToUpdate = PlayQueueItems.FirstOrDefault(t => t.TrackInfo.Res == trackToProcess.TrackInfo.Res);
+                                                              if (itemToUpdate != null)
+                                                              {
+                                                                  itemToUpdate.IsCached = trackToProcess.IsCached;
+                                                                  _logService.Trace("Track "+ itemToUpdate.Guid +" marked as cached");
+                                                              }
+                                                          });
         }
 
         private Task<string> DownloadFileForTrack(TrackViewModel trackViewModel)
