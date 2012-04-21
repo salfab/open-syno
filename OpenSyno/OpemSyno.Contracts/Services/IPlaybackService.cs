@@ -37,8 +37,6 @@ namespace OpenSyno.Services
 
         PlayState Status { get; }
 
-        bool IsTrackCached(SynoTrack track);
-
         void RefreshTracksInQueue();
 
         ///// <summary>

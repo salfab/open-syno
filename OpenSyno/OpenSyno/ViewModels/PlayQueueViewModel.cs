@@ -263,8 +263,8 @@ namespace OpenSyno.ViewModels
         }
 
         private bool IsTrackCached(TrackViewModel trackViewModel)       
-        {            
-            string redirectionForTrack = this._playbackService.GetRedirectionForTrack(track);
+        {
+            string redirectionForTrack = this._playbackService.GetRedirectionForTrack(trackViewModel.TrackInfo);
             if (redirectionForTrack != null)
             {
                 using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
@@ -273,7 +273,7 @@ namespace OpenSyno.ViewModels
                     {
                         using (var fileToCheck = userStore.OpenFile(redirectionForTrack,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
                         {
-                            var IsFileRightSize = track.Size == fileToCheck.Length;
+                            var IsFileRightSize = trackViewModel.TrackInfo.Size == fileToCheck.Length;
                             return IsFileRightSize;
                         }
                     }
