@@ -243,7 +243,7 @@ namespace OpenSyno.ViewModels
                 foreach (GuidToTrackMapping newItem in e.AddedItems)
                 {
                     var trackViewModel = this._trackViewModelFactory.Create(newItem.Guid, newItem.Track, this._pageSwitchingService);
-                    trackViewModel.IsCached = IsTrackCached(trackViewModel);
+                    trackViewModel.IsCached = this._playbackService.IsTrackCached(trackViewModel.TrackInfo);
                     this.PlayQueueItems.Add(trackViewModel);
                 }
             }
@@ -673,12 +673,18 @@ namespace OpenSyno.ViewModels
                                                   _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
                                                   _playbackService.SerializeAsciiUriFixes();
                                                   // Force refresh of the PlayqueueItems.
+                                                  MarkTrackAsCached(trackToProcess);
                                               }
                                               else
                                               {
                                                   _notificationService.Warning("The playlist was successfuly offlined.", "Playlist now available offline.");
                                               }
                                           });
+        }
+
+        private void MarkTrackAsCached(TrackViewModel trackToProcess)
+        {
+            trackToProcess.IsCached = true;
         }
 
         private Task<string> DownloadFileForTrack(TrackViewModel trackViewModel)

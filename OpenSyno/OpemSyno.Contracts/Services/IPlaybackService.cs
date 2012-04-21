@@ -37,6 +37,8 @@ namespace OpenSyno.Services
 
         PlayState Status { get; }
 
+        bool IsTrackCached(SynoTrack track);
+
         void RefreshTracksInQueue();
 
         ///// <summary>
@@ -104,6 +106,7 @@ namespace OpenSyno.Services
         void AddUrlRedirection(SynoTrack track, string url);
 
         string GetRedirectionForTrack(SynoTrack trackInfo);
+
     }
 
     public delegate void PlayqueueChangedEventHandler(object sender, PlayqueueChangedEventArgs args);
@@ -113,6 +116,8 @@ namespace OpenSyno.Services
         public IEnumerable<GuidToTrackMapping> RemovedItems { get; set; }
 
         public IEnumerable<GuidToTrackMapping> AddedItems { get; set; }
+
+        public IEnumerable<GuidToTrackMapping> ReplacedItems { get; set; }
 
         public int AddedItemsPosition { get; set; }
     }
