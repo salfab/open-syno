@@ -29,6 +29,7 @@ namespace OpenSyno
         public OpenSynoSettings()
         {
             this.Playlists = new List<Playlist>();
+            this.Port = 5000;
         }
         public DsmVersions DsmVersion { get; set; }
 
