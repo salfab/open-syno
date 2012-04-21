@@ -650,7 +650,7 @@ namespace OpenSyno.ViewModels
             Queue<TrackViewModel> processingQueue;
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                processingQueue = new Queue<TrackViewModel>(currentPlaylist.Tracks.Where(t => !userStore.FileExists(t.Guid.ToString())));
+                processingQueue = new Queue<TrackViewModel>( currentPlaylist.Tracks.Where(t => !IsTrackCached(t)));
             }
 
             if (processingQueue.Count > 0)
@@ -670,14 +670,14 @@ namespace OpenSyno.ViewModels
                                               if (processingQueue.Count > 0)
                                               {
                                                   ProcessOffliningQueue(processingQueue);
-                                                  _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
-                                                  _playbackService.SerializeAsciiUriFixes();
-                                                  // Force refresh of the PlayqueueItems.
                                               }
                                               else
                                               {
                                                   _notificationService.Warning("The playlist was successfuly offlined.", "Playlist now available offline.");
                                               }
+                                              _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
+                                              _playbackService.SerializeAsciiUriFixes();
+                                              // Force refresh of the PlayqueueItems.
                                           });
         }
 
