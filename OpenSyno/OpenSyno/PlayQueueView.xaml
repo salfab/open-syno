@@ -118,7 +118,7 @@
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
                         <Button  HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" />
                         <!--<TextBlock Text="avail. Offline" />-->
-                        <toolkit:ToggleSwitch Content="Offlined" IsChecked="{Binding IsPlaylistAvailableOffline, Mode=TwoWay}"/>
+                        <toolkit:ToggleSwitch Content="Offlined" IsEnabled="{Binding IsOfflining, Converter={StaticResource InvertBooleanConverter}}" IsChecked="{Binding IsPlaylistAvailableOffline, Mode=TwoWay}"/>
                         <Button HorizontalAlignment="Right" Content="Save to playlist" Command="{Binding SavePlaylistCommand}" CommandParameter="{Binding PlayQueueItems, Mode=TwoWay}"/>
                     </StackPanel>
                     <toolkit:LongListSelector Grid.Row="2" x:Name="TracksList" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ItemsSource="{Binding PlayQueueItems, Mode=TwoWay, Converter={StaticResource TrackViewModelsToGroupsConverter}}" ItemTemplate="{StaticResource CheckBoxVerticalBar}" >

@@ -1,4 +1,5 @@
 ﻿using Ninject;
+using OpemSyno.Contracts;
 using OpenSyno.Common;
 using OpenSyno.Helpers;
 
@@ -635,7 +636,15 @@ namespace OpenSyno.Services
             SerializePlayqueue();
         }
 
-        private void RemoveRemoteLocations()
+        public void RemoveUriRedirections(IEnumerable<AsciiUriFix> redirectionsToRemove)
+        {
+            foreach (var asciiUriFix in redirectionsToRemove)
+            {
+                _asciiUriFixes.Remove(asciiUriFix);
+            }
+        }
+
+        public void RemoveRemoteLocations()
         {
             //_asciiUriFixes.Clear();
             IEnumerable<AsciiUriFix> itemsToRemove;
@@ -644,10 +653,7 @@ namespace OpenSyno.Services
                 // Don't forget the ToArray, otherwise, linq will defer the iteration after the disposal of the userStore.
                 itemsToRemove = _asciiUriFixes.Where(o => userStore.FileExists(o.Url)).ToArray();
             }
-            foreach (var asciiUriFix in itemsToRemove)
-            {
-                _asciiUriFixes.Remove(asciiUriFix);
-            }
+            RemoveUriRedirections(itemsToRemove);
         }
 
         public void ClearTracksInQueue()

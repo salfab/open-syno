@@ -158,7 +158,8 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-        </ResourceDictionary>
+    	  <Converters:InvertBooleanConverter x:Key="InvertBooleanConverter" />
+    	</ResourceDictionary>
     </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>

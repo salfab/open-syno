@@ -170,6 +170,7 @@ namespace OpenSyno.ViewModels
         private bool _isCached;
         private const string IsCachedPropertyName = "IsCached";
 
+        [DataMember]
         public bool IsCached
         {
             get { return _isCached; }

@@ -54,6 +54,7 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsciiUriFix.cs" />
     <Compile Include="CredentialFormatValidationResult.cs" />
     <Compile Include="Domain\GuidToTrackMapping.cs" />
     <Compile Include="Domain\IArtistViewModel.cs" />

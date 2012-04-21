@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using OpemSyno.Contracts;
 
 namespace OpenSyno.Services
 {
@@ -36,8 +37,6 @@ namespace OpenSyno.Services
         //ObservableCollection<ISynoTrack> PlayqueueItems { get; }
 
         PlayState Status { get; }
-
-        void RefreshTracksInQueue();
 
         ///// <summary>
         ///// Clears the play queue.
@@ -105,6 +104,8 @@ namespace OpenSyno.Services
 
         string GetRedirectionForTrack(SynoTrack trackInfo);
 
+        void RemoveUriRedirections(IEnumerable<AsciiUriFix> redirectionsToRemove);        
+        void RemoveRemoteLocations();        
     }
 
     public delegate void PlayqueueChangedEventHandler(object sender, PlayqueueChangedEventArgs args);

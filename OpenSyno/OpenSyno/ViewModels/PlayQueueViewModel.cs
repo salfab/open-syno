@@ -156,6 +156,8 @@ namespace OpenSyno.ViewModels
 
             LoadSavedPlaylists();
             LoadCurrentPlaylist();
+
+            RefreshIsOfflinedFlag();
         }
 
         private void LoadSavedPlaylists()
@@ -361,9 +363,16 @@ namespace OpenSyno.ViewModels
                     OnPropertyChanged(CurrentPlaylistIndexPropertyName);
 
                     PersistCurrentPlaylistSettings(this.CurrentPlaylist);
-                    
+
+                    RefreshIsOfflinedFlag();
+
                 }                                
             }
+        }
+
+        private void RefreshIsOfflinedFlag()
+        {
+            IsPlaylistAvailableOffline = CurrentPlaylist.Tracks.All(o => o.IsCached);
         }
 
         private void PersistCurrentPlaylistSettings(Playlist currentPlaylist)
@@ -643,16 +652,37 @@ namespace OpenSyno.ViewModels
 
         private void DeleteOfflinedFilesForPlaylist(Playlist currentPlaylist)
         {
-            throw new NotImplementedException();
+            var cachedRedirections = currentPlaylist.Tracks.Where(IsTrackCached).Select(o => new
+                                                                                                 {
+                                                                                                     UriFix = new AsciiUriFix(o.TrackInfo.Res, _playbackService.GetRedirectionForTrack(o.TrackInfo)),
+                                                                                                     Track = o
+                                                                                                 });
+            foreach (var redirection in cachedRedirections)
+            {
+                var filename = redirection.UriFix.Url;
+                using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+                {
+                    if (userStore.FileExists(filename))
+                    {
+                        try
+                        {
+                            userStore.DeleteFile(filename);
+                        }
+                        catch (Exception)
+                        {
+                            _logService.Error(string.Format("Could not delete file {0} from the offlined tracks.", filename));
+                        }
+                    }
+                    ChangeCacheStatusForTrack(redirection.Track,false);
+                }
+            }
+            _playbackService.RemoveUriRedirections(cachedRedirections.Select(o => o.UriFix));
+            _playbackService.SerializeAsciiUriFixes();
+            IsolatedStorageSettings.ApplicationSettings.Save();
         }
 
         private void MakePlaylistAvailableOffline(Playlist currentPlaylist)
-        {
-            //currentPlaylist.Tracks.Select(t => DownloadFileForTrack(t).RunSynchronously()).ToObservable().ObserveOnDispatcher().SubscribeOn(Scheduler.TaskPool).Subscribe(() =>
-            //{
-            //    DownloadFileForTrack();
-            //}).Select();
-            //Observable.
+        {        
             Queue<TrackViewModel> processingQueue;
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
@@ -661,7 +691,24 @@ namespace OpenSyno.ViewModels
 
             if (processingQueue.Count > 0)
             {
+                this.IsOfflining = true;
                 ProcessOffliningQueue(processingQueue);
+            }
+        }
+
+        private bool _isOfflining;
+        private const string IsOffliningPropertyName = "IsOfflining";
+
+        public bool IsOfflining
+        {
+            get { return _isOfflining; }
+            set
+            {
+                if (_isOfflining != value)
+                {
+                    _isOfflining = value;
+                    OnPropertyChanged(IsOffliningPropertyName);
+                }
             }
         }
 
@@ -679,24 +726,30 @@ namespace OpenSyno.ViewModels
                                               }
                                               else
                                               {
+                                                  Deployment.Current.Dispatcher.BeginInvoke(() => this.IsOfflining = false);
                                                   _notificationService.Warning("The playlist was successfuly offlined.", "Playlist now available offline.");
+                                                  
+                                                  IsolatedStorageSettings.ApplicationSettings.Save();
                                               }
                                               _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
                                               _playbackService.SerializeAsciiUriFixes();
-                                              MarkTrackAsCached(trackToProcess);
+                                              ChangeCacheStatusForTrack(trackToProcess, true);
 
                                               // Force refresh of the PlayqueueItems.
                                           });
         }
 
-        private void MarkTrackAsCached(TrackViewModel trackToProcess)
+        private void ChangeCacheStatusForTrack(TrackViewModel trackToProcess, bool cacheState)
         {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
                                                           {
+                                                              trackToProcess.IsCached = cacheState;
+
+                                                              // if it is also in the playqueueItems, we need to update its cache state.
                                                               var itemToUpdate = PlayQueueItems.FirstOrDefault(t => t.TrackInfo.Res == trackToProcess.TrackInfo.Res);
                                                               if (itemToUpdate != null)
                                                               {
-                                                                  itemToUpdate.IsCached = true;
+                                                                  itemToUpdate.IsCached = cacheState;
                                                                   _logService.Trace("Track "+ itemToUpdate.Guid +" marked as cached");
                                                               }                                                              
                                                           });

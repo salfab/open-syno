@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using Microsoft.Phone.BackgroundAudio;
+using OpemSyno.Contracts;
 using OpenSyno.Common;
 
 namespace OpenSyno.BackgroundPlaybackAgent

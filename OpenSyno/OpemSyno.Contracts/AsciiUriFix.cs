@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace OpenSyno.Common
+namespace OpemSyno.Contracts
 {
     [DataContract]
     public class AsciiUriFix
