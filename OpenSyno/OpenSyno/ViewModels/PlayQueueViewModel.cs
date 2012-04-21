@@ -696,9 +696,9 @@ namespace OpenSyno.ViewModels
                                                               var itemToUpdate = PlayQueueItems.FirstOrDefault(t => t.TrackInfo.Res == trackToProcess.TrackInfo.Res);
                                                               if (itemToUpdate != null)
                                                               {
-                                                                  itemToUpdate.IsCached = trackToProcess.IsCached;
+                                                                  itemToUpdate.IsCached = true;
                                                                   _logService.Trace("Track "+ itemToUpdate.Guid +" marked as cached");
-                                                              }
+                                                              }                                                              
                                                           });
         }
 
