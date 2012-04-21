@@ -725,27 +725,7 @@ namespace OpenSyno.Services
             {
                 _asciiUriFixes.Add(new AsciiUriFix(track.Res, url));
             }
-        }
-
-        public bool IsTrackCached(SynoTrack track)
-        {
-            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
-            {
-                string redirectionForTrack = GetRedirectionForTrack(track);
-                if (redirectionForTrack != null)
-                {
-                    if (userStore.FileExists(redirectionForTrack))
-                    {
-                        using (var fileToCheck = userStore.OpenFile(redirectionForTrack,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
-                        {
-                            var IsFileRightSize = track.Size == fileToCheck.Length;
-                            return IsFileRightSize;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
+        }        
 
         public string GetRedirectionForTrack(SynoTrack trackInfo)
         {

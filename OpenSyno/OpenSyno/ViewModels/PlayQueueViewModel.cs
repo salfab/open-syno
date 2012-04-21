@@ -243,7 +243,7 @@ namespace OpenSyno.ViewModels
                 foreach (GuidToTrackMapping newItem in e.AddedItems)
                 {
                     var trackViewModel = this._trackViewModelFactory.Create(newItem.Guid, newItem.Track, this._pageSwitchingService);
-                    trackViewModel.IsCached = this._playbackService.IsTrackCached(trackViewModel.TrackInfo);
+                    trackViewModel.IsCached = IsTrackCached(trackViewModel);
                     this.PlayQueueItems.Add(trackViewModel);
                 }
             }
@@ -262,17 +262,21 @@ namespace OpenSyno.ViewModels
             OnPropertyChanged(PlayQueueItemsPropertyName);
         }
 
-        private bool IsTrackCached(TrackViewModel trackViewModel)
-        {
-            using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
+        private bool IsTrackCached(TrackViewModel trackViewModel)       
+        {            
+            string redirectionForTrack = this._playbackService.GetRedirectionForTrack(track);
+            if (redirectionForTrack != null)
             {
-                string redirectionForTrack = this._playbackService.GetRedirectionForTrack(trackViewModel.TrackInfo);
-                if (redirectionForTrack != null)
+                using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
                 {
                     if (userStore.FileExists(redirectionForTrack))
                     {
-                        return true;
-                    }  
+                        using (var fileToCheck = userStore.OpenFile(redirectionForTrack,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
+                        {
+                            var IsFileRightSize = track.Size == fileToCheck.Length;
+                            return IsFileRightSize;
+                        }
+                    }
                 }
             }
             return false;
@@ -650,7 +654,7 @@ namespace OpenSyno.ViewModels
             Queue<TrackViewModel> processingQueue;
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                processingQueue = new Queue<TrackViewModel>(currentPlaylist.Tracks.Where(t => !userStore.FileExists(t.Guid.ToString())));
+                processingQueue = new Queue<TrackViewModel>( currentPlaylist.Tracks.Where(t => !IsTrackCached(t)));
             }
 
             if (processingQueue.Count > 0)
@@ -670,15 +674,16 @@ namespace OpenSyno.ViewModels
                                               if (processingQueue.Count > 0)
                                               {
                                                   ProcessOffliningQueue(processingQueue);
-                                                  _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
-                                                  _playbackService.SerializeAsciiUriFixes();
-                                                  // Force refresh of the PlayqueueItems.
-                                                  MarkTrackAsCached(trackToProcess);
                                               }
                                               else
                                               {
                                                   _notificationService.Warning("The playlist was successfuly offlined.", "Playlist now available offline.");
                                               }
+                                              _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
+                                              _playbackService.SerializeAsciiUriFixes();
+                                              MarkTrackAsCached(trackToProcess);
+
+                                              // Force refresh of the PlayqueueItems.
                                           });
         }
 
