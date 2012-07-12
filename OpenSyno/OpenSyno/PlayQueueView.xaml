@@ -114,7 +114,13 @@
                 		<RowDefinition Height="Auto" />						
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <toolkit:ListPicker ItemsSource="{Binding Playlists}" DisplayMemberPath="Name" SelectedIndex="{Binding CurrentPlaylistIndex, Mode=TwoWay}"/>
+                    <toolkit:ListPicker ItemsSource="{Binding Playlists}" DisplayMemberPath="Name" SelectedIndex="{Binding CurrentPlaylistIndex, Mode=TwoWay}">
+                        <toolkit:ListPicker.FullModeItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </toolkit:ListPicker.FullModeItemTemplate>
+                    </toolkit:ListPicker>
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
                         <Button  HorizontalAlignment="Left" Content="Remove" Behaviors:ButtonClickToCommandBehavior.Command="{Binding RemoveTracksFromQueueCommand}" />
                         <!--<TextBlock Text="avail. Offline" />-->

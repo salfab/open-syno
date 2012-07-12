@@ -203,7 +203,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
                 case UserAction.Play:
                     if (player.PlayerState != PlayState.Playing)
                     {
-                        player.Play();
+                        player.Play(); // throws 0xC00D2EE2 : is it only when the cable is plugged to a pc ?
                     }
                     break;
                 case UserAction.Stop:
