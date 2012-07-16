@@ -122,7 +122,8 @@ namespace OpenSyno
 
                 viewModel.WakeUpFromTombstone();
             }
-                       
+
+            _newInstance = false;
             base.OnNavigatedTo(e);
         }
     }
