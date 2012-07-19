@@ -179,6 +179,7 @@ namespace OpenSyno
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            this._flurryTrackerService.StartSession();
             this._signInService = IoC.Container.Get<ISignInService>();
             this._signInService.SignInCompleted += this.OnSignInComplete;
             EventHandler<CheckTokenValidityCompletedEventArgs> completed = null;
