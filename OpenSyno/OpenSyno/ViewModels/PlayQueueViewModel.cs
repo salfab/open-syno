@@ -372,7 +372,13 @@ namespace OpenSyno.ViewModels
 
         private void RefreshIsOfflinedFlag()
         {
-            IsPlaylistAvailableOffline = CurrentPlaylist.Tracks.All(o => o.IsCached);
+            // FIXME : if we set the property ionstead of the backing field :
+            // it is going to trigger a behavior. this is nice for databinding with a toggle button, but it is error prone because by changing a property we do some heavy processing !!            
+            this._isPlaylistAvailableOffline = CurrentPlaylist.Tracks.All(o => o.IsCached);
+
+            // Fixme : if we don't artificially announce that the property has changed (through the dodgy hacky way of changing its backing field ) the toggle button won't reflect that.
+            OnPropertyChanged(IsPlaylistAvailableOfflinePropertyName);
+
         }
 
         private void PersistCurrentPlaylistSettings(Playlist currentPlaylist)
@@ -657,6 +663,7 @@ namespace OpenSyno.ViewModels
                                                                                                      UriFix = new AsciiUriFix(o.TrackInfo.Res, _playbackService.GetRedirectionForTrack(o.TrackInfo)),
                                                                                                      Track = o
                                                                                                  });
+            var tasksToWaitFor = new List<Task<bool>>();
             foreach (var redirection in cachedRedirections)
             {
                 var filename = redirection.UriFix.Url;
@@ -673,12 +680,21 @@ namespace OpenSyno.ViewModels
                             _logService.Error(string.Format("Could not delete file {0} from the offlined tracks.", filename));
                         }
                     }
-                    ChangeCacheStatusForTrack(redirection.Track,false);
+                    var task = ChangeCacheStatusForTrack(redirection.Track,false);
+                    tasksToWaitFor.Add(task);
                 }
             }
-            _playbackService.RemoveUriRedirections(cachedRedirections.Select(o => o.UriFix));
-            _playbackService.SerializeAsciiUriFixes();
-            IsolatedStorageSettings.ApplicationSettings.Save();
+
+            // not very elegant.
+            Task.Factory.ContinueWhenAll(tasksToWaitFor.ToArray(), t =>
+                                             {
+                                                 _playbackService.RemoveUriRedirections(cachedRedirections.Select(o => o.UriFix));
+                                                 _playbackService.SerializeAsciiUriFixes();
+                                                 IsolatedStorageSettings.ApplicationSettings.Save();
+                                             }
+                );
+
+           
         }
 
         private void MakePlaylistAvailableOffline(Playlist currentPlaylist)
@@ -720,6 +736,19 @@ namespace OpenSyno.ViewModels
             Task<string> downloadTask = DownloadFileForTrack(trackToProcess);
             downloadTask.ContinueWith(task =>
                                           {
+                                              var operationSuccessfulTask = ChangeCacheStatusForTrack(trackToProcess, true);
+
+                                              operationSuccessfulTask.ContinueWith(taskSuccessful =>
+                                                                                       {
+                                                                                           if (taskSuccessful.Result)
+                                                                                           {
+                                                                                               _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
+                                                                                               _playbackService.SerializeAsciiUriFixes();
+
+                                                                                               IsolatedStorageSettings.ApplicationSettings.Save();
+                                                                                           }
+                                                                                       });
+
                                               if (processingQueue.Count > 0)
                                               {
                                                   ProcessOffliningQueue(processingQueue);
@@ -728,19 +757,15 @@ namespace OpenSyno.ViewModels
                                               {
                                                   Deployment.Current.Dispatcher.BeginInvoke(() => this.IsOfflining = false);
                                                   _notificationService.Warning("The playlist was successfuly offlined.", "Playlist now available offline.");
-                                                  
-                                                  IsolatedStorageSettings.ApplicationSettings.Save();
                                               }
-                                              _playbackService.AddUrlRedirection(trackToProcess.TrackInfo, task.Result);
-                                              _playbackService.SerializeAsciiUriFixes();
-                                              ChangeCacheStatusForTrack(trackToProcess, true);
 
                                               // Force refresh of the PlayqueueItems.
                                           });
         }
 
-        private void ChangeCacheStatusForTrack(TrackViewModel trackToProcess, bool cacheState)
+        private Task<bool> ChangeCacheStatusForTrack(TrackViewModel trackToProcess, bool cacheState)
         {
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
             Deployment.Current.Dispatcher.BeginInvoke(() =>
                                                           {
                                                               trackToProcess.IsCached = cacheState;
@@ -751,8 +776,16 @@ namespace OpenSyno.ViewModels
                                                               {
                                                                   itemToUpdate.IsCached = cacheState;
                                                                   _logService.Trace("Track "+ itemToUpdate.Guid +" marked as cached");
-                                                              }                                                              
+                                                                  tcs.SetResult(true);
+                                                              }
+                                                              else
+                                                              {
+                                                                  tcs.SetResult(false);
+                                                              }
+
                                                           });
+            return tcs.Task;
+
         }
 
         private Task<string> DownloadFileForTrack(TrackViewModel trackViewModel)
