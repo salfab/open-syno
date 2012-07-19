@@ -50,6 +50,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FlurryWP7SDK">
+      <HintPath>..\3rd party\Flurry\FlurryWP7SDK.dll</HintPath>
+    </Reference>
     <Reference Include="MediaParsers.Phone, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\3rd party\ManagedMediaHelpers\MediaParsers.Phone.dll</HintPath>
     </Reference>
@@ -100,6 +103,8 @@
     <Compile Include="DashboardView.xaml.cs">
       <DependentUpon>DashboardView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Services\FlurryTrackerService.cs" />
+    <Compile Include="Services\IFlurryTrackerService.cs" />
     <Compile Include="NotificationService.xaml.cs" />
     <Compile Include="Playlist.xaml.cs" />
     <Compile Include="Services\LogService.cs" />

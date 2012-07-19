@@ -150,10 +150,14 @@ namespace OpenSyno
             
             IoC.Container.Bind<IPlaybackService>().To<PlaybackService>().InSingletonScope();
             IoC.Container.Bind<AlbumViewModelFactory>().To<AlbumViewModelFactory>();
+
+            _flurryTrackerService = new FlurryTrackerService("LVXIENQ85782Q11F3UKR");
+            IoC.Container.Bind<IFlurryTrackerService>().ToConstant(_flurryTrackerService);
+
             ActivateEagerTypes();
 
             ResolvePrivateMembers();
-
+            
         }
 
         private void ResolvePrivateMembers()
@@ -252,6 +256,8 @@ namespace OpenSyno
         // Code to execute on Unhandled Exceptions
         private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
+            _flurryTrackerService.LogError("An unhandled exception occured.", e.ExceptionObject);
+
             ILogService logService = IoC.Container.Get<ILogService>();
         
             logService.Error(e.ExceptionObject.GetType().FullName);
@@ -377,6 +383,7 @@ namespace OpenSyno
         private ISignInService _signInService;
 
         private ILogService _logService;
+        private IFlurryTrackerService _flurryTrackerService;
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()
