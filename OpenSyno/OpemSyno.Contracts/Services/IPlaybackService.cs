@@ -80,7 +80,7 @@ namespace OpenSyno.Services
 
         event PlayqueueChangedEventHandler PlayqueueChanged;
 
-        void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition, Action<Dictionary<SynoTrack, Guid>> callback);
+        void InsertTracksToQueue(IEnumerable<GuidToTrackMapping> tracks, int insertPosition, Action<Dictionary<SynoTrack, Guid>> callback);
 
         IEnumerable<GuidToTrackMapping> GetTracksInQueue();
 

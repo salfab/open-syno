@@ -155,6 +155,7 @@ namespace OpenSyno.Services
                     catch (Exception e)
                     {
                         // could not deserialize XML for playlist : let's build an empty list.
+                        _logService.Error("could not deserialize XML for playlist : let's build an empty list.");
                         _asciiUriFixes = new List<AsciiUriFix>();
                     }
                 }
@@ -422,79 +423,10 @@ namespace OpenSyno.Services
 
         public event PlayqueueChangedEventHandler PlayqueueChanged;
 
-        public void InsertTracksToQueue(IEnumerable<SynoTrack> tracks, int insertPosition, Action<Dictionary<SynoTrack, Guid>> callback)
+        public void InsertTracksToQueue(IEnumerable<GuidToTrackMapping> tracksToGuidMapping, int insertPosition, Action<Dictionary<SynoTrack, Guid>> callback)
         {
-            _tracksToGuidMapping = new List<GuidToTrackMapping>(tracks.Select(o => new GuidToTrackMapping(Guid.NewGuid(), o)));
+            _tracksToGuidMapping = tracksToGuidMapping.ToList();
             OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = _tracksToGuidMapping , AddedItemsPosition = insertPosition });
-            return;
-            
-            if (insertPosition != _tracksToGuidMapping.Count())
-            {
-                // we need to change the infrastructure and replace the dictionary with a list so we can choose the order !
-                throw new NotSupportedException("Can only insert tracks at the end of the queue for now. sorry :(");
-            }
-            var i = 0;
-            bool isAnyFixNeeded = false;
-            // FIXME : Be able to choose the position
-            foreach (var synoTrack in tracks)
-            {
-                Guid newGuid = Guid.NewGuid();
-                _tracksToGuidMapping.Add(new GuidToTrackMapping(newGuid, synoTrack));
-                var tracksToFix = _tracksToGuidMapping.Where(mapping => !_asciiUriFixes.Any(fix => mapping.Track.Res == fix.Res) && mapping.Track.Res.Any(c => c == '&' || c > 127)).Select(t => t.Track);
-                isAnyFixNeeded = tracksToFix.Count() > 0;
-                foreach (var track in tracksToFix)
-                {
-                    _asciiUriFixes.Add(new AsciiUriFix(track.Res, null));
-
-                    // query shorten URL
-
-                    // Use url-shortening service.
-                    // http://t0.tv/api/shorten?u=<url>
-                    WebClient webClient = new WebClient();
-
-
-                    webClient.DownloadStringCompleted += (s, e) =>
-                        {
-                            var shortUrl = e.Result;
-                            var res = (string)e.UserState;
-                            _asciiUriFixes.Single(fix => fix.Res == res).Url = shortUrl;
-                            if (!_asciiUriFixes.Any(fix => fix.Url == null))
-                            {
-                                SerializeAsciiUriFixes();
-                                Dictionary<SynoTrack, Guid> dictionary = _tracksToGuidMapping.Where(o => tracks.Contains(o.Track)).ToDictionary(o => o.Track, o => o.Guid);
-                                callback(dictionary);
-                            }
-                        };
-                    var relativePathToAudioStreamService = this._versionDependentResourceProvider.GetAudioStreamWebserviceRelativePath(DsmVersions.V4_0);
-                    string url =
-                   string.Format(
-                       "http://{0}:{1}{2}/0.mp3?sid={3}&action=streaming&songpath={4}",
-                       _audioStationSession.Host,
-                       _audioStationSession.Port,
-                       relativePathToAudioStreamService,
-                       _audioStationSession.Token.Split('=')[1],
-                       HttpUtility.UrlEncode(track.Res).Replace("+", "%20"));
-
-                    webClient.DownloadStringAsync(new Uri("http://tinyurl.com/api-create.php?url=" + HttpUtility.UrlEncode(url)), track.Res);
-
-                }
-                // FIXME : Urgent : replace NotifyCollectionChanged by a custom event that can propagate bulk collection changes ! (optimize writes on disk )
-                OnTracksInQueueChanged(new PlayqueueChangedEventArgs { AddedItems = new[] { new GuidToTrackMapping(newGuid, synoTrack) }, AddedItemsPosition = insertPosition + i });
-                i++;
-            }
-
-            // if no fix was needed, the callback hasn't been called yet !
-            if (!isAnyFixNeeded)
-            {
-                Dictionary<SynoTrack, Guid> dictionary = new Dictionary<SynoTrack, Guid>();
-
-                foreach (var track in tracks)
-                {
-                    dictionary.Add(track, _tracksToGuidMapping.Where(o=>o.Track == track).First().Guid );
-                }
-              
-                callback(dictionary);
-            }
         }
 
         public void SerializeAsciiUriFixes()

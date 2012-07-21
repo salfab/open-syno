@@ -157,7 +157,7 @@ namespace OpenSyno.ViewModels
             LoadSavedPlaylists();
             LoadCurrentPlaylist();
 
-            RefreshIsOfflinedFlag();
+            //RefreshIsOfflinedFlag();
         }
 
         private void LoadSavedPlaylists()
@@ -879,12 +879,12 @@ namespace OpenSyno.ViewModels
             //    this.CurrentPlaylist = playQueue;
             //}
 
-            var tracks = items.Select(o => o.TrackInfo);
+            var guidToTrackMappings = items.Select(o => new GuidToTrackMapping(o.Guid,o.TrackInfo));
 
             // int insertPosition = _playbackService.GetTracksCountInQueue();
             int insertPosition = PlayQueueItems.Count();
 
-            _playbackService.InsertTracksToQueue(tracks, insertPosition, callback);
+            _playbackService.InsertTracksToQueue(guidToTrackMappings, insertPosition, callback);
             //foreach (var trackViewModel in items)
             //{
             //    PlayQueueItems.Add(trackViewModel);
