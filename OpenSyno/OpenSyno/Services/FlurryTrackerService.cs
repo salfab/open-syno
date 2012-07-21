@@ -19,7 +19,7 @@ namespace OpenSyno.Services
 
         public void LogError(string message, Exception exception)
         {
-            Api.LogError(message, exception);            
+            Api.LogError(message + "\r\n" + exception.GetType() + "\r\n" + exception.Message + "\r\n" + exception.StackTrace, exception);            
         }
     }
 }
