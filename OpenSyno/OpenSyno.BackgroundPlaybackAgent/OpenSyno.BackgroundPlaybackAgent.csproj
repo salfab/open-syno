@@ -60,7 +60,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioPlayer.cs" />
+    <Compile Include="LastFmScrobblingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PlayqueueInterProcessCommunicationTransporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OpemSyno.Contracts\OpemSyno.Contracts.csproj">

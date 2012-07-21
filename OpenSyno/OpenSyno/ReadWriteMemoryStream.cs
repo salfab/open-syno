@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Ninject;
+using OpemSyno.Contracts.Services;
 using OpenSyno.Helpers;
 using OpenSyno;
 

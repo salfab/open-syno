@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.Practices.Prism.Events;
 using Newtonsoft.Json.Linq;
 using Ninject;
+using OpemSyno.Contracts.Services;
 using Synology.AudioStationApi;
 
 namespace OpenSyno.Services

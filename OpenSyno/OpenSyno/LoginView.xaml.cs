@@ -11,6 +11,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Practices.Prism.Events;
 using Ninject;
+using OpemSyno.Contracts.Services;
 using OpenSyno.Helpers;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;

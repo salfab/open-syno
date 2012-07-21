@@ -7,6 +7,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Practices.Prism.Events;
 using Ninject;
+using OpemSyno.Contracts.Services;
 using OpenSyno.Common;
 using OpenSyno.Helpers;
 using OpenSyno.Services;

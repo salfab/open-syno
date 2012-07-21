@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Threading;
 using Microsoft.Phone.Tasks;
+using OpemSyno.Contracts.Services;
 using OpenSyno.Services;
 
 namespace OpenSyno

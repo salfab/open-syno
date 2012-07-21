@@ -13,6 +13,7 @@ using Microsoft.Practices.Prism.Events;
 using Ninject;
 using Ninject.Activation;
 using Ninject.Planning.Bindings;
+using OpemSyno.Contracts.Services;
 using OpenSyno.Helpers;
 using OpenSyno.Services;
 using OpenSyno.ViewModels;

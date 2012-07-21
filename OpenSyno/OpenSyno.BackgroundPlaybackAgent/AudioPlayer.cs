@@ -2,6 +2,8 @@
 using FlurryWP7SDK;
 using Microsoft.Phone.BackgroundAudio;
 using OpemSyno.Contracts;
+using OpemSyno.Contracts.Domain;
+using OpemSyno.Contracts.Services;
 using OpenSyno.Common;
 
 namespace OpenSyno.BackgroundPlaybackAgent
@@ -30,6 +32,8 @@ namespace OpenSyno.BackgroundPlaybackAgent
         private List<AsciiUriFix> _asciiUriFixes;
         private List<GuidToTrackMapping> _tracksToGuidMapping = new List<GuidToTrackMapping>();
         private PlayqueueInterProcessCommunicationTransporter _playqueueInformation;
+        private ILastFmScrobblingService _lastFmScrobblingService;
+        private SettingsInterProcessCommunicationTransporter _settingsInformation;
 
         /// <remarks>
         /// AudioPlayer instances can share the same process. 
@@ -44,6 +48,10 @@ namespace OpenSyno.BackgroundPlaybackAgent
             IVersionDependentResourcesProvider versionDependentResourcesProvider = new VersionDependentResourcesProvider();
 
             _audioTrackFactory = new AudioTrackFactory(versionDependentResourcesProvider);
+
+            _settingsInformation = LoadSettings();
+
+            _lastFmScrobblingService = new LastFmScrobblingService(_settingsInformation.LastFmSettings);
 
             // TODO : Handle exceptions 
             using (var userStoreForApplication = IsolatedStorageFile.GetUserStoreForApplication())
@@ -62,6 +70,30 @@ namespace OpenSyno.BackgroundPlaybackAgent
                 });
 
             }
+        }
+
+        private SettingsInterProcessCommunicationTransporter LoadSettings()
+        {
+            SettingsInterProcessCommunicationTransporter settingsInformation;
+            using (var userStoreForApplication = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                using (IsolatedStorageFileStream playQueueFile =userStoreForApplication.OpenFile("SettingsInterProcessCommunicationTransporter.xml", FileMode.OpenOrCreate))
+                {
+                    // here, we can't work with an ISynoTrack :( tightly bound to the implementation, because of serialization issues...
+                    var dcs = new DataContractSerializer(typeof(SettingsInterProcessCommunicationTransporter), new Type[] { typeof(SynoTrack) });
+
+                    try
+                    {
+                        settingsInformation = (SettingsInterProcessCommunicationTransporter)dcs.ReadObject(playQueueFile);
+                    }
+                    catch (Exception)
+                    {
+                        settingsInformation = new SettingsInterProcessCommunicationTransporter();
+                        settingsInformation.IsUndefined = true;
+                    }
+                }
+            }
+            return settingsInformation;
         }
 
         private void LoadPlayqueue(IsolatedStorageFile userStoreForApplication)
@@ -139,6 +171,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
             switch (playState)
             {
                 case PlayState.TrackEnded:
+                    this._lastFmScrobblingService.Scrobble(track);
                     Func<List<GuidToTrackMapping>, AudioTrack, GuidToTrackMapping> defineNextTrackPredicate = (mappings, currentTrack) =>
                         {
                             var guidToTrackMapping = mappings.SingleOrDefault(o => o.Guid == new Guid(currentTrack.Tag));
@@ -419,22 +452,5 @@ namespace OpenSyno.BackgroundPlaybackAgent
         {
 
         }
-    }
-
-    [DataContract]
-    public class PlayqueueInterProcessCommunicationTransporter
-    {
-        public PlayqueueInterProcessCommunicationTransporter()
-        {
-            Mappings = new List<GuidToTrackMapping>();
-        }
-        [DataMember]
-        public string Host { get; set; }
-        [DataMember]
-        public int Port { get; set; }
-        [DataMember]
-        public string Token { get; set; }
-        [DataMember]
-        public List<GuidToTrackMapping> Mappings { get; set; }
     }
 }
