@@ -64,7 +64,7 @@
         {
             if (IsEnabled)
             {
-                _writer.WriteLine("[{0}] - {1}", DateTime.Now, message);
+                _writer.WriteLine("TRACE : [{0}] - {1}", DateTime.Now, message);
             }
             
         }
@@ -80,6 +80,14 @@
         public string GetLogFileSinceAppStart()
         {
             return GetLogFileFromPosition(_positionAtLaunch);
+        }
+
+        public void Warning(string message)
+        {
+            if (IsEnabled)
+            {
+                _writer.WriteLine("WARNING : [{0}] - {1}", DateTime.Now, message);
+            }
         }
 
         private string GetLogFileFromPosition(long startPosition)
@@ -133,5 +141,6 @@
         void DeactivateConditionalTracing(string key);
         void ConditionalTrace(string message, string conditionKey);
         string GetLogFileSinceAppStart();
+        void Warning(string message);
     }
 }
