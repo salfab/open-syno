@@ -38,7 +38,7 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// </remarks>
         public AudioPlayer()
         {
-            Api.StartSession("LVXIENQ85782Q11F3UKR");
+            // Api.StartSession("LVXIENQ85782Q11F3UKR");
 
             // since we are in a background agent : the types registered in the IoC container are not shared.
             IVersionDependentResourcesProvider versionDependentResourcesProvider = new VersionDependentResourcesProvider();
