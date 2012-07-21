@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -60,15 +61,19 @@ namespace OpenSyno
 
                 EmailComposeTask emailComposeTask = new EmailComposeTask();
                 emailComposeTask.To = "opensyno@seesharp.ch";
-
-                if (logFile.Length > 50000)
-                {
-                    const string truncateDisclaimer = "This logfile has been truncated : only the last 64kbytes are shown.\r\n";
-                    emailComposeTask.Body = truncateDisclaimer + logFile.Substring(logFile.Length - 32000 + truncateDisclaimer.Length);
-                }
-                else
+                try
                 {
                     emailComposeTask.Body = logFile;
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    if (Debugger.IsAttached)
+                    {
+                        Debugger.Break();
+                    }
+
+                    const string truncateDisclaimer = "This logfile has been truncated : only the last 64kbytes are shown.\r\n";
+                    emailComposeTask.Body = truncateDisclaimer + logFile.Substring(logFile.Length - 32000 + truncateDisclaimer.Length);
                 }
 
                 emailComposeTask.Subject = "Log file";

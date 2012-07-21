@@ -79,6 +79,9 @@ namespace OpenSyno
             EventAggregator eventAggregator = new EventAggregator();
             IoC.Container.Bind<IEventAggregator>().ToConstant(eventAggregator);
 
+            _logService = new IsolatedStorageLogService();
+            IoC.Container.Bind<ILogService>().ToConstant(_logService).InSingletonScope();
+
             string synoSettings = "SynoSettings";
             _openSynoSettings = IsolatedStorageSettings.ApplicationSettings.Contains(synoSettings) ? (OpenSynoSettings)IsolatedStorageSettings.ApplicationSettings[synoSettings] : new OpenSynoSettings();
 
@@ -121,9 +124,6 @@ namespace OpenSyno
             
             IoC.Container.Bind<PlayQueueViewModel>().ToSelf().InSingletonScope();
             IoC.Container.Bind<SearchResultsViewModel>().ToSelf().InSingletonScope();
-
-            _logService = new IsolatedStorageLogService();
-            IoC.Container.Bind<ILogService>().ToConstant(_logService).InSingletonScope();
             
             IoC.Container.Bind<ISearchResultItemViewModelFactory>().To<SearchResultItemViewModelFactory>().InSingletonScope();
 

@@ -268,6 +268,7 @@ namespace OpenSyno.ViewModels
 
         private bool IsTrackCached(TrackViewModel trackViewModel)       
         {
+            var isTrackCached = false;
             string redirectionForTrack = this._playbackService.GetRedirectionForTrack(trackViewModel.TrackInfo);
             if (redirectionForTrack != null)
             {
@@ -277,13 +278,15 @@ namespace OpenSyno.ViewModels
                     {
                         using (var fileToCheck = userStore.OpenFile(redirectionForTrack,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
                         {
-                            var IsFileRightSize = trackViewModel.TrackInfo.Size == fileToCheck.Length;
-                            return IsFileRightSize;
+                            var isFileOfRightSize = trackViewModel.TrackInfo.Size == fileToCheck.Length;
+                            isTrackCached = isFileOfRightSize;
                         }
                     }
                 }
             }
-            return false;
+
+            this._logService.Trace(string.Format("Track {0} is cached : {1} with redirection set to : {2}.", trackViewModel.TrackInfo.Title, isTrackCached, redirectionForTrack));
+            return isTrackCached;
         }
 
         private void OnSavePlaylist(IEnumerable<TrackViewModel> tracks)
@@ -658,7 +661,7 @@ namespace OpenSyno.ViewModels
 
         private void DeleteOfflinedFilesForPlaylist(Playlist currentPlaylist)
         {
-            var cachedRedirections = currentPlaylist.Tracks.Where(IsTrackCached).Select(o => new
+            var cachedRedirections = currentPlaylist.Tracks.Where(t => t.IsCached).Select(o => new
                                                                                                  {
                                                                                                      UriFix = new AsciiUriFix(o.TrackInfo.Res, _playbackService.GetRedirectionForTrack(o.TrackInfo)),
                                                                                                      Track = o
@@ -680,21 +683,24 @@ namespace OpenSyno.ViewModels
                             _logService.Error(string.Format("Could not delete file {0} from the offlined tracks.", filename));
                         }
                     }
+                    else
+                    {
+                        _logService.Warning(string.Format("The track {0} was mapped to a cached file but the file was not existing : {1}", redirection.Track.TrackInfo.Title, filename));
+                    }
                     var task = ChangeCacheStatusForTrack(redirection.Track,false);
                     tasksToWaitFor.Add(task);
                 }
             }
 
-            // not very elegant.
-            Task.Factory.ContinueWhenAll(tasksToWaitFor.ToArray(), t =>
-                                             {
-                                                 _playbackService.RemoveUriRedirections(cachedRedirections.Select(o => o.UriFix));
-                                                 _playbackService.SerializeAsciiUriFixes();
-                                                 IsolatedStorageSettings.ApplicationSettings.Save();
-                                             }
-                );
+            Task.Factory.ContinueWhenAll(tasksToWaitFor.ToArray(), tasks =>
+                                                                       {
+                                                                           _playbackService.RemoveUriRedirections(cachedRedirections.Select(o => o.UriFix));
+                                                                           _playbackService.SerializeAsciiUriFixes();
+                                                                           IsolatedStorageSettings.ApplicationSettings.Save();
+                                                                       });
 
-           
+   
+
         }
 
         private void MakePlaylistAvailableOffline(Playlist currentPlaylist)
