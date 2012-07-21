@@ -1,5 +1,6 @@
 ﻿using Ninject;
 using OpemSyno.Contracts;
+using OpemSyno.Contracts.Services;
 using OpenSyno.Common;
 using OpenSyno.Helpers;
 
@@ -583,7 +584,7 @@ namespace OpenSyno.Services
             using (var userStore = IsolatedStorageFile.GetUserStoreForApplication())
             {
                 // Don't forget the ToArray, otherwise, linq will defer the iteration after the disposal of the userStore.
-                itemsToRemove = _asciiUriFixes.Where(o => userStore.FileExists(o.Url)).ToArray();
+                itemsToRemove = _asciiUriFixes.Where(o => !userStore.FileExists(o.Url)).ToArray();
             }
             RemoveUriRedirections(itemsToRemove);
         }
