@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Ninject;
+using OpemSyno.Contracts;
 
 namespace OpenSyno.ViewModels
 {
@@ -31,7 +32,7 @@ namespace OpenSyno.ViewModels
 
         private IUrlParameterToObjectsPlateHeater _ticketUrlParameterToObjectPlateHeater;
 
-        public SearchViewModel(ISearchService searchService, IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator, ISignInService signInService, IUrlParameterToObjectsPlateHeater ticketUrlParameterToObjectPlateHeater)
+        public SearchViewModel(ISearchService searchService, IPageSwitchingService pageSwitchingService, IEventAggregator eventAggregator, ISignInService signInService, IUrlParameterToObjectsPlateHeater ticketUrlParameterToObjectPlateHeater, IOpenSynoSettings opensynoSettings)
         {
             _searchService = searchService;
             this._ticketUrlParameterToObjectPlateHeater = ticketUrlParameterToObjectPlateHeater;
@@ -54,6 +55,11 @@ namespace OpenSyno.ViewModels
             DispatchSearchCommand = new DelegateCommand<string>(OnDispatchSearch);
             ClearKeywordCommand = new DelegateCommand(OnClearKeyword);
             ShowPlayQueueCommand = new DelegateCommand(OnShowPlayQueue);
+
+            if (opensynoSettings.GetCredentialFormatValidationStatus() != CredentialFormatValidationStatus.Valid)
+            {
+                this._pageSwitchingService.NavigateToCredentialsPage();
+            }
         }
 
         private void OnShowPlayQueue()

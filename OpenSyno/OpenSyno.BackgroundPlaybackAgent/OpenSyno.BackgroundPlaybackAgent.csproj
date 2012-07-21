@@ -42,6 +42,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FlurryWP7SDK">
+      <HintPath>..\3rd party\Flurry\FlurryWP7SDK.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Ninject">
       <HintPath>..\3rd party\Ninject\Ninject.dll</HintPath>

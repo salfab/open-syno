@@ -45,8 +45,7 @@ namespace OpenSyno
 
             // the page is an humble object, and the navigatorService, its sole dependency.
             var navigator = IoC.Container.Get<INavigatorService>();
-            navigator.ActivateNavigationService(NavigationService, true);
-
+            navigator.ActivateNavigationService(NavigationService, true);            
             
             // string viewName = ViewNames.SearchView;// "SearchView"; // GetType().FullName;
             //// Don't register if it has been already registered in the past.

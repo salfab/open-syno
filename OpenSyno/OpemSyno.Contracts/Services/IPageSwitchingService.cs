@@ -12,5 +12,6 @@
         void NavigateToPlayQueue();
 
         void NavigateToArtistDetailView(string artistId);
+        void NavigateToCredentialsPage();
     }
 }

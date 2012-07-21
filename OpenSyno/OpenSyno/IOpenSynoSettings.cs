@@ -24,6 +24,6 @@
         Guid CurrentPlaylistGuid { get; set; }
         DsmVersions DsmVersion { get; set; }
 
-        CredentialFormatValidationResult IsCredentialFormatValid();
+        CredentialFormatValidationStatus GetCredentialFormatValidationStatus();
     }
 }

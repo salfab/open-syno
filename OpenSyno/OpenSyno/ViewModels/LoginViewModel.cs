@@ -74,9 +74,9 @@ namespace OpenSyno
                 // need to get a new token.
 
                 // we need to check if the settings are okay too because this takes place before the check performed in the OnSignIn command handler.
-                var formatValidity = _synoSettings.IsCredentialFormatValid();
+                var formatValidity = _synoSettings.GetCredentialFormatValidationStatus();
 
-                if (formatValidity != CredentialFormatValidationResult.Valid)
+                if (formatValidity != CredentialFormatValidationStatus.Valid)
                 {
                     _signInService.ShowCredentialErrorMessage(formatValidity);
                     return;
@@ -128,9 +128,9 @@ namespace OpenSyno
             _synoSettings.Port = Port;
 
             // NOTE - is it still needed here, since we do a check cached token validity async just after ?
-            var formatValidity = _synoSettings.IsCredentialFormatValid();
+            var formatValidity = _synoSettings.GetCredentialFormatValidationStatus();
 
-            if (formatValidity != CredentialFormatValidationResult.Valid)
+            if (formatValidity != CredentialFormatValidationStatus.Valid)
             {
                 _signInService.ShowCredentialErrorMessage(formatValidity);               
                 return;

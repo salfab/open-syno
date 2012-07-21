@@ -1,6 +1,6 @@
 ﻿namespace OpemSyno.Contracts
 {
-    public enum CredentialFormatValidationResult
+    public enum CredentialFormatValidationStatus
     {
         Valid, 
         HostEmpty,

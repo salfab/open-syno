@@ -55,7 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsciiUriFix.cs" />
-    <Compile Include="CredentialFormatValidationResult.cs" />
+    <Compile Include="CredentialFormatValidationStatus.cs" />
     <Compile Include="Domain\GuidToTrackMapping.cs" />
     <Compile Include="Domain\IArtistViewModel.cs" />
     <Compile Include="Domain\IAudioTrackFactory.cs" />

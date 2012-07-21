@@ -45,7 +45,7 @@
 	<DataTemplate x:Key="CheckBoxVerticalBar">
         <StackPanel Orientation="Horizontal">
 		    <CheckBox  IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding TrackInfo.Title}" />
-            <TextBlock Text="*" Visibility="{Binding IsCached, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <TextBlock Text="*" Visibility="{Binding IsCached, Mode=TwoWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
         </StackPanel>
         <!--<Grid>
 			<Grid.ColumnDefinitions>

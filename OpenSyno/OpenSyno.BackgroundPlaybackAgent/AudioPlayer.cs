@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using FlurryWP7SDK;
 using Microsoft.Phone.BackgroundAudio;
 using OpemSyno.Contracts;
 using OpenSyno.Common;
@@ -37,6 +38,8 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// </remarks>
         public AudioPlayer()
         {
+            Api.StartSession("LVXIENQ85782Q11F3UKR");
+
             // since we are in a background agent : the types registered in the IoC container are not shared.
             IVersionDependentResourcesProvider versionDependentResourcesProvider = new VersionDependentResourcesProvider();
 
@@ -105,6 +108,8 @@ namespace OpenSyno.BackgroundPlaybackAgent
         /// Code to execute on Unhandled Exceptions
         private void AudioPlayer_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
+            Api.LogError("AudioPlayer_UnhandledException", e.ExceptionObject);
+
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 // An unhandled exception has occurred; break into the debugger

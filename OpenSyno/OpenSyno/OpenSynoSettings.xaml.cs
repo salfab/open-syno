@@ -33,24 +33,24 @@ namespace OpenSyno
         }
         public DsmVersions DsmVersion { get; set; }
 
-        public CredentialFormatValidationResult IsCredentialFormatValid()
+        public CredentialFormatValidationStatus GetCredentialFormatValidationStatus()
         {
             if (string.IsNullOrEmpty(this.UserName) || string.IsNullOrEmpty(this.Password))
             {
-                return CredentialFormatValidationResult.EmptyUsernamePassword;
+                return CredentialFormatValidationStatus.EmptyUsernamePassword;
             }
 
             if (string.IsNullOrWhiteSpace(this.Host))
             {
-                return CredentialFormatValidationResult.HostEmpty;
+                return CredentialFormatValidationStatus.HostEmpty;
             }
 
             if (CheckHostnameContainsPort(this.Host))
             {
-                return CredentialFormatValidationResult.PortIncludedInHostname;
+                return CredentialFormatValidationStatus.PortIncludedInHostname;
             }
 
-            return CredentialFormatValidationResult.Valid;
+            return CredentialFormatValidationStatus.Valid;
         }
 
         private bool CheckHostnameContainsPort(string hostname)

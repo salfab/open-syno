@@ -12,6 +12,6 @@ namespace OpenSyno.Services
         void SignIn();
         void CheckCachedTokenValidityAsync();
 
-        void ShowCredentialErrorMessage(CredentialFormatValidationResult formatValidity);
+        void ShowCredentialErrorMessage(CredentialFormatValidationStatus formatValidity);
     }
 }

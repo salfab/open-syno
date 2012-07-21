@@ -101,15 +101,15 @@ namespace OpenSyno.Services
 
                                                   };
                 // we pass the client object along just so it doesn't get garbage collected before the eventhandler is called.
-            var formatValidity = _openSynoSettings.IsCredentialFormatValid();
+            var formatValidity = _openSynoSettings.GetCredentialFormatValidationStatus();
 
-            if (formatValidity != CredentialFormatValidationResult.Valid)
+            if (formatValidity != CredentialFormatValidationStatus.Valid)
             {
                 ShowCredentialErrorMessage(formatValidity);
             }                        
 
             // var isBadFormat = CheckHostnameDoesNotContainPort(_openSynoSettings.Host);
-            if (formatValidity == CredentialFormatValidationResult.Valid)
+            if (formatValidity == CredentialFormatValidationStatus.Valid)
             {
                 // let's prevent unexpected validation error.
                 try
@@ -127,23 +127,23 @@ namespace OpenSyno.Services
             }
         }
 
-        public void ShowCredentialErrorMessage(CredentialFormatValidationResult formatValidity)
+        public void ShowCredentialErrorMessage(CredentialFormatValidationStatus formatValidity)
         {
             switch (formatValidity)
             {
-                case CredentialFormatValidationResult.Valid:
+                case CredentialFormatValidationStatus.Valid:
                     break;
-                case CredentialFormatValidationResult.HostEmpty:
+                case CredentialFormatValidationStatus.HostEmpty:
                     _notificationService.Warning("No hostname was specified in the settings. Please provide a hostname for the Disk Station.", "Hostname not specified");
                     break;
-                case CredentialFormatValidationResult.InvalidHostFormat:
+                case CredentialFormatValidationStatus.InvalidHostFormat:
                     break;
-                case CredentialFormatValidationResult.InvalidPort:
+                case CredentialFormatValidationStatus.InvalidPort:
                     break;
-                case CredentialFormatValidationResult.EmptyUsernamePassword:
+                case CredentialFormatValidationStatus.EmptyUsernamePassword:
                     _notificationService.Warning("The username or the password was not specified in the settings. Please provide a username and a matching password registered in the Disk Station.", "Missing username or password");
                     break;
-                case CredentialFormatValidationResult.PortIncludedInHostname:
+                case CredentialFormatValidationStatus.PortIncludedInHostname:
                     _notificationService.Warning("Please, enter the port in the dedicated field instead of using the notation hostname:port", "Hostname not valid");
                     break;
                 default:
