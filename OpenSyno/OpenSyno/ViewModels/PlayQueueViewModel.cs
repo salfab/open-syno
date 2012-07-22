@@ -879,7 +879,7 @@ namespace OpenSyno.ViewModels
             //    this.CurrentPlaylist = playQueue;
             //}
 
-            var guidToTrackMappings = items.Select(o => new GuidToTrackMapping(o.Guid,o.TrackInfo));
+            var guidToTrackMappings = items.Select(o => new GuidToTrackMapping(o.Guid ,o.TrackInfo));
 
             // int insertPosition = _playbackService.GetTracksCountInQueue();
             int insertPosition = PlayQueueItems.Count();
