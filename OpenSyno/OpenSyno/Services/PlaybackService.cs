@@ -1,14 +1,10 @@
 ﻿using Ninject;
 using OpemSyno.Contracts;
-using OpemSyno.Contracts.Services;
-using OpenSyno.Common;
-using OpenSyno.Helpers;
 
 namespace OpenSyno.Services
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.IO.IsolatedStorage;
     using System.Linq;
