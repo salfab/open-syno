@@ -198,12 +198,12 @@ namespace OpenSyno.ViewModels
             // NOTE - if there is a bug and we have two matches, then we are going to fallback to an unsaved playlist.
             var currentPlaylist = this.Playlists.SingleOrDefault(o => o.Id == currentPlaylistId);
 
-            // we probably should do something cleaner by correctly saving the "unsaved playqueue" playlist. or something... think about it.
-            if (currentPlaylist.Id == Guid.Empty)
-            {
-                currentPlaylist.Tracks.Clear();
-                currentPlaylist.Tracks.AddRange(this.PlayQueueItems);                
-            }
+            //// we probably should do something cleaner by correctly saving the "unsaved playqueue" playlist. or something... think about it.
+            //if (currentPlaylist.Id == Guid.Empty)
+            //{
+            //    currentPlaylist.Tracks.Clear();
+            //    currentPlaylist.Tracks.AddRange(this.PlayQueueItems);                
+            //}
 
             // 2+ or no matching playlists at all : 
             if (currentPlaylist == null)
@@ -259,14 +259,24 @@ namespace OpenSyno.ViewModels
                 }
             }
 
-            if (this.CurrentPlaylist != null && this.CurrentPlaylist.Id != Guid.Empty)
+            if (this.CurrentPlaylist != null)
             {
-                var savedPlayList = this.CurrentPlaylist;
-                var playlist = this.Playlists.Single(o => o.Id == Guid.Empty);
-                playlist.Tracks.Clear();
-                playlist.Tracks.AddRange(savedPlayList.Tracks);
-                this.CurrentPlaylist = playlist;
+                if (this.CurrentPlaylist.Id != Guid.Empty)
+                {
+                    var savedPlayList = this.CurrentPlaylist;
+                    var playlist = this.Playlists.Single(o => o.Id == Guid.Empty);
+                    playlist.Tracks.Clear();
+                    playlist.Tracks.AddRange(savedPlayList.Tracks);
+                    this.CurrentPlaylist = playlist;
+                }
+                else
+                {
+                    this.CurrentPlaylist.Tracks = this.PlayQueueItems.ToList();
+                    PersistCurrentPlaylistSettings(this.CurrentPlaylist);
+                    this.RefreshIsOfflinedFlag();
+                }
             }
+
 
 
             // Hack : we want to make sure the converter Will be re-evaluated, so the easiest way is to trigger a propery changed.
