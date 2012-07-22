@@ -198,6 +198,13 @@ namespace OpenSyno.ViewModels
             // NOTE - if there is a bug and we have two matches, then we are going to fallback to an unsaved playlist.
             var currentPlaylist = this.Playlists.SingleOrDefault(o => o.Id == currentPlaylistId);
 
+            // we probably should do something cleaner by correctly saving the "unsaved playqueue" playlist. or something... think about it.
+            if (currentPlaylist.Id == Guid.Empty)
+            {
+                currentPlaylist.Tracks.Clear();
+                currentPlaylist.Tracks.AddRange(this.PlayQueueItems);                
+            }
+
             // 2+ or no matching playlists at all : 
             if (currentPlaylist == null)
             {
