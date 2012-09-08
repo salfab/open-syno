@@ -64,7 +64,6 @@ namespace OpenSyno.Services
         /// </summary>
         event TrackCurrentPositionChangedDelegate TrackCurrentPositionChanged;
 
-        event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
 
         //ISynoTrack GetNextTrack(ISynoTrack currentTrack);
 
