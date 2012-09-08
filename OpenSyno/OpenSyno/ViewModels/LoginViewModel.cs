@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 namespace OpenSyno
 {
@@ -116,6 +117,8 @@ namespace OpenSyno
         public string Host { get; set; }
         
         public int Port { get; set; }
+
+        public List<Type> RendererType { get; set; }
 
         private void OnSignIn()
         {

@@ -19,13 +19,17 @@ namespace OpenSyno.Services
 
     using Synology.AudioStationApi;
 
-    public class PlaybackService : IPlaybackService, IAudioRenderingService
+    public class PlaybackService : IPlaybackService
     {
         /// <summary>
         /// The service responsible for downloading and rendering the audio files.
         /// </summary>
 
         private readonly IAudioStationSession _audioStationSession;
+
+        private readonly IAudioRenderingServiceFactory _audioRenderingServiceFactory;
+
+        private readonly IAudioRenderingService _audioRenderingService;
 
         private readonly IAudioTrackFactory _audioTrackFactory;
 
@@ -103,7 +107,7 @@ namespace OpenSyno.Services
         /// <param name="trackToPlay">The track to play.</param>
         public void PlayTrackInQueue(Guid trackToPlay)
         {
-            StreamTrack(trackToPlay);            
+            _audioRenderingService.StreamTrack(trackToPlay);            
         }
 
         protected void OnTrackStarted(TrackStartedEventArgs trackStartedEventArgs)
@@ -121,14 +125,16 @@ namespace OpenSyno.Services
         /// </summary>
         /// <param name="audioStationSession"></param>
         /// <param name="audioTrackFactory"></param>
-        public PlaybackService(IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory, IVersionDependentResourcesProvider versionDependentResourceProvider)
+        public PlaybackService(IAudioStationSession audioStationSession,IAudioRenderingServiceFactory audioRenderingServiceFactory, IAudioTrackFactory audioTrackFactory, IVersionDependentResourcesProvider versionDependentResourceProvider)
         {
             _logService = IoC.Container.Get<ILogService>();
                         
             _audioStationSession = audioStationSession;
+            _audioRenderingServiceFactory = audioRenderingServiceFactory;
             _audioTrackFactory = audioTrackFactory;
             _versionDependentResourceProvider = versionDependentResourceProvider;
 
+            
             // We need an observable collection so we can serialize the items to IsolatedStorage in order to get the background rendering service to read it from disk, since the background Agent is not running in the same process.
             //PlayqueueItems = new ObservableCollection<ISynoTrack>();
 
@@ -185,6 +191,7 @@ namespace OpenSyno.Services
             }
 
 
+            this._audioRenderingService = this._audioRenderingServiceFactory.Create(this._tracksToGuidMapping, _asciiUriFixes);
             //this.PlayqueueItems.CollectionChanged += this.OnPlayqueueItemsChanged;
 
             BackgroundAudioPlayer.Instance.PlayStateChanged += new EventHandler(this.BackgroundPlayerPlayStateChanged);
@@ -308,17 +315,7 @@ namespace OpenSyno.Services
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        #region audioservice
-        public event EventHandler<MediaPositionChangedEventArgs> MediaPositionChanged;
-
-        public event EventHandler<MediaEndedEventArgs> MediaEnded;
-
-        public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
-
-        public event EventHandler<PlayBackStartedEventArgs> PlaybackStarted;
-
-        #endregion
+     
 
         //public ISynoTrack GetNextTrack(ISynoTrack currentTrack)
         //{
@@ -335,78 +332,23 @@ namespace OpenSyno.Services
 
         public void PausePlayback()
         {
-            BackgroundAudioPlayer.Instance.Pause();
+            _audioRenderingService.Pause();
         }
 
         public void ResumePlayback()
         {
-            BackgroundAudioPlayer.Instance.Play();
+            _audioRenderingService.Resume();
         }
-
-        #region audioservice
-
-        public void Pause()
-        {
-            BackgroundAudioPlayer.Instance.Pause();
-        }
-
-        public void Resume()
-        {
-            BackgroundAudioPlayer.Instance.Play();
-        }
-        #endregion
-
 
         public double GetVolume()
         {
-            return BackgroundAudioPlayer.Instance.Volume;
+            return _audioRenderingService.GetVolume();
         }
 
         public void SetVolume(double volume)
         {
-            if (BackgroundAudioPlayer.Instance.Volume != volume)
-            {
-                BackgroundAudioPlayer.Instance.Volume = volume;
-            }            
+            _audioRenderingService.SetVolume(volume);
         }
-        #region audiorendering service
-        public void StreamTrack(Guid guidOfTrackToPlay)
-        {
-            _logService.Trace("Starting track streaming for track guid " + guidOfTrackToPlay);
-            //// hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
-            //string url =
-            //    string.Format(
-            //        "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
-            //        _audioStationSession.Host,
-            //        _audioStationSession.Port,
-            //        _audioStationSession.Token.Split('=')[1],
-            //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
-            SynoTrack baseSynoTrack = _tracksToGuidMapping.Single(o=>o.Guid == guidOfTrackToPlay).Track;
-            AudioTrack audioTrack;
-            if (_asciiUriFixes.Any(fix => fix.Res == baseSynoTrack.Res))
-            {
-                _logService.Trace("Uri fix found for track " + guidOfTrackToPlay);
-                AsciiUriFix asciiUriFix = this._asciiUriFixes.Single(fix => fix.Res == baseSynoTrack.Res);
-                asciiUriFix.CallbackWhenFixIsApplicable( fix =>
-                    {
-                        audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, asciiUriFix.Url);
-                        BackgroundAudioPlayer.Instance.Track = audioTrack;
-                        BackgroundAudioPlayer.Instance.Play();
-                    });
-            }
-            else
-            {
-                _logService.Trace("No uri fix found for track " + guidOfTrackToPlay);
-                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
-                BackgroundAudioPlayer.Instance.Track = audioTrack;
-                BackgroundAudioPlayer.Instance.Play();
-            }
-
-        }
-
-
-
-        #endregion
 
 
         public void SkipNext()
@@ -753,14 +695,6 @@ namespace OpenSyno.Services
             }
         }
 
-        private void OnBufferingProgressUpdated(BufferingProgressUpdatedEventArgs bufferingProgressUpdatedEventArgs)
-        {
-            if (BufferingProgressUpdated != null)
-            {
-                BufferingProgressUpdated(this, bufferingProgressUpdatedEventArgs);
-            }
-        }
-
         private void OnMediaPositionChanged(object sender, MediaPositionChangedEventArgs e)
         {
             OnTrackCurrentPositionChanged(e);
@@ -780,5 +714,114 @@ namespace OpenSyno.Services
         public event TrackStartedDelegate TrackStarted;
         public event TrackCurrentPositionChangedDelegate TrackCurrentPositionChanged;
 
+    }
+
+    public interface IAudioRenderingServiceFactory
+    {
+        IAudioRenderingService Create(List<GuidToTrackMapping> tracksToGuidMapping, List<AsciiUriFix> asciiUriFixes);
+    }
+
+    public class AudioRenderingServiceFactory : IAudioRenderingServiceFactory
+    {
+        private ILogService logService;
+        private IAudioTrackFactory audioTrackFactory;
+        private IAudioStationSession audioStationSession;
+
+        public AudioRenderingServiceFactory(ILogService logService)
+        {
+            this.logService = logService;
+        }
+
+        public IAudioRenderingService Create(List<GuidToTrackMapping> tracksToGuidMapping, List<AsciiUriFix> asciiUriFixes)
+        {
+            return new AudioRenderingService(tracksToGuidMapping, asciiUriFixes, logService, audioStationSession, audioTrackFactory);
+        }
+    }
+
+    public class AudioRenderingService : IAudioRenderingService
+    {
+        private readonly List<GuidToTrackMapping> _tracksToGuidMapping;
+        private readonly List<AsciiUriFix> _asciiUriFixes;
+        private readonly ILogService _logService;
+        private IAudioTrackFactory _audioTrackFactory;
+        private IAudioStationSession _audioStationSession;
+
+        public AudioRenderingService(List<GuidToTrackMapping> tracksToGuidMapping, List<AsciiUriFix> asciiUriFixes, ILogService logService, IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory)
+        {
+            _tracksToGuidMapping = tracksToGuidMapping;
+            _asciiUriFixes = asciiUriFixes;
+            _logService = logService;
+            _audioStationSession = audioStationSession;
+            _audioTrackFactory = audioTrackFactory;
+        }
+
+        public event EventHandler<MediaPositionChangedEventArgs> MediaPositionChanged;
+        public event EventHandler<MediaEndedEventArgs> MediaEnded;
+        public event EventHandler<BufferingProgressUpdatedEventArgs> BufferingProgressUpdated;
+        public event EventHandler<PlayBackStartedEventArgs> PlaybackStarted;
+        #region audioservice
+
+        public void Pause()
+        {
+            BackgroundAudioPlayer.Instance.Pause();
+        }
+
+        public void Resume()
+        {
+            BackgroundAudioPlayer.Instance.Play();
+        }
+
+        public double GetVolume()
+        {
+            return BackgroundAudioPlayer.Instance.Volume;
+        }
+
+        public void SetVolume(double volume)
+        {
+            if (BackgroundAudioPlayer.Instance.Volume != volume)
+            {
+                BackgroundAudioPlayer.Instance.Volume = volume;
+            }
+        }
+
+        public void StreamTrack(Guid guidOfTrackToPlay)
+        {
+            _logService.Trace("Starting track streaming for track guid " + guidOfTrackToPlay);
+            //// hack : Synology's webserver doesn't accept the + character as a space : it needs a %20, and it needs to have special characters such as '&' to be encoded with %20 as well, so an HtmlEncode is not an option, since even if a space would be encoded properly, an ampersand (&) would be translated into &amp;
+            //string url =
+            //    string.Format(
+            //        "http://{0}:{1}/audio/webUI/audio_stream.cgi/0.mp3?sid={2}&action=streaming&songpath={3}",
+            //        _audioStationSession.Host,
+            //        _audioStationSession.Port,
+            //        _audioStationSession.Token.Split('=')[1],
+            //        HttpUtility.UrlEncode(trackToPlay.Res).Replace("+", "%20"));
+            SynoTrack baseSynoTrack = _tracksToGuidMapping.Single(o => o.Guid == guidOfTrackToPlay).Track;
+            AudioTrack audioTrack;
+            if (_asciiUriFixes.Any(fix => fix.Res == baseSynoTrack.Res))
+            {
+                _logService.Trace("Uri fix found for track " + guidOfTrackToPlay);
+                AsciiUriFix asciiUriFix = this._asciiUriFixes.Single(fix => fix.Res == baseSynoTrack.Res);
+                asciiUriFix.CallbackWhenFixIsApplicable(fix =>
+                {
+                    audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token, asciiUriFix.Url);
+                    BackgroundAudioPlayer.Instance.Track = audioTrack;
+                    this.Resume();
+                    //BackgroundAudioPlayer.Instance.Play();
+                });
+            }
+            else
+            {
+                _logService.Trace("No uri fix found for track " + guidOfTrackToPlay);
+                audioTrack = _audioTrackFactory.Create(baseSynoTrack, guidOfTrackToPlay, _audioStationSession.Host, _audioStationSession.Port, _audioStationSession.Token);
+                BackgroundAudioPlayer.Instance.Track = audioTrack;
+                this.Resume();
+                //BackgroundAudioPlayer.Instance.Play();
+            }
+
+        }
+
+
+
+        #endregion
     }
 }
