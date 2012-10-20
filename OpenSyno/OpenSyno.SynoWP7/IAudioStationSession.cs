@@ -21,7 +21,7 @@
         void SearchAllMusic(string pattern, Action<IEnumerable<SynoTrack>> callback, Action<Exception> callbackError);
         void SearchArtist(string pattern, Action<IEnumerable<SynoItem>> callback, Action<Exception> callbackError);
         void GetAlbumsForArtist(SynoItem artist, Action<IEnumerable<SynoItem>, long, SynoItem> callback, Action<Exception> callbackError);
-        void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError);
+        void GetTracksForAlbum(SynoItem album, SynoItem artist, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError);
 
         bool IsSignedIn { get; }
 

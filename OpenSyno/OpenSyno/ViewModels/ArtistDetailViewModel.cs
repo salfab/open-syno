@@ -100,7 +100,7 @@ namespace OpenSyno.ViewModels
                 // album is busy because its tracks are getting loaded.
                 albumViewModel.IsBusy = true;
 
-                _searchService.GetTracksForAlbum(album,(synoTracks,count, containingAlbum) =>
+                _searchService.GetTracksForAlbum(album, artist,(synoTracks,count, containingAlbum) =>
                     {
                         // Note - would it work, based on the synoitem instead of the ItemID ?
                         // Note - we rely on the fact that there each album is only present once in the artists discography ( based on its ItemID ) otherwise, it crashes !

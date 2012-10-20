@@ -140,7 +140,7 @@ namespace Synology.AudioStationApi
             HttpWebRequest request = BuildRequest(url);
 
             int limit = 100;
-            string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(artist.ItemID), limit);
+            string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword={0}&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(artist.ItemID), limit);
 
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 
@@ -592,7 +592,7 @@ namespace Synology.AudioStationApi
 
             // TODO : Find a way to retrieve the whole list by chunks of smaller size to have something to show earlier... or stream the JSON and parse it on the fly if it is possible
             int limit = 5000;
-            string postString = string.Format(@"sort=title&dir=ASC&action=browse&target=musiclib_music_aa&server=musiclib_music_aa&category=&keyword={0}&start=0&limit={1}", pattern, limit);
+            string postString = string.Format(@"sort=title&dir=ASC&action=browse&target=musiclib_music_aa&server=musiclib_music_aa&category=&keyword={0}&start=0&limit={1}&library=shared", pattern, limit);
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 
             request.BeginGetRequestStream(ar =>
@@ -740,7 +740,11 @@ namespace Synology.AudioStationApi
             request.Method = "POST";
 
             int limit = 10000;
-            string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(artist.ItemID), limit);
+            // string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(artist.ItemID), limit);
+
+            string postString = string.Format(@"sort=title&dir=ASC&action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&limit={1}&library=shared&category_name={2}&artistType=artist", HttpUtility.UrlEncode(artist.ItemID), limit, HttpUtility.UrlEncode(artist.Title));
+
+
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 
             request.BeginGetRequestStream(ar =>
@@ -797,7 +801,7 @@ namespace Synology.AudioStationApi
                 request);
         }
 
-        public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError)
+        public void GetTracksForAlbum(SynoItem album,SynoItem artist, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError)
         {
             string urlBase = string.Format("http://{0}:{1}", this.Host, this.Port);
 
@@ -818,7 +822,8 @@ namespace Synology.AudioStationApi
             request.Method = "POST";
 
             int limit = 10000;
-            string postString = string.Format(@"action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}", HttpUtility.UrlEncode(album.ItemID), limit);
+            // prior to 4.1  : "action=browse&target={0}&server=musiclib_music_aa&category=&keyword=&start=0&sort=title&dir=ASC&limit={1}"
+            string postString = string.Format(@"sort=album&dir=ASC&action=browse&target={0}&server=musiclib_root&category=&keyword=&start=0&limit={1}&library=shared&category_name={2}&artistType=artist&album_name={3}", HttpUtility.UrlEncode(album.ItemID), limit, artist.Title, album.Title);
             byte[] postBytes = System.Text.Encoding.UTF8.GetBytes(postString);
 
             request.BeginGetRequestStream(ar =>

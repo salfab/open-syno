@@ -89,7 +89,7 @@
             throw new NotImplementedException();
         }
 
-        public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError)
+        public void GetTracksForAlbum(SynoItem album, SynoItem artist, Action<IEnumerable<SynoTrack>, long, SynoItem> callback, Action<Exception> callbackError)
         {
             throw new NotImplementedException();
         }

@@ -175,7 +175,7 @@
             callback(results, 6, artist);
         }
 
-        public void GetTracksForAlbum(SynoItem album, Action<IEnumerable<SynoTrack>, long, SynoItem> callback)
+        public void GetTracksForAlbum(SynoItem album, SynoItem artist, Action<IEnumerable<SynoTrack>, long, SynoItem> callback)
         {
             List<SynoTrack> tracks = new List<SynoTrack>();
             tracks.Add(new SynoTrack { Album = "Alice", Artist = "Tom Waits", Title = "Alice" });

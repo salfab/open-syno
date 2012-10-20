@@ -48,9 +48,9 @@
             _audioStationSession.GetAlbumsForArtist(artist, callback, OnOperationReturnedWithError);
         }
 
-        public void GetTracksForAlbum(SynoItem album,  Action<IEnumerable<SynoTrack>, long, SynoItem> callback)
+        public void GetTracksForAlbum(SynoItem album, SynoItem artist, Action<IEnumerable<SynoTrack>, long, SynoItem> callback)
         {
-            _audioStationSession.GetTracksForAlbum(album, callback, OnOperationReturnedWithError);
+            _audioStationSession.GetTracksForAlbum(album, artist,callback, OnOperationReturnedWithError);
         }
 
         private void OnOperationReturnedWithError(Exception e)
