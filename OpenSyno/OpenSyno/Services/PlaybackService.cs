@@ -727,9 +727,11 @@ namespace OpenSyno.Services
         private IAudioTrackFactory audioTrackFactory;
         private IAudioStationSession audioStationSession;
 
-        public AudioRenderingServiceFactory(ILogService logService)
+        public AudioRenderingServiceFactory(ILogService logService, IAudioStationSession audioStationSession, IAudioTrackFactory audioTrackFactory)
         {
+            this.audioStationSession = audioStationSession;
             this.logService = logService;
+            this.audioTrackFactory = audioTrackFactory;
         }
 
         public IAudioRenderingService Create(List<GuidToTrackMapping> tracksToGuidMapping, List<AsciiUriFix> asciiUriFixes)
